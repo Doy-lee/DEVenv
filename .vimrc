@@ -1,0 +1,266 @@
+" // Startup ///////////////////////////////////////////////////////////////////
+" Windows/Linux differences
+
+let s:running_windows = has("win16") || has("win32") || has("win64")
+let g:myvimdir ="~/.vim"
+
+if s:running_windows
+  let g:myvimdir ="~/vimfiles"
+endif
+
+" Use Vim settings over Vi settings
+set nocompatible
+
+" Enables filetype detection, ftplugins, and indent files
+filetype plugin indent on
+
+" // Vim Plugin Manager ////////////////////////////////////////////////////////
+if s:running_windows
+	call plug#begin('~/vimfiles/plugged')
+else
+	call plug#begin('~/.vim/plugged')
+endif
+
+" {on} Means to lazy-load when that command is invoked
+Plug 'https://github.com/ervandew/supertab'
+Plug 'https://github.com/scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'https://github.com/tpope/vim-dispatch'
+Plug 'https://github.com/tpope/vim-fugitive'
+Plug 'https://github.com/bfrg/vim-cpp-modern'
+
+Plug 'https://github.com/junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'https://github.com/junegunn/fzf.vim'
+
+" Themes
+Plug 'https://github.com/whatyouhide/vim-gotham'
+Plug 'https://github.com/tomasr/molokai'
+Plug 'https://github.com/roosta/vim-srcery'
+Plug 'https://github.com/morhetz/gruvbox'
+
+call plug#end()
+
+" // General Settings //////////////////////////////////////////////////////////
+set autowrite     " Automatically save before commands like :next and :make
+set autoread      " Auto reload changed files
+set backspace=2   " Backspace like most programs in insert mode
+set hidden        " Allow more than one modified buffer to be left without saving
+set incsearch     " Do incremental searching
+set ignorecase    " Search isn't case sensitive
+set lazyredraw    " Redraw the screen less often
+set nowrap        " No softwrapping by default
+set splitright    " Open new v-splits to the right
+set showcmd       " Display incomplete commands
+set vb            " Turn on screen flash which is quieter than audio bell
+set wildmenu      " Allow vim command-line autocompletion
+set wildmode=full " Specifies option for wildmenu
+set expandtab     " Turn tabs into spaces
+
+set noswapfile    " Disable swapfile
+set cscopetag     " Search both cscopes db and tags file"
+
+" Ignore files in commandline autocomplete
+set wildignore+=*.class,*.o
+set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe,*.obj,*.vcxproj,*.pdb,*.idb
+
+" Undo Settings
+silent! set undofile                       " Save undo history to file
+set undolevels=1000                        " Maximum number of undos that can be done
+let &undodir=expand(g:myvimdir."/undodir") " Set location to save undo files
+
+" Create the undo history folder if it doesn't exist
+if !isdirectory(expand(&undodir))
+  call mkdir(expand(&undodir), "p")
+endif
+
+" // Appearance ////////////////////////////////////////////////////////////////
+" Fix C-syntax highlighting marking valid curly braces as invalid
+" let c_no_curly_error=1
+
+syntax on              " syntax highlighting
+set laststatus=2       " always show status bar
+set ruler              " show the cursor position all the time
+set guioptions=        " remove extra gui elements
+set cpoptions+=$       " $ as end marker for the change operator
+set showmatch          " automatically show matching brackets. works like it does in bbedit.
+set number             " Show line numbers
+set relativenumber     " Show relative line numbers
+set background=dark    " Some themes use this indicator to theme themselves
+set cursorline         " Highlight current line
+set colorcolumn=80,100 " Set a 80, 100 char column marker
+
+" Show EOL type and last modified timestamp, right after the filename
+set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(expand(\"%:p\")))})%=%l,%c%V\ %P
+
+" Resize splits when the window is resized
+au VimResized * :wincmd =
+
+set autoindent        " Always use autoindent
+set encoding=utf-8    " Consistent character encoding
+set foldnestmax=1     " Maximum number of nested folds
+" set foldlevel=99    " Initially all folds open
+set foldlevelstart=99 " Initially all folds open
+set foldmethod=indent " Allow folding of
+set linebreak         " When wrapping lines, don't break words
+set list              " Show 'listchar' characters
+set shiftwidth=2      " Number of space chars for indentation
+set smartindent
+set smarttab          " Make 'tab' insert indents at the beginning of a line
+set tabstop=2         " Number of space chars for pressing tab
+set textwidth=80      " Always format to 80 chars
+set fileformats=unix,dos
+
+set listchars=tab:>-
+
+let g:gruvbox_contrast_dark='hard'
+let g:gruvbox_italic=0
+let g:gruvbox_bold=0
+colorscheme gruvbox
+
+if has("gui_running")
+    set guifont=InputMonoCondensed:h10
+
+	" NOTE(doyle): Some list chars in gui don't show correctly in terminal so separate logic
+	" old listchars=tab:>-,eol:¬,trail:■,extends:»,precedes:«
+	set listchars+=trail:■,extends:»,precedes:«
+
+	if s:running_windows
+		" Go full screen, cmd only compatible with windows
+		" au GUIEnter * simalt ~x
+	endif
+
+	" Don't show trailing spaces in insert mode
+	augroup trailing
+	  au!
+	  au InsertEnter * :set listchars-=trail:■
+	  au InsertLeave * :set listchars+=trail:■
+	augroup END
+else
+	set term=xterm
+	set t_Co=256            " 256 colors
+	let &t_AB="\e[48;5;%dm" " vodoo magic for CONEMU
+	let &t_AF="\e[38;5;%dm" " vodoo magic for CONEMU
+
+	set listchars+=trail:$,extends:>,precedes:<
+
+	" Fix Cmder backspace bug
+	inoremap <Char-0x07F> <BS>
+	nnoremap <Char-0x07F> <BS>
+endif
+
+augroup persistent_settings
+  au!
+  " Formatting options (see :h fo-table)
+  au BufEnter * :set formatoptions=q1j
+augroup END
+
+" Key Mappings & Functions ///////////////////////////////////////////////////////
+" Enable mouse support
+if has('mouse')
+    set mouse=a
+endif
+
+" Map Ctrl+HJKL to navigate buffer window
+nmap <silent> <C-h> :wincmd h<CR>
+nmap <silent> <C-j> :wincmd j<CR>
+nmap <silent> <C-k> :wincmd k<CR>
+nmap <silent> <C-l> :wincmd l<CR>
+
+" Move by wrapped lines instead of line numbers
+nnoremap j gj
+nnoremap k gk
+nnoremap gj j
+nnoremap gk k
+
+" Map NERDTree to Ctrl-N
+map <C-n> :NERDTreeToggle<CR>
+
+" Change to current buffer's directory
+nmap cd :cd <C-R>=expand("%:p:h")<CR><CR>
+
+" Show list of buffers using leader key (default \)b
+nnoremap <leader>b :Buffers<CR>
+nnoremap <leader>s :vs<CR>
+nnoremap <leader>f :Files<CR>
+nnoremap <leader>t :Tags<CR>
+nnoremap <leader>l :Lines<CR>
+nnoremap <leader>a :Ag<CR>
+
+" Execute clang format on tab
+if s:running_windows
+	map <C-I> :pyf $home/clang-format.py<CR>
+	imap <C-I> <ESC>:pyf $home/clang-format.py<CR>i
+else
+	map <C-I> :py3f ~/Loki/Tools/dqndev/unix/clang-format.py<CR>
+	imap <C-I> <ESC>:py3f ~/Loki/Tools/dqndev/unix/clang-format.py<CR>i
+endif
+
+" Increase font size using (Ctrl+Up Arrow) or (Ctrl+Down Arrow) if we are using
+" gvim Otherwise font size is determined in terminal
+if has ('gui_running')
+	nnoremap <C-Up> :silent! let &guifont = substitute(
+	 \ &guifont,
+	 \ ':h\zs\d\+',
+	 \ '\=eval(submatch(0)+1)',
+	 \ 'g')<CR>
+	nnoremap <C-Down> :silent! let &guifont = substitute(
+	 \ &guifont,
+	 \ ':h\zs\d\+',
+	 \ '\=eval(submatch(0)-1)',
+	 \ 'g')<CR>
+endif
+
+" Reload vimrc when it's edited
+augroup myvimrc
+	au!
+	au BufWritePost $MYVIMRC so $MYVIMRC
+augroup end
+
+" Return to the same line when a file is reopened
+augroup line_return
+  au!
+  au BufReadPost *
+        \ if line("'\"") > 0 && line("'\"") <= line("$") |
+        \     execute 'normal! g`"zvzz' |
+        \ endif
+augroup end
+
+" Error message formats thanks to
+" https://forums.handmadehero.org/index.php/forum?view=topic&catid=4&id=704#3982
+set errorformat+=\\\ %#%f(%l\\\,%c):\ %m                       " MSVC: MSBuild
+set errorformat+=\\\ %#%f(%l)\ :\ %#%t%[A-z]%#\ %m             " MSVC: cl.exe
+set errorformat+=\\\ %#%t%nxx:\ %m                             " MSVC: cl.exe, fatal errors is crudely implemented
+set errorformat+=\\\ %#LINK\ :\ %m                             " MSVC: link.exe, can't find link library badly implemented
+set errorformat+=\\\ %#%s\ :\ error\ %m                        " MSVC: link.exe, errors is badly implemented
+set errorformat+=\\\ %#%s\ :\ fatal\ error\ %m                 " MSVC: link.exe, fatal errors is badly implemented
+set errorformat+=\\\ %#%f(%l\\\,%c-%*[0-9]):\ %#%t%[A-z]%#\ %m " MSVC: HLSL fxc.exe
+set errorformat+=%\\%%(CTIME%\\)%\\@=%m                        " ctime.exe -stats
+
+if s:running_windows
+    set makeprg=build
+    nnoremap <A-r> :!start cmd /c run<CR>
+    nnoremap <A-b> :Make<CR>
+else
+    execute "set <A-b>=\eb"
+    execute "set <A-n>=\en"
+    execute "set <A-p>=\ep"
+    set makeprg=./build.sh
+    nnoremap <f5> :Make<cr>
+endif
+
+"Go to next error
+"Go to previous error
+nnoremap <A-n> :cn<CR>
+nnoremap <A-p> :cp<CR>
+
+
+" Push Quickfix (qf) window to the bottom of the screen.
+autocmd FileType qf wincmd J
+
+" Resize Quickfix (qf) to a maximum of 10 lines depending on the actual contents
+au FileType qf call AdjustWindowHeight(3, 10)
+function! AdjustWindowHeight(minheight, maxheight)
+  exe max([min([line("$"), a:maxheight]), a:minheight]) . "wincmd _"
+endfunction
+
+" Fzf
+let g:fzf_tags_command = 'ctags -R --c++-kinds=+p --fields=+iaS'
