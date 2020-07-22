@@ -62,8 +62,14 @@ REM
 REM Clang Format
 REM
 set clang_format_url=https://raw.githubusercontent.com/llvm-mirror/clang/master/tools/clang-format/clang-format.py
-set clang_format_path=%vim_root%\vimfiles
+set clang_format_path=%vim_root%\.vim
 set clang_format_file=%clang_format_path%\clang-format.py
 echo - Downloading from %clang_format_url% to %clang_format_path%
 if not exist "%clang_format_path%" mkdir "%clang_format_path%"
 if not exist "%clang_format_file%" powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest %clang_format_url% -OutFile %clang_format_file%"
+
+REM
+REM Ag
+REM
+echo - Copy Installer\win32_ag.exe to %cmder_install_path%\bin\ag.exe
+copy /Y Installer\win32_ag.exe %cmder_install_path%\bin\ag.exe

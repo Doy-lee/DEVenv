@@ -23,7 +23,6 @@ Plug 'https://github.com/junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --al
 Plug 'https://github.com/junegunn/fzf.vim'
 
 " Themes
-Plug 'https://github.com/whatyouhide/vim-gotham'
 Plug 'https://github.com/tomasr/molokai'
 Plug 'https://github.com/roosta/vim-srcery'
 Plug 'https://github.com/morhetz/gruvbox'
@@ -177,8 +176,8 @@ nnoremap <leader>a :Ag<CR>
 
 " Execute clang format on tab
 if s:running_windows
-	map <C-I> :pyf $home/clang-format.py<CR>
-	imap <C-I> <ESC>:pyf $home/clang-format.py<CR>i
+	map <C-I> :pyf $home\.vim\clang-format.py<CR>
+	imap <C-I> <ESC>:pyf $home\.vim\clang-format.py<CR>i
 else
 	map <C-I> :py3f ~/.vim/clang-format.py<CR>
 	imap <C-I> <ESC>:py3f ~/.vim/clang-format.py<CR>i
