@@ -178,8 +178,8 @@ if s:running_windows
 	map <C-I> :pyf $home/clang-format.py<CR>
 	imap <C-I> <ESC>:pyf $home/clang-format.py<CR>i
 else
-	map <C-I> :py3f ~/Loki/Tools/dqndev/unix/clang-format.py<CR>
-	imap <C-I> <ESC>:py3f ~/Loki/Tools/dqndev/unix/clang-format.py<CR>i
+	map <C-I> :py3f ~/.vim/clang-format.py<CR>
+	imap <C-I> <ESC>:py3f ~/.vim/clang-format.py<CR>i
 endif
 
 " Increase font size using (Ctrl+Up Arrow) or (Ctrl+Down Arrow) if we are using
