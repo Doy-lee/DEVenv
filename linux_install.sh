@@ -1,9 +1,7 @@
-wget --directory-prefix=../.vim/autoload https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-cp -f .vimrc ~/.vimrc
+if [[ ! -f "${HOME}/.vim/autoload/plug.vim" ]]; then
+  wget --directory-prefix=../.vim/autoload https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+fi
 
-<<<<<<< HEAD:linux_setup.sh
-sudo apt install tmux
-=======
 if [[ ! -f "${HOME}/.vim/clang-format.py" ]]; then
   wget --directory-prefix=${HOME}/.vim https://raw.githubusercontent.com/llvm-mirror/clang/master/tools/clang-format/clang-format.py
 fi
@@ -11,7 +9,6 @@ fi
 cp -f Installer/_vimrc ~/.vimrc
 
 sudo apt install silversearcher-ag tmux exuberant-ctags neovim clang-format
->>>>>>> d28479c... Update development environment:linux_install.sh
 
 cat > ~/.tmux.conf <<EOF
 set-option -g mouse on

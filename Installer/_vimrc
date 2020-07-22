@@ -1,31 +1,13 @@
 " // Startup ///////////////////////////////////////////////////////////////////
 " Windows/Linux differences
-
 let s:running_windows = has("win16") || has("win32") || has("win64")
-let g:myvimdir ="~/.vim"
 
 if s:running_windows
   let g:myvimdir ="~/vimfiles"
-<<<<<<< HEAD:.vimrc
-endif
-
-" Use Vim settings over Vi settings
-set nocompatible
-
-" Enables filetype detection, ftplugins, and indent files
-filetype plugin indent on
-
-" // Vim Plugin Manager ////////////////////////////////////////////////////////
-if s:running_windows
-	call plug#begin('~/vimfiles/plugged')
-else
-	call plug#begin('~/.vim/plugged')
-=======
   silent! call plug#begin('~/vimfiles/plugged')
 else
   let g:myvimdir ="~/.vim"
   silent! call plug#begin('~/.vim/plugged')
->>>>>>> d28479c... Update development environment:Installer/_vimrc
 endif
 
 " {on} Means to lazy-load when that command is invoked
@@ -142,7 +124,6 @@ if has("gui_running")
 	  au InsertLeave * :set listchars+=trail:■
 	augroup END
 else
-	set term=xterm
 	set t_Co=256            " 256 colors
 	let &t_AB="\e[48;5;%dm" " vodoo magic for CONEMU
 	let &t_AF="\e[38;5;%dm" " vodoo magic for CONEMU
@@ -247,9 +228,9 @@ if s:running_windows
     nnoremap <A-r> :!start cmd /c run<CR>
     nnoremap <A-b> :Make<CR>
 else
-    execute "set <A-b>=\eb"
-    execute "set <A-n>=\en"
-    execute "set <A-p>=\ep"
+    " Set vim terminal to enter normal mode using escape like normal vim behaviour
+    tnoremap <Esc> <C-\><C-n>
+
     set makeprg=./build.sh
     nnoremap <f5> :Make<cr>
 endif
