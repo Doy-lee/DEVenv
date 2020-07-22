@@ -2,6 +2,8 @@
 " Windows/Linux differences
 let s:running_windows = has("win16") || has("win32") || has("win64")
 
+set nocompatible
+
 if s:running_windows
   let g:myvimdir ="~/vimfiles"
   silent! call plug#begin('~/vimfiles/plugged')
@@ -106,15 +108,15 @@ let g:gruvbox_bold=0
 colorscheme gruvbox
 
 if has("gui_running")
-    set guifont=InputMonoCondensed:h10
 
 	" NOTE(doyle): Some list chars in gui don't show correctly in terminal so separate logic
 	" old listchars=tab:>-,eol:¬,trail:■,extends:»,precedes:«
 	set listchars+=trail:■,extends:»,precedes:«
 
 	if s:running_windows
-		" Go full screen, cmd only compatible with windows
-		" au GUIEnter * simalt ~x
+    set guifont=Consolas:h11
+  else
+    set guifont=InputMonoCondensed:h10
 	endif
 
 	" Don't show trailing spaces in insert mode
