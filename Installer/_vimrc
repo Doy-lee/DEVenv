@@ -228,17 +228,15 @@ set errorformat+=%\\%%(CTIME%\\)%\\@=%m                        " ctime.exe -stat
 if s:running_windows
     set makeprg=build
     nnoremap <A-r> :!start cmd /c run<CR>
-    nnoremap <A-b> :Make<CR>
 else
     " Set vim terminal to enter normal mode using escape like normal vim behaviour
     tnoremap <Esc> <C-\><C-n>
-
     set makeprg=./build.sh
-    nnoremap <f5> :Make<cr>
 endif
 
 "Go to next error
 "Go to previous error
+nnoremap <f5> :Make<cr>
 nnoremap <A-n> :cn<CR>
 nnoremap <A-p> :cp<CR>
 
