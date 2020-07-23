@@ -68,6 +68,9 @@ echo - Downloading from %clang_format_url% to %clang_format_path%
 if not exist "%clang_format_path%" mkdir "%clang_format_path%"
 if not exist "%clang_format_file%" powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest %clang_format_url% -OutFile %clang_format_file%"
 
+echo - Copy Installer\win32_clang_format.exe to %cmder_install_path%\bin\clang-format.exe
+copy /Y Installer\win32_clang_format.exe %cmder_install_path%\bin\clang-format.exe
+
 REM
 REM Ag
 REM
