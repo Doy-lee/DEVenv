@@ -92,10 +92,10 @@ set foldlevelstart=99 " Initially all folds open
 set foldmethod=indent " Allow folding of
 set linebreak         " When wrapping lines, don't break words
 set list              " Show 'listchar' characters
-set shiftwidth=2      " Number of space chars for indentation
+set shiftwidth=4      " Number of space chars for indentation
 set smartindent
 set smarttab          " Make 'tab' insert indents at the beginning of a line
-set tabstop=2         " Number of space chars for pressing tab
+set tabstop=4         " Number of space chars for pressing tab
 set textwidth=80      " Always format to 80 chars
 set fileformats=unix,dos
 
