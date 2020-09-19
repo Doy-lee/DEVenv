@@ -72,6 +72,14 @@ echo - Copy Installer\win32_clang_format.exe to %cmder_install_path%\bin\clang-f
 copy /Y Installer\win32_clang_format.exe %cmder_install_path%\bin\clang-format.exe
 
 REM
+REM ctags
+REM
+set ctags_path=%cmder_install_path%\bin\ctags.exe
+set ctags_file=Installer\win32_ctags.exe
+echo - Copy %ctags_file% to %ctags_path%
+copy /Y %ctags_file% %ctags_path%
+
+REM
 REM Ag
 REM
 echo - Copy Installer\win32_ag.exe to %cmder_install_path%\bin\ag.exe
