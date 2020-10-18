@@ -48,7 +48,7 @@ REM
 REM GVim Fullscreen DLL
 REM
 set gvim_fullscreen_dll=Installer\win32_gvim_fullscreen.dll
-set gvim_fullscreen_dll_install_path=GVim\App\vim\vim80\gvimfullscreen.dll
+set gvim_fullscreen_dll_install_path=GVim\App\vim\vim80\gvim_fullscreen.dll
 echo - Copy %gvim_fullscreen_dll% to %gvim_fullscreen_dll_install_path%
 copy /Y %gvim_fullscreen_dll% %gvim_fullscreen_dll_install_path%
 
