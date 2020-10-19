@@ -7,6 +7,7 @@ if [[ ! -f "${HOME}/.vim/clang-format.py" ]]; then
 fi
 
 cp -f Installer/_vimrc ~/.vimrc
+cp -f Installer/unix_nvim_init.vim ~/.config/nvim/init.vim
 
 sudo apt install silversearcher-ag tmux exuberant-ctags neovim clang-format
 
