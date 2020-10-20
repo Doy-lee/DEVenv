@@ -256,4 +256,4 @@ let g:fzf_tags_command = 'ctags -R --c++-kinds=+p --fields=+iaS'
 noremap <f11> <esc>:call libcallnr('gvim_fullscreen.dll', 'ToggleFullscreen', 0)<cr>
 
 " Asyncrun open quickfix window up to 10 lines
-let g:asycnrun_open = 10
+let g:asyncrun_open = 10
