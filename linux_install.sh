@@ -35,3 +35,7 @@ bind -n M-Right resize-pane -R 10
 bind -n M-Up resize-pane -U 10
 bind -n M-Down resize-pane -D 10
 EOF
+
+mkdir -p Bin
+rm -rf Bin/ctags_cpp.sh
+echo ctags --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ $@ >> Bin/ctags_cpp.sh
