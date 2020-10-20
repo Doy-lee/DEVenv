@@ -72,12 +72,23 @@ echo - Copy Installer\win32_clang_format.exe to %cmder_install_path%\bin\clang-f
 copy /Y Installer\win32_clang_format.exe %cmder_install_path%\bin\clang-format.exe
 
 REM
-REM ctags
+REM ctags, scanmapset (bind capslock to escape via registry), uncap (bind capslock to escape whilst program running shim)
 REM
 set ctags_path=%cmder_install_path%\bin\ctags.exe
+set scanmapset_path=%cmder_install_path%\bin\scanmapset.exe
+set uncap_path=%cmder_install_path%\bin\uncap.exe
+
 set ctags_file=Installer\win32_ctags.exe
+set scanmapset_file=Installer\win32_scanmapset.exe
+set uncap_file=Installer\win32_uncap.exe
+
 echo - Copy %ctags_file% to %ctags_path%
+echo - Copy %scanmapset_file% to %scanmapset_path%
+echo - Copy %uncap_file% to %uncap_path%
+
 copy /Y %ctags_file% %ctags_path%
+copy /Y %scanmapset_file% %scanmapset_path%
+copy /Y %uncap_file% %uncap_path%
 
 REM
 REM Ag
