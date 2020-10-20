@@ -18,7 +18,7 @@ Plug 'https://github.com/scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'https://github.com/tpope/vim-fugitive'
 Plug 'https://github.com/bfrg/vim-cpp-modern'
 
-Plug 'skywind3000/asyncrun'
+Plug 'skywind3000/asyncrun.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
@@ -254,3 +254,6 @@ let g:fzf_tags_command = 'ctags -R --c++-kinds=+p --fields=+iaS'
 
 " Fullscreen
 noremap <f11> <esc>:call libcallnr('gvim_fullscreen.dll', 'ToggleFullscreen', 0)<cr>
+
+" Asyncrun open quickfix window up to 10 lines
+let g:asycnrun_open = 10
