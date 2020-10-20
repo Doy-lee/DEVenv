@@ -1,9 +1,7 @@
-" // Startup ///////////////////////////////////////////////////////////////////
-" Windows/Linux differences
+" ==============================================================================
+" Plugins
+" ==============================================================================
 let s:running_windows = has("win16") || has("win32") || has("win64")
-
-set nocompatible
-
 if s:running_windows
   let g:myvimdir ="~/vimfiles"
   silent! call plug#begin('~/vimfiles/plugged')
@@ -12,15 +10,12 @@ else
   silent! call plug#begin('~/.vim/plugged')
 endif
 
-" {on} Means to lazy-load when that command is invoked
 Plug 'https://github.com/ervandew/supertab'
 Plug 'https://github.com/scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'https://github.com/tpope/vim-fugitive'
 Plug 'https://github.com/bfrg/vim-cpp-modern'
-
-Plug 'skywind3000/asyncrun.vim'
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
+Plug 'https://github.com/skywind3000/asyncrun.vim'
+Plug 'https://github.com/Yggdroot/LeaderF'
 
 " Themes
 Plug 'https://github.com/tomasr/molokai'
@@ -29,7 +24,10 @@ Plug 'https://github.com/morhetz/gruvbox'
 
 call plug#end()
 
-" // General Settings //////////////////////////////////////////////////////////
+" ==============================================================================
+" Settings
+" ==============================================================================
+set nocompatible
 set autowrite     " Automatically save before commands like :next and :make
 set autoread      " Auto reload changed files
 set backspace=2   " Backspace like most programs in insert mode
@@ -44,7 +42,6 @@ set vb            " Turn on screen flash which is quieter than audio bell
 set wildmenu      " Allow vim command-line autocompletion
 set wildmode=full " Specifies option for wildmenu
 set expandtab     " Turn tabs into spaces
-
 set noswapfile    " Disable swapfile
 set cscopetag     " Search both cscopes db and tags file"
 
@@ -62,21 +59,34 @@ if !isdirectory(expand(&undodir))
   call mkdir(expand(&undodir), "p")
 endif
 
-" // Appearance ////////////////////////////////////////////////////////////////
-" Fix C-syntax highlighting marking valid curly braces as invalid
-" let c_no_curly_error=1
-
-syntax on              " syntax highlighting
-set laststatus=2       " always show status bar
-set ruler              " show the cursor position all the time
-set guioptions=        " remove extra gui elements
-set cpoptions+=$       " $ as end marker for the change operator
-set showmatch          " automatically show matching brackets. works like it does in bbedit.
-set number             " Show line numbers
-set relativenumber     " Show relative line numbers
-set background=dark    " Some themes use this indicator to theme themselves
-set cursorline         " Highlight current line
-set colorcolumn=80,100 " Set a 80, 100 char column marker
+" ==============================================================================
+" Appearance
+" ==============================================================================
+syntax on                " syntax highlighting
+set autoindent           " Always use autoindent
+set background=dark      " Some themes use this indicator to theme themselves
+set colorcolumn=80,100   " Set a 80, 100 char column marker
+set cpoptions+=$         " $ as end marker for the change operator
+set cursorline           " Highlight current line
+set encoding=utf-8       " Consistent character encoding
+set fileformats=unix,dos
+set foldlevelstart=99    " Initially all folds open
+set foldmethod=indent    " Allow folding of
+set foldnestmax=1        " Maximum number of nested folds
+set guioptions=          " remove extra gui elements
+set laststatus=2         " always show status bar
+set linebreak            " When wrapping lines, don't break words
+set list                 " Show 'listchar' characters
+set number               " Show line numbers
+set relativenumber       " Show relative line numbers
+set ruler                " show the cursor position all the time
+set shiftwidth=4         " Number of space chars for indentation
+set showmatch            " automatically show matching brackets. works like it does in bbedit.
+set smartindent
+set smarttab             " Make 'tab' insert indents at the beginning of a line
+set tabstop=4            " Number of space chars for pressing tab
+set textwidth=80         " Always format to 80 chars
+set listchars=tab:>-
 
 " Show EOL type and last modified timestamp, right after the filename
 set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(expand(\"%:p\")))})%=%l,%c%V\ %P
@@ -84,65 +94,65 @@ set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(ex
 " Resize splits when the window is resized
 au VimResized * :wincmd =
 
-set autoindent        " Always use autoindent
-set encoding=utf-8    " Consistent character encoding
-set foldnestmax=1     " Maximum number of nested folds
-" set foldlevel=99    " Initially all folds open
-set foldlevelstart=99 " Initially all folds open
-set foldmethod=indent " Allow folding of
-set linebreak         " When wrapping lines, don't break words
-set list              " Show 'listchar' characters
-set shiftwidth=4      " Number of space chars for indentation
-set smartindent
-set smarttab          " Make 'tab' insert indents at the beginning of a line
-set tabstop=4         " Number of space chars for pressing tab
-set textwidth=80      " Always format to 80 chars
-set fileformats=unix,dos
-
-set listchars=tab:>-
-
+" ==============================================================================
+" Theme
+" ==============================================================================
 let g:gruvbox_contrast_dark='hard'
 let g:gruvbox_italic=0
 let g:gruvbox_bold=0
 colorscheme gruvbox
 
 if has("gui_running")
+    " NOTE(doyle): Some list chars in gui don't show correctly in terminal so separate logic
+    " old listchars=tab:>-,eol:¬,trail:■,extends:»,precedes:«
+    set listchars+=trail:■,extends:»,precedes:«
+    if s:running_windows
+        set guifont=Consolas:h11
+    else
+        set guifont=InputMonoCondensed:h10
+    endif
 
-	" NOTE(doyle): Some list chars in gui don't show correctly in terminal so separate logic
-	" old listchars=tab:>-,eol:¬,trail:■,extends:»,precedes:«
-	set listchars+=trail:■,extends:»,precedes:«
+    " Don't show trailing spaces in insert mode
+    augroup trailing
+      au!
+      au InsertEnter * :set listchars-=trail:■
+      au InsertLeave * :set listchars+=trail:■
+    augroup END
 
-	if s:running_windows
-    set guifont=Consolas:h11
-  else
-    set guifont=InputMonoCondensed:h10
-	endif
+    " Increase font size using (Ctrl+Up Arrow) or (Ctrl+Down Arrow) if we are using
+    " gvim Otherwise font size is determined in terminal
+    nnoremap <C-Up> :silent! let &guifont = substitute(
+     \ &guifont,
+     \ ':h\zs\d\+',
+     \ '\=eval(submatch(0)+1)',
+     \ 'g')<CR>
+    nnoremap <C-Down> :silent! let &guifont = substitute(
+     \ &guifont,
+     \ ':h\zs\d\+',
+     \ '\=eval(submatch(0)-1)',
+     \ 'g')<CR>
 
-	" Don't show trailing spaces in insert mode
-	augroup trailing
-	  au!
-	  au InsertEnter * :set listchars-=trail:■
-	  au InsertLeave * :set listchars+=trail:■
-	augroup END
 else
-	set t_Co=256            " 256 colors
-	let &t_AB="\e[48;5;%dm" " vodoo magic for CONEMU
-	let &t_AF="\e[38;5;%dm" " vodoo magic for CONEMU
+    set t_Co=256            " 256 colors
+    let &t_AB="\e[48;5;%dm" " vodoo magic for CONEMU
+    let &t_AF="\e[38;5;%dm" " vodoo magic for CONEMU
 
-	set listchars+=trail:$,extends:>,precedes:<
+    set listchars+=trail:$,extends:>,precedes:<
 
-	" Fix Cmder backspace bug
-	inoremap <Char-0x07F> <BS>
-	nnoremap <Char-0x07F> <BS>
+    " Fix Cmder backspace bug
+    inoremap <Char-0x07F> <BS>
+    nnoremap <Char-0x07F> <BS>
 endif
 
+" Formatting options (see :h fo-table)
 augroup persistent_settings
   au!
-  " Formatting options (see :h fo-table)
   au BufEnter * :set formatoptions=q1j
 augroup END
 
-" Key Mappings & Functions ///////////////////////////////////////////////////////
+" ==============================================================================
+" Key Bindings
+" ==============================================================================
 " Enable mouse support
 if has('mouse')
     set mouse=a
@@ -166,52 +176,53 @@ map <C-n> :NERDTreeToggle<CR>
 " Change to current buffer's directory
 nmap cd :cd <C-R>=expand("%:p:h")<CR><CR>
 
-" Show list of buffers using leader key (default \)b
-nnoremap <leader>b :Buffers<CR>
+" Buffer Splitting
 nnoremap <leader>s :vs<CR>
-nnoremap <leader>f :Files<CR>
-nnoremap <leader>t :Tags<CR>
-nnoremap <leader>l :Lines<CR>
-nnoremap <leader>a :Ag<CR>
 
-" Execute clang format on tab
+" Go to next error
+" Go to previous error
+nnoremap <A-n> :cn<CR>
+nnoremap <A-p> :cp<CR>
+
+" Fullscreen
 if s:running_windows
-	map <C-I> :pyf $home\.vim\clang-format.py<CR>
-	imap <C-I> <ESC>:pyf $home\.vim\clang-format.py<CR>i
+    noremap <f11> <esc>:call libcallnr('gvim_fullscreen.dll', 'ToggleFullscreen', 0)<cr>
+endif
+
+" ==============================================================================
+" Leaderf
+" ==============================================================================
+" Config
+let g:Lf_MruFileExclude = ['*.so', '*.tmp', '*.bak', '*.exe', '*.dll']
+
+" Bindings
+nnoremap <leader>b :<C-U><C-R>=printf("Leaderf buffer %s", "")<CR><CR>
+nnoremap <leader>f :<C-U><C-R>=printf("Leaderf file %s", "")<CR><CR>
+nnoremap <leader>l :<C-U><C-R>=printf("Leaderf line %s", "")<CR><CR>
+nnoremap <leader>m :<C-U><C-R>=printf("Leaderf mru %s", "")<CR><CR>
+nnoremap <leader>p :<C-U><C-R>=printf("Leaderf function %s", "")<CR><CR>
+nnoremap <leader>t :<C-U><C-R>=printf("Leaderf tag %s", "")<CR><CR>
+nnoremap <leader>h :<C-U><C-R>=printf("Leaderf self %s", "")<CR><CR>
+
+noremap <C-P> :<C-U><C-R>=printf("Leaderf bufTag %s", "")<CR><CR>
+noremap <C-F> :<C-U><C-R>=printf("Leaderf! rg -e %s ", expand("<cword>"))<CR>
+
+" ==============================================================================
+" Clang Format
+" ==============================================================================
+if s:running_windows
+    map <C-I> :pyf $home\.vim\clang-format.py<CR>
+    imap <C-I> <ESC>:pyf $home\.vim\clang-format.py<CR>i
 else
-	map <C-I> :py3f ~/.vim/clang-format.py<CR>
-	imap <C-I> <ESC>:py3f ~/.vim/clang-format.py<CR>i
+    map <C-I> :py3f ~/.vim/clang-format.py<CR>
+    imap <C-I> <ESC>:py3f ~/.vim/clang-format.py<CR>i
 endif
 
-" Increase font size using (Ctrl+Up Arrow) or (Ctrl+Down Arrow) if we are using
-" gvim Otherwise font size is determined in terminal
-if has ('gui_running')
-	nnoremap <C-Up> :silent! let &guifont = substitute(
-	 \ &guifont,
-	 \ ':h\zs\d\+',
-	 \ '\=eval(submatch(0)+1)',
-	 \ 'g')<CR>
-	nnoremap <C-Down> :silent! let &guifont = substitute(
-	 \ &guifont,
-	 \ ':h\zs\d\+',
-	 \ '\=eval(submatch(0)-1)',
-	 \ 'g')<CR>
-endif
-
-" Reload vimrc when it's edited
-augroup myvimrc
-	au!
-	au BufWritePost $MYVIMRC so $MYVIMRC
-augroup end
-
-" Return to the same line when a file is reopened
-augroup line_return
-  au!
-  au BufReadPost *
-        \ if line("'\"") > 0 && line("'\"") <= line("$") |
-        \     execute 'normal! g`"zvzz' |
-        \ endif
-augroup end
+" ==============================================================================
+" Compiling / AsyncRun
+" ==============================================================================
+" Asyncrun open quickfix window up to 10 lines
+let g:asyncrun_open = 10
 
 " Error message formats thanks to
 " https://forums.handmadehero.org/index.php/forum?view=topic&catid=4&id=704#3982
@@ -234,26 +245,20 @@ else
     set makeprg=./build.sh
 endif
 
-"Go to next error
-"Go to previous error
-nnoremap <A-n> :cn<CR>
-nnoremap <A-p> :cp<CR>
+" ==============================================================================
+" Other
+" ==============================================================================
+" Reload vimrc when it's edited
+augroup myvimrc
+    au!
+    au BufWritePost $MYVIMRC so $MYVIMRC
+augroup end
 
-
-" Push Quickfix (qf) window to the bottom of the screen.
-autocmd FileType qf wincmd J
-
-" Resize Quickfix (qf) to a maximum of 10 lines depending on the actual contents
-au FileType qf call AdjustWindowHeight(3, 10)
-function! AdjustWindowHeight(minheight, maxheight)
-  exe max([min([line("$"), a:maxheight]), a:minheight]) . "wincmd _"
-endfunction
-
-" Fzf
-let g:fzf_tags_command = 'ctags -R --c++-kinds=+p --fields=+iaS'
-
-" Fullscreen
-noremap <f11> <esc>:call libcallnr('gvim_fullscreen.dll', 'ToggleFullscreen', 0)<cr>
-
-" Asyncrun open quickfix window up to 10 lines
-let g:asyncrun_open = 10
+" Return to the same line when a file is reopened
+augroup line_return
+  au!
+  au BufReadPost *
+        \ if line("'\"") > 0 && line("'\"") <= line("$") |
+        \     execute 'normal! g`"zvzz' |
+        \ endif
+augroup end

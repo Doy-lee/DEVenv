@@ -9,7 +9,7 @@ fi
 cp -f Installer/_vimrc ~/.vimrc
 cp -f Installer/unix_nvim_init.vim ~/.config/nvim/init.vim
 
-sudo apt install silversearcher-ag tmux exuberant-ctags neovim clang-format
+sudo apt install exuberant-ctags neovim clang-format ripgrep
 
 cat > ~/.tmux.conf <<EOF
 set-option -g mouse on

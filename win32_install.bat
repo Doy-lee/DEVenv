@@ -91,7 +91,9 @@ copy /Y %scanmapset_file% %scanmapset_path%
 copy /Y %uncap_file% %uncap_path%
 
 REM
-REM Ag
+REM ripgrep
 REM
-echo - Copy Installer\win32_ag.exe to %cmder_install_path%\bin\ag.exe
-copy /Y Installer\win32_ag.exe %cmder_install_path%\bin\ag.exe
+set rg_path=%cmder_install_path%\bin
+set rg_zip=Installer\win32_rg_v12.1.1.7z
+echo - Extracting %rg_zip% to %rg_path%
+if not exist "%rg_path%\rg.exe" Installer\win32_7za.exe x -y -o%rg_path% %rg_zip% > NUL
