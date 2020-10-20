@@ -1,4 +1,6 @@
 @echo off
+setlocal
+
 REM
 REM Cmder
 REM
@@ -18,10 +20,13 @@ if not exist "%cmder_install_path%" Installer\win32_7za.exe x -y -o%cmder_instal
 REM
 REM Cmder User Profile
 REM
-set cmder_user_profile_install_path=Cmder\config\user_profile.cmd
 set cmder_user_profile=Installer\win32_cmder_user_profile.cmd
+set cmder_user_profile_install_path=%cmder_root%\config
+set cmder_user_profile_install_dest=%cmder_user_profile_install_path%\user_profile.cmd
+
 echo - Copy %cmder_user_profile% to %cmder_user_profile_install_path%
-copy /Y %cmder_user_profile% %cmder_user_profile_install_path% > NUL
+if not exist "%cmder_user_profile_install_path%" mkdir "%cmder_user_profile_install_path%"
+copy /Y %cmder_user_profile% %cmder_user_profile_install_dest% > NUL
 
 REM
 REM GVim
@@ -70,6 +75,20 @@ if not exist "%clang_format_file%" powershell -Command "[Net.ServicePointManager
 
 echo - Copy Installer\win32_clang_format.exe to %cmder_install_path%\bin\clang-format.exe
 copy /Y Installer\win32_clang_format.exe %cmder_install_path%\bin\clang-format.exe
+
+REM
+REM Python
+REM
+set python_version=3.6.5
+set python_url=https://www.python.org/ftp/python/%python_version%/python-%python_version%-embed-amd64.zip
+set python_zip=python-%python_version%-embed-amd64.zip
+set python_zip_dest=Installer\%python_zip%
+set python_dest=%cmder_root%\bin\python
+echo - Downloading from %python_url% to %python_zip_dest%
+if not exist "%python_zip_dest%" powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest %python_url% -OutFile %python_zip_dest%"
+
+echo - Unzip %python_zip_dest% to %python_dest%
+if not exist "%python_dest%" Installer\win32_7za.exe x -y -o%python_dest% %python_zip_dest% > NUL
 
 REM
 REM ctags, scanmapset (bind capslock to escape via registry), uncap (bind capslock to escape whilst program running shim)

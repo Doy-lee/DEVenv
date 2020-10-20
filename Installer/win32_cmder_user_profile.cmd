@@ -18,3 +18,6 @@
 
 @echo off
 alias gvim=%cmder_root%\..\GVim\gVimPortable.exe $*
+set PATH=%cmder_root%\bin\python;%PATH%
+set HOME=%cmder_root%\..\
+set HOMEPATH=%cmder_root%\..\
