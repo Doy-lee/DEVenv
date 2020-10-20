@@ -15,12 +15,12 @@ endif
 " {on} Means to lazy-load when that command is invoked
 Plug 'https://github.com/ervandew/supertab'
 Plug 'https://github.com/scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-Plug 'https://github.com/tpope/vim-dispatch'
 Plug 'https://github.com/tpope/vim-fugitive'
 Plug 'https://github.com/bfrg/vim-cpp-modern'
 
-Plug 'https://github.com/junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'https://github.com/junegunn/fzf.vim'
+Plug 'skywind3000/asyncrun'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 
 " Themes
 Plug 'https://github.com/tomasr/molokai'
@@ -226,16 +226,16 @@ set errorformat+=%\\%%(CTIME%\\)%\\@=%m                        " ctime.exe -stat
 
 if s:running_windows
     set makeprg=build
-    nnoremap <A-r> :!start cmd /c run<CR>
+    nnoremap <f5> :AsyncRun ./build.bat<cr>
 else
     " Set vim terminal to enter normal mode using escape like normal vim behaviour
     tnoremap <Esc> <C-\><C-n>
+    nnoremap <f5> :AsyncRun ./build.sh<cr>
     set makeprg=./build.sh
 endif
 
 "Go to next error
 "Go to previous error
-nnoremap <f5> :Make<cr>
 nnoremap <A-n> :cn<CR>
 nnoremap <A-p> :cp<CR>
 
