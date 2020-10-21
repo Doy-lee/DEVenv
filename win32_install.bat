@@ -77,6 +77,20 @@ echo - Copy Installer\win32_clang_format.exe to %cmder_install_path%\bin\clang-f
 copy /Y Installer\win32_clang_format.exe %cmder_install_path%\bin\clang-format.exe
 
 REM
+REM Python
+REM
+set python_version=3.6.5
+set python_zip=python-%python_version%-embed-win32.zip
+set python_url=https://www.python.org/ftp/python/%python_version%/%python_zip%
+set python_zip_dest=Installer\%python_zip%
+set python_dest=%cmder_root%\bin\python
+echo - Downloading from %python_url% to %python_zip_dest%
+if not exist "%python_zip_dest%" powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest %python_url% -OutFile %python_zip_dest%"
+
+echo - Unzip %python_zip_dest% to %python_dest%
+if not exist "%python_dest%" Installer\win32_7za.exe x -y -o%python_dest% %python_zip_dest% > NUL
+
+REM
 REM ctags, scanmapset (bind capslock to escape via registry), uncap (bind capslock to escape whilst program running shim)
 REM
 set ctags_path=%cmder_install_path%\bin\ctags.exe
