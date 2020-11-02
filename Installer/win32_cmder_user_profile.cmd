@@ -17,7 +17,7 @@
 :: %ccall% "/customOption" "command/program"
 
 @echo off
-set PATH=%cmder_root%\bin\python;%PATH%
+set PATH=%cmder_root%\bin\python;%cmder_root%\bin\python\Scripts;%PATH%
 set HOME=%cmder_root%\..\Home
 set HOMEPATH=%cmder_root%\..\Home
 set USERPROFILE=%cmder_root%\..\Home

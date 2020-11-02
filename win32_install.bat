@@ -84,11 +84,25 @@ set python_zip=python-%python_version%-embed-win32.zip
 set python_url=https://www.python.org/ftp/python/%python_version%/%python_zip%
 set python_zip_dest=Installer\%python_zip%
 set python_dest=%cmder_root%\bin\python
+
 echo - Downloading from %python_url% to %python_zip_dest%
 if not exist "%python_zip_dest%" powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest %python_url% -OutFile %python_zip_dest%"
 
 echo - Unzip %python_zip_dest% to %python_dest%
 if not exist "%python_dest%" Installer\win32_7za.exe x -y -o%python_dest% %python_zip_dest% > NUL
+
+REM Python Pip Setup
+set python_pth_file=Installer\win32_python36._pth
+set python_pth_dest_file=%python_dest%\python36._pth
+echo - Copy %python_pth_file% to %python_pth_dest_file%
+copy /Y %python_pth_file% %python_pth_dest_file% > NUL
+
+REM Python Pip
+set python_pip_url=https://bootstrap.pypa.io/get-pip.py
+set python_pip_file=%python_dest%\get-pip.py
+echo - Downloading from %python_pip_url% to %python_pip_file%
+if not exist "%python_pip_file%" powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest %python_pip_url% -OutFile %python_pip_file%"
+if not exist "%python_dest%\Scripts\pip.exe" %python_dest%\python %python_pip_file%
 
 REM
 REM ctags, scanmapset (bind capslock to escape via registry), uncap (bind capslock to escape whilst program running shim)

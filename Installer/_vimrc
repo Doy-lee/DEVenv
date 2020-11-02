@@ -211,8 +211,8 @@ noremap <C-F> :<C-U><C-R>=printf("Leaderf! rg -e %s ", expand("<cword>"))<CR>
 " Clang Format
 " ==============================================================================
 if s:running_windows
-    map <C-I> :pyf $home\.vim\clang-format.py<CR>
-    imap <C-I> <ESC>:pyf $home\.vim\clang-format.py<CR>i
+    map <C-I> :py3f $home\.vim\clang-format.py<CR>
+    imap <C-I> <ESC>:py3f $home\.vim\clang-format.py<CR>i
 else
     map <C-I> :py3f ~/.vim/clang-format.py<CR>
     imap <C-I> <ESC>:py3f ~/.vim/clang-format.py<CR>i
