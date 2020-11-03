@@ -186,7 +186,7 @@ nnoremap <A-p> :cp<CR>
 
 " Fullscreen
 if s:running_windows
-    noremap <f11> <esc>:call libcallnr('gvim_fullscreen.dll', 'ToggleFullscreen', 0)<cr>
+    noremap <f11> <esc>:call libcallnr('gvim_fullscreen.dll', 'ToggleFullScreen', 0)<cr>
 endif
 
 " ==============================================================================
@@ -211,8 +211,8 @@ noremap <C-F> :<C-U><C-R>=printf("Leaderf! rg -e %s ", expand("<cword>"))<CR>
 " Clang Format
 " ==============================================================================
 if s:running_windows
-    map <C-I> :py3f $home\.vim\clang-format.py<CR>
-    imap <C-I> <ESC>:py3f $home\.vim\clang-format.py<CR>i
+    map <C-I> :py3f $home\vimfiles\clang-format.py<CR>
+    imap <C-I> <ESC>:py3f $home\vimfiles\clang-format.py<CR>i
 else
     map <C-I> :py3f ~/.vim/clang-format.py<CR>
     imap <C-I> <ESC>:py3f ~/.vim/clang-format.py<CR>i
