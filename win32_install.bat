@@ -30,17 +30,6 @@ echo - Extracting %cmder_zip% to %cmder_root%
 if not exist "%cmder_root%" %installer_root%\win32_7za.exe x -y -o%cmder_root% %cmder_zip% > NUL
 
 REM
-REM Cmder User Profile
-REM
-set cmder_user_profile=%installer_root%\win32_cmder_user_profile.cmd
-set cmder_user_profile_install_dir=%cmder_root%\config
-set cmder_user_profile_install_file=%cmder_user_profile_install_dir%\user_profile.cmd
-
-echo - Copy %cmder_user_profile% to %cmder_user_profile_install_dir%
-if not exist "%cmder_user_profile_install_dir%" mkdir "%cmder_user_profile_install_dir%"
-copy /Y %cmder_user_profile% %cmder_user_profile_install_file% > NUL
-
-REM
 REM GVim
 REM
 set gvim_url=https://tuxproject.de/projects/vim/complete-x64.7z
@@ -149,8 +138,16 @@ set python_zip_install_path=%tools_root%\WPy64-3902
 
 echo - Downloading from %python_url% to %python_zip_installer%
 if not exist "%python_zip_installer%" powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest %python_url% -OutFile %python_zip_installer%"
-if not exist "%python_zip_installer%" echo Failed to download Zig, exiting.
+if not exist "%python_zip_installer%" echo Failed to download Python, exiting.
 if not exist "%python_zip_installer%" goto :eof
 
 echo - Unzip %python_zip_installer% to %python_zip_install_path%
 if not exist %python_zip_install_path% %installer_root%\win32_7za.exe x -y -o%tools_root% %python_zip_installer% > NUL
+
+set cmder_config_file=%cmder_root%\config\user_profile.cmd
+echo @echo off> %cmder_config_file%
+echo set PATH=%zig_zip_install_path%;%python_zip_install_path%\python-3.9.0.amd64;%%PATH%%>> %cmder_config_file%
+echo set HOME=%cmder_root%\..\Home>> %cmder_config_file%
+echo set HOMEPATH=%cmder_root%\..\Home>> %cmder_config_file%
+echo set USERPROFILE=%cmder_root%\..\Home>> %cmder_config_file%
+echo alias gvim=%cmder_root%\..\Tools\GVim\gvim_noOLE.exe $*>> %cmder_config_file%
