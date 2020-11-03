@@ -17,9 +17,9 @@
 :: %ccall% "/customOption" "command/program"
 
 @echo off
+call %cmder_root%\..\Tools\WPy64-3902\scripts\env.bat
 set HOME=%cmder_root%\..\Home
 set HOMEPATH=%cmder_root%\..\Home
 set USERPROFILE=%cmder_root%\..\Home
-call %cmder_root%\..\Tools\WPy64-3902\scripts\env.bat
 
 alias gvim=%cmder_root%\..\Tools\GVim\gvim_noOLE.exe $*
