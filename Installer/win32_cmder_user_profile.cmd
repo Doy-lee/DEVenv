@@ -17,7 +17,7 @@
 :: %ccall% "/customOption" "command/program"
 
 @echo off
-call %cmder_root%\..\Tools\WPy64-3902\scripts\env.bat
+set PATH=%cmder_root%\..\Tools\zig-x86_64\zig-windows-x86_64-0.6.0;%cmder_root%\..\Tools\WPy64-3902\python-3.9.0.amd64;%PATH%
 set HOME=%cmder_root%\..\Home
 set HOMEPATH=%cmder_root%\..\Home
 set USERPROFILE=%cmder_root%\..\Home

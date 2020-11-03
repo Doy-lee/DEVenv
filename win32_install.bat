@@ -130,7 +130,7 @@ set zig_version=0.6.0
 set zig_zip=zig-windows-x86_64-%zig_version%.zip
 set zig_url=https://ziglang.org/download/%zig_version%/%zig_zip%
 set zig_zip_installer=%installer_root%\win32_%zig_zip%
-set zig_zip_install_path=%compiler_root%\zig-x86_64
+set zig_zip_install_path=%compiler_root%\zig-windows-x86_64-%zig_version%
 
 echo - Downloading from %zig_url% to %zig_zip_installer%
 if not exist "%zig_zip_installer%" powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest %zig_url% -OutFile %zig_zip_installer%"
@@ -138,7 +138,7 @@ if not exist "%zig_zip_installer%" echo Failed to download Zig, exiting.
 if not exist "%zig_zip_installer%" goto :eof
 
 echo - Unzip %zig_zip_installer% to %zig_zip_install_path%
-if not exist %zig_zip_install_path% %installer_root%\win32_7za.exe x -y -o%zig_zip_install_path% %zig_zip_installer% > NUL
+if not exist %zig_zip_install_path% %installer_root%\win32_7za.exe x -y -o%compiler_root% %zig_zip_installer% > NUL
 
 REM
 REM Python
