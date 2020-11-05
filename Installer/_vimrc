@@ -195,6 +195,7 @@ endif
 " ==============================================================================
 " Config
 let g:Lf_MruFileExclude = ['*.so', '*.tmp', '*.bak', '*.exe', '*.dll']
+let g:Lf_UseVersionControlTool = 0
 
 " Bindings
 nnoremap <leader>b :<C-U><C-R>=printf("Leaderf buffer %s", "")<CR><CR>
