@@ -108,6 +108,7 @@ set cmder_config_file=%cmder_root%\config\user_profile.cmd
 echo - Generate cmder config at %cmder_config_file%
 echo @echo off> %cmder_config_file%
 echo set PATH=%zig_path%;%python_path%\python-3.9.0.amd64;%%PATH%%>> "%cmder_config_file%"
+echo set PYTHONHOME=%python_path%\python-3.9.0.amd64>> "%cmder_config_file%"
 echo set HOME=%cmder_root%\..\Home>> "%cmder_config_file%"
 echo set HOMEPATH=%cmder_root%\..\Home>> "%cmder_config_file%"
 echo set USERPROFILE=%cmder_root%\..\Home>> "%cmder_config_file%"
