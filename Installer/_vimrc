@@ -194,8 +194,19 @@ endif
 " Leaderf
 " ==============================================================================
 " Config
-let g:Lf_MruFileExclude = ['*.so', '*.tmp', '*.bak', '*.exe', '*.dll']
+let g:Lf_MruFileExclude = ['tags', '*.so', '.o', '*.exe', '*.dll']
 let g:Lf_UseVersionControlTool = 0
+let g:Lf_JumpToExistingWindow = 0
+let g:Lf_WildIgnore = {
+        \ 'dir': ['.git', '.svn', '.hg'],
+        \ 'file': ['tags', '*.so', '.o', '*.exe', '*.dll']
+        \}
+
+let g:Lf_CtagsFuncOpts = {
+        \ 'c': '--c-kinds=fp',
+        \ 'c++': '--c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++',
+        \ 'rust': '--rust-kinds=f',
+        \ }
 
 " Bindings
 nnoremap <leader>b :<C-U><C-R>=printf("Leaderf buffer %s", "")<CR><CR>
