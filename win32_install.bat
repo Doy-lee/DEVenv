@@ -75,7 +75,7 @@ if exist "%rg_exe%" (
 REM
 REM Zig
 REM
-set zig_version=0.6.0
+set zig_version=0.7.0
 set zig_file=zig-windows-x86_64-%zig_version%.zip
 set zig_zip=%installer_root%\win32_%zig_file%
 set zig_path=%compiler_root%\zig-windows-x86_64-%zig_version%
