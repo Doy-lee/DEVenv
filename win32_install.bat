@@ -114,6 +114,13 @@ echo set HOMEPATH=%cmder_root%\..\Home>> "%cmder_config_file%"
 echo set USERPROFILE=%cmder_root%\..\Home>> "%cmder_config_file%"
 echo alias gvim=%cmder_root%\..\Tools\GVim\gvim.exe $*>> "%cmder_config_file%"
 
+REM
+REM CTags Helper Script
+REM
+set ctags_file=%cmder_root%\bin\ctags_cpp.bat
+echo @echo off> %ctags_file%
+echo ctags --c++-kinds=+p --fields=+iaS --extras --language-force=C++ %%*>> %ctags_file%
+
 echo - Setup complete! Launch %cmder_root%\cmder.exe [or restart Cmder instance if you're updating an existing installation]
 exit /b
 
