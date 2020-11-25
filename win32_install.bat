@@ -119,7 +119,7 @@ REM CTags Helper Script
 REM
 set ctags_file=%cmder_root%\bin\ctags_cpp.bat
 echo @echo off> %ctags_file%
-echo ctags --c++-kinds=+p --fields=+iaS --extras --language-force=C++ %%*>> %ctags_file%
+echo ctags --c++-kinds=+p --fields=+iaS --extras=+q --language-force=C++ %%*>> %ctags_file%
 
 echo - Setup complete! Launch %cmder_root%\cmder.exe [or restart Cmder instance if you're updating an existing installation]
 exit /b
