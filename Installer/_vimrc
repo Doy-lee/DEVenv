@@ -259,7 +259,7 @@ let g:clang_format#style_options = {
             \ "TabWidth": 4,
             \ }
 
-map <C-I> :update<CR><C-v>:ClangFormat<CR>
+map <C-I> :update!<CR><C-v>:ClangFormat<CR>
 
 " ==============================================================================
 " Compiling / AsyncRun
