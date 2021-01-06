@@ -32,10 +32,12 @@ REM clang-format: C/C++ formatting tool
 REM ctags: C/C++ code annotation generator
 REM scanmapset: Bind capslock to escape via registry
 REM uncap: Bind capslock to escape via run-time program
+REM clang-format: Default clang-format style
 call :CopyFile "%installer_root%\win32_clang_format.exe" "%cmder_root%\bin\clang-format.exe" || exit /b
 call :CopyFile "%installer_root%\win32_ctags.exe" "%cmder_root%\bin\ctags.exe" || exit /b
 call :CopyFile "%installer_root%\win32_scanmapset.exe" "%cmder_root%\bin\scanmapset.exe" || exit /b
 call :CopyFile "%installer_root%\win32_uncap.exe" "%cmder_root%\bin\uncap.exe" || exit /b
+call :CopyFile "%installer_root%\clang-format-style-file" "%home%\_clang-format" || exit /b
 
 REM
 REM GVim, Vim Plug, Vim Config
@@ -59,6 +61,13 @@ if exist "%vim_plug%" (
 ) else (
     if not exist "%vim_plug_path%" mkdir "%vim_plug_path%"
     call :DownloadFile https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim "%vim_plug%" || exit /b
+)
+
+set vim_clang_format=%vim_root%\clang-format.py
+if exist "%vim_clang_format%" (
+    echo - [Cache] Vim Clang Format already installed at %vim_clang_format%
+) else (
+    call :DownloadFile https://raw.githubusercontent.com/llvm/llvm-project/main/clang/tools/clang-format/clang-format.py "%vim_clang_format%" || exit /b
 )
 
 REM

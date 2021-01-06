@@ -16,7 +16,6 @@ Plug 'https://github.com/tpope/vim-fugitive'
 Plug 'https://github.com/bfrg/vim-cpp-modern'
 Plug 'https://github.com/skywind3000/asyncrun.vim'
 Plug 'https://github.com/Yggdroot/LeaderF'
-Plug 'https://github.com/rhysd/vim-clang-format'
 
 " Themes
 Plug 'https://github.com/tomasr/molokai'
@@ -223,43 +222,25 @@ noremap <C-F> :<C-U><C-R>=printf("Leaderf! rg -e %s ", expand("<cword>"))<CR>
 " ==============================================================================
 " Clang Format
 " ==============================================================================
-let g:clang_format#style_options = {
-            \ "AccessModifierOffset": -4,
-            \ "AlignAfterOpenBracket": "true",
-            \ "AlignConsecutiveAssignments": "true",
-            \ "AlignTrailingComments": "true",
-            \ "AllowAllParametersOfDeclarationOnNextLine": "true",
-            \ "AllowShortBlocksOnASingleLine": "false",
-            \ "AllowShortIfStatementsOnASingleLine": "true",
-            \ "AllowShortLoopsOnASingleLine": "false",
-            \ "AlwaysBreakAfterDefinitionReturnType": "false",
-            \ "AlwaysBreakBeforeMultilineStrings": "true",
-            \ "AlwaysBreakTemplateDeclarations": "true",
-            \ "BinPackArguments": "false",
-            \ "BinPackParameters": "false",
-            \ "BreakBeforeBraces": "Allman",
-            \ "BreakConstructorInitializersBeforeComma": "true",
-            \ "ColumnLimit": 120,
-            \ "ConstructorInitializerIndentWidth": 0,
-            \ "Cpp11BracedListStyle": "true",
-            \ "IndentCaseLabels": "true",
-            \ "IndentFunctionDeclarationAfterType": "false",
-            \ "IndentWidth": 4,
-            \ "MaxEmptyLinesToKeep": 1,
-            \ "NamespaceIndentation": "None",
-            \ "PointerBindsToType": "false",
-            \ "SpaceBeforeAssignmentOperators": "true",
-            \ "SpaceInEmptyParentheses": "false",
-            \ "SpacesBeforeTrailingComments": 1,
-            \ "SpacesInAngles": "false",
-            \ "SpacesInCStyleCastParentheses": "false",
-            \ "SpacesInParentheses": "false",
-            \ "SpacesInSquareBrackets": "false",
-            \ "Standard": "Cpp11",
-            \ "TabWidth": 4,
-            \ }
+if s:running_windows
+    if has('python')
+        map <C-I> :pyf ~/vimfiles/clang-format.py<CR>
+        imap <C-I> <c-o>:pyf ~/vimfiles/clang-format.py<CR>
+    elseif has('python3')
+        map <C-I> :py3f ~/vimfiles/clang-format.py<CR>
+        imap <C-I> <c-o>:py3f ~/vimfiles/clang-format.py<CR>
+    endif
+else
+    if has('python')
+        map <C-I> :pyf ~/.vim/clang-format.py<CR>
+        imap <C-I> <c-o>:pyf ~/.vim/clang-format.py<CR>
+    elseif has('python3')
+        map <C-I> :py3f ~/.vim/clang-format.py<CR>
+        imap <C-I> <c-o>:py3f ~/.vim/clang-format.py<CR>
+    endif
+endif
 
-map <C-I> :update!<CR><C-v>:ClangFormat<CR>
+
 
 " ==============================================================================
 " Compiling / AsyncRun
