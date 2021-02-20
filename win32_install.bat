@@ -5,6 +5,7 @@ set root=%~dp0
 set home=%root%\home
 set cmder_root=%root%\Cmder
 set installer_root=%root%\Installer
+set downloads_root=%root%\Downloads
 set vim_root=%home%\vimfiles
 set tools_root=%root%\Tools
 set compiler_root=%tools_root%\Compiler
@@ -13,12 +14,13 @@ if not exist %home% mkdir %home%
 if not exist %installer_root% mkdir %installer_root%
 if not exist %tools_root% mkdir %tools_root%
 if not exist %compiler_root% mkdir %compiler_root%
+if not exist %downloads_root% mkdir %downloads_root%
 
 REM
 REM Cmder
 REM
 set cmder_version=v1.3.16
-set cmder_zip=%installer_root%\win32_cmder_%cmder_version%.7z
+set cmder_zip=%downloads_root%\win32_cmder_%cmder_version%.7z
 if exist "%cmder_root%" (
     echo - [Cache] Cmder already installed at %cmder_root%
 ) else (
@@ -42,7 +44,7 @@ call :CopyFile "%installer_root%\clang-format-style-file" "%home%\_clang-format"
 REM
 REM GVim, Vim Plug, Vim Config
 REM
-set gvim_zip=%installer_root%\win32_gvim_x64.7z
+set gvim_zip=%downloads_root%\win32_gvim_x64.7z
 set gvim_path=%tools_root%\GVim
 if exist "%gvim_path%" (
     echo - [Cache] GVim already installed at %gvim_path%
@@ -86,7 +88,7 @@ REM Zig
 REM
 set zig_version=0.7.0
 set zig_file=zig-windows-x86_64-%zig_version%.zip
-set zig_zip=%installer_root%\win32_%zig_file%
+set zig_zip=%downloads_root%\win32_%zig_file%
 set zig_path=%compiler_root%\zig-windows-x86_64-%zig_version%
 if exist "%zig_path%" (
     echo - [Cache] Zig already installed at %zig_path%
@@ -101,7 +103,7 @@ REM
 set python_version=3.9.0.2dot
 set python_version_nodot=3902
 set python_url=https://github.com/winpython/winpython/releases/download/3.0.20201028/Winpython64-%python_version%.exe
-set python_zip=%installer_root%\win32_Winpython64-%python_version%.exe
+set python_zip=%downloads_root%\win32_Winpython64-%python_version%.exe
 set python_path=%tools_root%\WPy64-%python_version_nodot%
 if exist "%python_path%" (
     echo - [Cache] Python already installed at %python_path%
