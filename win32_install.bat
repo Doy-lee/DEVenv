@@ -218,6 +218,7 @@ REM ----------------------------------------------------------------------------
 set terminal_script=!root_dir!\terminal.bat
 echo @echo off> "!terminal_script!"
 echo set PATH=!gpg_w32_bin_dir!;%%PATH%%>> "!terminal_script!"
+echo set PATH=!gvim_dir!;%%PATH%%>> "!terminal_script!"
 echo set PATH=!llvm_bin_dir!;%%PATH%%>> "!terminal_script!"
 echo set PATH=!python_bin_dir!;%%PATH%%>> "!terminal_script!"
 echo set PATH=!python_scripts_bin_dir!;%%PATH%%>> "!terminal_script!"
@@ -228,7 +229,6 @@ echo set PYTHONHOME=!python_bin_dir!>> "!terminal_script!"
 echo set HOME=!home_dir!>> "!terminal_script!"
 echo set HOMEPATH=!home_dir!>> "!terminal_script!"
 echo set USERPROFILE=!home_dir!>> "!terminal_script!"
-echo set gvim=!gvim_dir!\gvim.exe $*>> "!terminal_script!"
 echo call !tools_dir!\MSVC-2019-v16.9.2-VC-v14.28.29910-Win10-SDK-v10.0.19041.0-x64\msvc_env_x64.bat>> "!terminal_script!"
 echo !cmder_dir!\cmder.exe>> "!terminal_script!"
 
