@@ -1,3 +1,6 @@
+@echo off
+setlocal
+
 REM
 REM Generate Standalone MSVC17 x86/x64 Toolchain from VS Installation
 REM
@@ -20,21 +23,24 @@ REM
 REM For other Visual Studio versions, you may need to update the version numbers.
 REM
 
-@echo off
-setlocal
-
 REM Configuration (NOTE: Update arch to either, "x86", "x64" or "x86 x64" for both toolchains).
-set arch=x64
+set arch=x86 x64
 
 REM Source Directories (NOTE: Update the directories for your desired version)
-set vs1=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023
-set vs2=C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0
-set vs3=C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0
-set vs4=C:\Program Files (x86)\Windows Kits\10\Lib\10.0.17763.0
-set dll1=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\api-ms-win-*.dll
+set vs_version=2017
+set msvc_version=14.16.27023
+set win_sdk_version=10.0.17763.0
+
+set vs_root=C:\Program Files (x86)\Microsoft Visual Studio\%vs_version%\Community
+set vs1=%vs_root%\VC\Tools\MSVC\%msvc_version%
+set vs2=C:\Program Files (x86)\Windows Kits\10\bin\%win_sdk_version%
+set vs3=C:\Program Files (x86)\Windows Kits\10\Include\%win_sdk_version%
+set vs4=C:\Program Files (x86)\Windows Kits\10\Lib\%win_sdk_version%
+set dll1=%vs_root%\Common7\Tools\api-ms-win-*.dll
 set dll2=C:\Windows\System32\*140*.dll
 set dll3=C:\Windows\System32\ucrtbase*.dll
 set dll4=C:\Windows\System32\VsGraphicsHelper.dll
+
 
 REM Destination Directory
 set dest=%~1
