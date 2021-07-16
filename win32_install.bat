@@ -185,7 +185,7 @@ REM ripgrep
 REM ----------------------------------------------------------------------------
 set rg_sha256=a47ace6f654c5ffa236792fc3ee3fefd9c7e88e026928b44da801acb72124aa8
 set rg_version=13.0.0
-set rg_zip=!downloads_dir!\win32_rg_v!rg_version!.7z
+set rg_zip=!downloads_dir!\win32_rg_v!rg_version!.zip
 set rg_dir=!tools_dir!\ripgrep-!rg_version!
 set rg_subfolder=!rg_dir!\ripgrep-!rg_version!-x86_64-pc-windows-msvc
 if not exist !rg_dir! (
@@ -215,7 +215,9 @@ set python_scripts_bin_dir=!python_bin_dir!\Scripts
 REM ----------------------------------------------------------------------------
 REM Super Terminal
 REM ----------------------------------------------------------------------------
-set terminal_script=!root_dir!\terminal.bat
+set terminal_script=!root_dir!\win32_terminal.bat
+set msvc_script=!tools_dir!\MSVC-2019-v16.9.2-VC-v14.28.29910-Win10-SDK-v10.0.19041.0-x64\msvc_env_x64.bat
+
 echo @echo off> "!terminal_script!"
 echo set PATH=!gpg_w32_bin_dir!;%%PATH%%>> "!terminal_script!"
 echo set PATH=!gvim_dir!;%%PATH%%>> "!terminal_script!"
@@ -229,8 +231,8 @@ echo set PYTHONHOME=!python_bin_dir!>> "!terminal_script!"
 echo set HOME=!home_dir!>> "!terminal_script!"
 echo set HOMEPATH=!home_dir!>> "!terminal_script!"
 echo set USERPROFILE=!home_dir!>> "!terminal_script!"
-echo call !tools_dir!\MSVC-2019-v16.9.2-VC-v14.28.29910-Win10-SDK-v10.0.19041.0-x64\msvc_env_x64.bat>> "!terminal_script!"
-echo !cmder_dir!\cmder.exe>> "!terminal_script!"
+echo if exist "!msvc_script!" call "!msvc_script!">> "!terminal_script!"
+echo call "!cmder_dir!\cmder.exe" %%*>> "!terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM CTags Helper Script
