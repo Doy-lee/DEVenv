@@ -60,7 +60,7 @@ set gpg_w32_version=2.3.1
 set gpg_w32_date=20210420
 set gpg_w32_zip=!downloads_dir!\win32_gpg_w32_v!gpg_w32_version!.exe
 set gpg_w32_dir=!tools_dir!\gpg_w32-!gpg_w32_version!
-if not exist !gpg_w32_dir! (
+if not exist "!gpg_w32_dir!\bin\gpg.exe" (
     call :DownloadFile "https://gnupg.org/ftp/gcrypt/binary/gnupg-w32-!gpg_w32_version!_!gpg_w32_date!.exe" "!gpg_w32_zip!" || exit /B
     call :VerifyFileSHA256 "!gpg_w32_zip!" "!gpg_w32_sha256!" || exit /B
     call :Unzip "!gpg_w32_zip!" "!gpg_w32_dir!" || exit /B
@@ -91,7 +91,7 @@ set dependencies_sha256=44df956dbe267e0a705224c3b85d515fee2adc87509861e24fb6c6b0
 set dependencies_version=v1.10
 set dependencies_zip=!downloads_dir!\win32_dependencies_!dependencies_version!.zip
 set dependencies_dir=!tools_dir!\dependencies-!dependencies_version!
-if not exist !dependencies_dir! (
+if not exist "!dependencies_dir!\DependenciesGui.exe" (
     call :DownloadFile "https://github.com/lucasg/Dependencies/releases/download/!dependencies_version!/Dependencies_x64_Release.zip" "!dependencies_zip!" || exit /B
     call :VerifyFileSHA256 "!dependencies_zip!" "!dependencies_sha256!" || exit /B
     call :Unzip "!dependencies_zip!" "!dependencies_dir!" || exit /B
@@ -104,7 +104,7 @@ set everything_sha256=f61b601acba59d61fb0631a654e48a564db34e279b6f2cc45e20a42ce9
 set everything_version=1.4.1.1009
 set everything_zip=!downloads_dir!\win32_everything_v!everything_version!.7z
 set everything_dir=!tools_dir!\everything-!everything_version!
-if not exist !everything_dir! (
+if not exist "!everything_dir!\everything.exe" (
     call :DownloadFile "https://www.voidtools.com/Everything-!everything_version!.x64.zip" "!everything_zip!" || exit /B
     call :VerifyFileSHA256 "!everything_zip!" "!everything_sha256!" || exit /B
     call :Unzip "!everything_zip!" "!everything_dir!" || exit /B
@@ -115,7 +115,7 @@ REM GVim, Vim Plug, Vim Config
 REM ----------------------------------------------------------------------------
 set gvim_zip=!downloads_dir!\win32_gvim_x64.7z
 set gvim_dir=!tools_dir!\GVim
-if not exist !gvim_dir! (
+if not exist "!gvim_dir!\gvim.exe" (
     call :DownloadFile https://tuxproject.de/projects/vim/complete-x64.7z !gvim_zip! || exit /B
     call :Unzip "!gvim_zip!" "!gvim_dir!" || exit /B
 )
@@ -139,7 +139,7 @@ set llvm_zip=!downloads_dir!\win32_llvm_x64_v!llvm_version!.exe
 set llvm_dir=!tools_dir!\llvm-!llvm_version!
 set llvm_gpg_key=!downloads_dir!\llvm-tstellar-gpg-key.asc
 set llvm_gpg_sig=!llvm_zip!.sig
-if not exist !llvm_dir! (
+if not exist "!llvm_dir!\bin\clang.exe" (
     call :DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/tstellar-gpg-key.asc" "!llvm_gpg_key!" || exit /B
     call :DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-!llvm_version!/LLVM-!llvm_version!-win64.exe.sig" "!llvm_gpg_sig!" || exit /B
     call :DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-!llvm_version!/LLVM-!llvm_version!-win64.exe" "!llvm_zip!" || exit /B
@@ -161,6 +161,19 @@ call :CopyFile "!installer_dir!\win32_ctags.exe" "!cmder_dir!\bin\ctags.exe" || 
 call :CopyFile "!installer_dir!\win32_scanmapset.exe" "!cmder_dir!\bin\scanmapset.exe" || exit /B
 call :CopyFile "!installer_dir!\win32_uncap.exe" "!cmder_dir!\bin\uncap.exe" || exit /B
 call :CopyFile "!installer_dir!\clang-format-style-file" "!home_dir!\_clang-format" || exit /B
+
+REM ----------------------------------------------------------------------------
+REM ProcessHacker
+REM ----------------------------------------------------------------------------
+set process_hacker_sha256=e8836365abab7478d8e4c2d3fb3bb1fce82048cd4da54bab41cacbae1f45b1ff
+set process_hacker_version=3.0.4212
+set process_hacker_zip=!downloads_dir!\win32_process_hacker-!process_hacker_version!.zip
+set process_hacker_dir=!tools_dir!\process_hacker-!process_hacker_version!
+if not exist "!process_hacker_dir!\64bit\ProcessHacker.exe" (
+    call :DownloadFile "https://ci.appveyor.com/api/buildjobs/8say005q9xy48cc3/artifacts/processhacker-!process_hacker_version!-bin.zip" "!process_hacker_zip!" || exit /B
+    call :VerifyFileSHA256 "!process_hacker_zip!" "!process_hacker_sha256!" || exit /B
+    call :Unzip "!process_hacker_zip!" "!process_hacker_dir!" || exit /B
+)
 
 REM ----------------------------------------------------------------------------
 REM Python
@@ -188,11 +201,26 @@ set rg_version=13.0.0
 set rg_zip=!downloads_dir!\win32_rg_v!rg_version!.zip
 set rg_dir=!tools_dir!\ripgrep-!rg_version!
 set rg_subfolder=!rg_dir!\ripgrep-!rg_version!-x86_64-pc-windows-msvc
-if not exist !rg_dir! (
+if not exist "!rg_dir!\rg.exe" (
     call :DownloadFile "https://github.com/BurntSushi/ripgrep/releases/download/!rg_version!/ripgrep-!rg_version!-x86_64-pc-windows-msvc.zip" "!rg_zip!" || exit /B
     call :VerifyFileSHA256 "!rg_zip!" "!rg_sha256!" || exit /B
     call :Unzip "!rg_zip!" "!rg_dir!" || exit /B
     call :Move "!rg_subfolder!" "!rg_dir!" || exit /B
+)
+
+REM ----------------------------------------------------------------------------
+REM Keypirinha
+REM ----------------------------------------------------------------------------
+set keypirinha_sha256=d109a16e6a5cf311abf6d06bbe5b1be3b9ba323b79c32a168628189e10f102a5
+set keypirinha_version=2.26
+set keypirinha_zip=!downloads_dir!\win32_keypirinha-x64-!keypirinha_version!.7z
+set keypirinha_dir=!tools_dir!\keypirinha-x64-!keypirinha_version!
+set keypirinha_subfolder=!keypirinha_dir!\keypirinha
+if not exist "!keypirinha_dir!\keypirinha.exe" (
+    call :DownloadFile "https://github.com/Keypirinha/Keypirinha/releases/download/v!keypirinha_version!/keypirinha-!keypirinha_version!-x64-portable.7z" "!keypirinha_zip!" || exit /B
+    call :VerifyFileSHA256 "!keypirinha_zip!" "!keypirinha_sha256!" || exit /B
+    call :Unzip "!keypirinha_zip!" "!keypirinha_dir!" || exit /B
+    call :Move "!keypirinha_subfolder!" "!keypirinha_dir!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -203,7 +231,7 @@ set zig_version=0.8.0
 set zig_file=zig-windows-x86_64-!zig_version!.zip
 set zig_zip=!downloads_dir!\win32_!zig_file!
 set zig_dir=!tools_dir!\zig-windows-x86_64-!zig_version!
-if not exist !zig_dir! (
+if not exist "!zig_dir!\zig.exe" (
     call :DownloadFile "https://ziglang.org/download/!zig_version!/!zig_file!" "!zig_zip!" || exit /B
     call :VerifyFileSHA256 "!zig_zip!" "!zig_sha256!" || exit /B
     call :Unzip "!zig_zip!" "!zig_dir!" || exit /B
@@ -233,6 +261,14 @@ echo set HOMEPATH=!home_dir!>> "!terminal_script!"
 echo set USERPROFILE=!home_dir!>> "!terminal_script!"
 echo if exist "!msvc_script!" call "!msvc_script!">> "!terminal_script!"
 echo call "!cmder_dir!\cmder.exe" %%*>> "!terminal_script!"
+
+REM ----------------------------------------------------------------------------
+REM Background Application Scripts
+REM ----------------------------------------------------------------------------
+set terminal_script=!root_dir!\win32_start_background_apps.bat
+echo @echo off> "!terminal_script!"
+echo "!everything_dir!\everything.exe">> "!terminal_script!"
+echo "!keypirinha_dir!\keypirinha.exe">> "!terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM CTags Helper Script
@@ -285,7 +321,7 @@ if exist !dest! (
     echo - !msg!
     call !zip7_dir!\7z.exe x -y -spe -o!dest! !zip_file!
 )
-exit /B
+exit /B !ERROLEVEL!
 
 REM ------------------------------------------------------------------------------------------------
 :VerifyFileSHA256
@@ -299,8 +335,10 @@ call powershell "$FileHash = Get-FileHash -algorithm sha256 !file!; $FileHash.Ha
 REM Verify Hash
 set /p actual_sha256=< !calculated_sha256_file!
 if "!expected_sha256!" neq "!actual_sha256!" (
-    echo - [Verify] !file! Hash BAD: Expected:   !expected_sha256!
-    echo                      Calculated: !actual_sha256!
+    echo - [Verify] !file!
+    echo SHA256 Hash does not match, failing.
+    echo Expected:   !expected_sha256!
+    echo Calculated: !actual_sha256!
     exit /B -1
 ) else (
     echo - [Verify] !file! Hash OK: !expected_sha256!
@@ -311,7 +349,5 @@ REM ----------------------------------------------------------------------------
 :Move
 set src=%~1
 set dest=%~2
-
 if exist !src! robocopy !src! !dest! /E /MOVE /NP /NJS /NJS /NS /NC /NFL /NDL
-
-exit /B
+exit /B 0
