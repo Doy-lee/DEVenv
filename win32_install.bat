@@ -5,15 +5,15 @@ REM ----------------------------------------------------------------------------
 REM Setup Folder Locations
 REM ----------------------------------------------------------------------------
 set root_dir=!CD!
-set home_dir=!root_dir!\home
-set cmder_dir=!root_dir!\Cmder
-set installer_dir=!root_dir!\Installer
-set downloads_dir=!installer_dir!\Downloads
+set home_dir=Home
+set cmder_dir=Cmder
+set install_dir=Installer
+set downloads_dir=!install_dir!\Downloads
 set vim_dir=!home_dir!\vimfiles
-set tools_dir=!root_dir!\Tools
+set tools_dir=Tools
 
 if not exist !home_dir! mkdir !home_dir!
-if not exist !installer_dir! mkdir !installer_dir!
+if not exist !install_dir! mkdir !install_dir!
 if not exist !downloads_dir! mkdir !downloads_dir!
 if not exist !tools_dir! mkdir !tools_dir!
 
@@ -120,8 +120,8 @@ if not exist "!gvim_dir!\gvim.exe" (
     call :Unzip "!gvim_zip!" "!gvim_dir!" || exit /B
 )
 
-call :CopyFile "!installer_dir!\_vimrc" "!home_dir!" || exit /B
-call :CopyFile "!installer_dir!\win32_gvim_fullscreen.dll" "!gvim_dir!\gvim_fullscreen.dll" || exit /B
+call :CopyFile "!install_dir!\_vimrc" "!home_dir!" || exit /B
+call :CopyFile "!install_dir!\win32_gvim_fullscreen.dll" "!gvim_dir!\gvim_fullscreen.dll" || exit /B
 
 set vim_plug_dir=!vim_dir!\autoload
 set vim_plug=!vim_plug_dir!\plug.vim
@@ -130,6 +130,20 @@ call :DownloadFile "https://raw.githubusercontent.com/junegunn/vim-plug/master/p
 
 set vim_clang_format=!vim_dir!\clang-format.py
 call :DownloadFile "https://raw.githubusercontent.com/llvm/llvm-project/main/clang/tools/clang-format/clang-format.py" "!vim_clang_format!" || exit /B
+
+REM ----------------------------------------------------------------------------
+REM Keypirinha
+REM ----------------------------------------------------------------------------
+set keypirinha_sha256=d109a16e6a5cf311abf6d06bbe5b1be3b9ba323b79c32a168628189e10f102a5
+set keypirinha_version=2.26
+set keypirinha_zip=!downloads_dir!\win32_keypirinha-x64-!keypirinha_version!.7z
+set keypirinha_dir=!tools_dir!\keypirinha-x64-!keypirinha_version!
+if not exist "!keypirinha_dir!\keypirinha.exe" (
+    call :DownloadFile "https://github.com/Keypirinha/Keypirinha/releases/download/v!keypirinha_version!/keypirinha-!keypirinha_version!-x64-portable.7z" "!keypirinha_zip!" || exit /B
+    call :VerifyFileSHA256 "!keypirinha_zip!" "!keypirinha_sha256!" || exit /B
+    call :Unzip "!keypirinha_zip!" "!keypirinha_dir!" || exit /B
+    call :Move "!keypirinha_dir!\keypirinha" "!keypirinha_dir!" || exit /B
+)
 
 REM ----------------------------------------------------------------------------
 REM LLVM/Clang
@@ -157,10 +171,26 @@ REM ----------------------------------------------------------------------------
 REM ctags: C/C++ code annotation generator
 REM scanmapset: Bind capslock to escape via registry
 REM uncap: Bind capslock to escape via run-time program
-call :CopyFile "!installer_dir!\win32_ctags.exe" "!cmder_dir!\bin\ctags.exe" || exit /B
-call :CopyFile "!installer_dir!\win32_scanmapset.exe" "!cmder_dir!\bin\scanmapset.exe" || exit /B
-call :CopyFile "!installer_dir!\win32_uncap.exe" "!cmder_dir!\bin\uncap.exe" || exit /B
-call :CopyFile "!installer_dir!\clang-format-style-file" "!home_dir!\_clang-format" || exit /B
+call :CopyFile "!install_dir!\win32_ctags.exe" "!cmder_dir!\bin\ctags.exe" || exit /B
+call :CopyFile "!install_dir!\win32_scanmapset.exe" "!cmder_dir!\bin\scanmapset.exe" || exit /B
+call :CopyFile "!install_dir!\win32_uncap.exe" "!cmder_dir!\bin\uncap.exe" || exit /B
+call :CopyFile "!install_dir!\clang-format-style-file" "!home_dir!\_clang-format" || exit /B
+
+REM ------------------------------------------------------------------------
+REM MinGW64
+REM ------------------------------------------------------------------------
+set mingw_sha256=853970527b5de4a55ec8ca4d3fd732c00ae1c69974cc930c82604396d43e79f8
+set mingw_version=8.1.0
+set mingw_zip=!downloads_dir!\mingw64-posix-seg-rt_v6-rev0!mingw_version!.7z
+set mingw_dir=!tools_dir!\mingw64-posix-seh-rt_v6-rev0-!mingw_version!
+set mingw_bin_dir=!mingw_dir!\bin
+if not exist "!mingw_bin_dir!\gcc.exe" (
+    call :DownloadFile \"https://sourceforge.net/projects/mingw-w64/files/Toolchains targetting Win64/Personal Builds/mingw-builds/%mingw_version%/threads-posix/seh/x86_64-!mingw_version!-release-posix-seh-rt_v6-rev0.7z\" !mingw_zip! || exit /B
+    call :VerifyFileSHA256 !mingw_zip! !mingw_sha256! || exit /B
+    call :Unzip !mingw_zip! !mingw_dir! || exit /B
+    call :Move !mingw_dir!\mingw64 !mingw_dir! || exit /B
+)
+set PATH=!working_dir!\!mingw_bin_dir!;!PATH!
 
 REM ----------------------------------------------------------------------------
 REM ProcessHacker
@@ -182,16 +212,17 @@ set python_sha256=93cc3db75dffb4d56b9f64af43294f130f2c222a66de7a1325d0ce8f1ed62e
 set python_version=3.9.0.2dot
 set python_version_nodot=3902
 set python_version_dot=3.9.0
-set python_url=https://github.com/winpython/winpython/releases/download/3.0.20201028/Winpython64-!python_version!.exe
 set python_zip=!downloads_dir!\win32_Winpython64-!python_version!.exe
 set python_dir=!tools_dir!\Winpython64-!python_version_nodot!
-set python_subfolder=!python_dir!\WPy64-!python_version_nodot!
 if not exist !python_dir! (
-    call :DownloadFile !python_url! "!python_zip!" || exit /B
+    call :DownloadFile "https://github.com/winpython/winpython/releases/download/3.0.20201028/Winpython64-!python_version!.exe" "!python_zip!" || exit /B
     call :VerifyFileSHA256 "!python_zip!" "!python_sha256!" || exit /B
     call :Unzip "!python_zip!" "!python_dir!" || exit /B
-    call :Move "!python_subfolder!" "!python_dir!" || exit /B
+    call :Move "!python_dir!\WPy64-!python_version_nodot!" "!python_dir!" || exit /B
 )
+
+set python_bin_dir=!python_dir!\python-!python_version_dot!.amd64
+set python_scripts_bin_dir=!python_bin_dir!\Scripts
 
 REM ----------------------------------------------------------------------------
 REM ripgrep
@@ -200,27 +231,11 @@ set rg_sha256=a47ace6f654c5ffa236792fc3ee3fefd9c7e88e026928b44da801acb72124aa8
 set rg_version=13.0.0
 set rg_zip=!downloads_dir!\win32_rg_v!rg_version!.zip
 set rg_dir=!tools_dir!\ripgrep-!rg_version!
-set rg_subfolder=!rg_dir!\ripgrep-!rg_version!-x86_64-pc-windows-msvc
 if not exist "!rg_dir!\rg.exe" (
     call :DownloadFile "https://github.com/BurntSushi/ripgrep/releases/download/!rg_version!/ripgrep-!rg_version!-x86_64-pc-windows-msvc.zip" "!rg_zip!" || exit /B
     call :VerifyFileSHA256 "!rg_zip!" "!rg_sha256!" || exit /B
     call :Unzip "!rg_zip!" "!rg_dir!" || exit /B
-    call :Move "!rg_subfolder!" "!rg_dir!" || exit /B
-)
-
-REM ----------------------------------------------------------------------------
-REM Keypirinha
-REM ----------------------------------------------------------------------------
-set keypirinha_sha256=d109a16e6a5cf311abf6d06bbe5b1be3b9ba323b79c32a168628189e10f102a5
-set keypirinha_version=2.26
-set keypirinha_zip=!downloads_dir!\win32_keypirinha-x64-!keypirinha_version!.7z
-set keypirinha_dir=!tools_dir!\keypirinha-x64-!keypirinha_version!
-set keypirinha_subfolder=!keypirinha_dir!\keypirinha
-if not exist "!keypirinha_dir!\keypirinha.exe" (
-    call :DownloadFile "https://github.com/Keypirinha/Keypirinha/releases/download/v!keypirinha_version!/keypirinha-!keypirinha_version!-x64-portable.7z" "!keypirinha_zip!" || exit /B
-    call :VerifyFileSHA256 "!keypirinha_zip!" "!keypirinha_sha256!" || exit /B
-    call :Unzip "!keypirinha_zip!" "!keypirinha_dir!" || exit /B
-    call :Move "!keypirinha_subfolder!" "!keypirinha_dir!" || exit /B
+    call :Move "!rg_dir!\ripgrep-!rg_version!-x86_64-pc-windows-msvc" "!rg_dir!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -237,9 +252,6 @@ if not exist "!zig_dir!\zig.exe" (
     call :Unzip "!zig_zip!" "!zig_dir!" || exit /B
 )
 
-set python_bin_dir=!tools_dir!\Winpython64-!python_version_nodot!\python-!python_version_dot!.amd64
-set python_scripts_bin_dir=!python_bin_dir!\Scripts
-
 REM ----------------------------------------------------------------------------
 REM Super Terminal
 REM ----------------------------------------------------------------------------
@@ -247,19 +259,20 @@ set terminal_script=!root_dir!\win32_terminal.bat
 set msvc_script=!tools_dir!\MSVC-2019-v16.9.2-VC-v14.28.29910-Win10-SDK-v10.0.19041.0-x64\msvc_env_x64.bat
 
 echo @echo off> "!terminal_script!"
-echo set PATH=!gpg_w32_bin_dir!;%%PATH%%>> "!terminal_script!"
-echo set PATH=!gvim_dir!;%%PATH%%>> "!terminal_script!"
-echo set PATH=!llvm_bin_dir!;%%PATH%%>> "!terminal_script!"
-echo set PATH=!python_bin_dir!;%%PATH%%>> "!terminal_script!"
-echo set PATH=!python_scripts_bin_dir!;%%PATH%%>> "!terminal_script!"
-echo set PATH=!rg_dir!;%%PATH%%>> "!terminal_script!"
-echo set PATH=!zig_dir!;%%PATH%%>> "!terminal_script!"
-echo set PATH=!zip7_dir!;%%PATH%%>> "!terminal_script!"
-echo set PYTHONHOME=!python_bin_dir!>> "!terminal_script!"
-echo set HOME=!home_dir!>> "!terminal_script!"
-echo set HOMEPATH=!home_dir!>> "!terminal_script!"
-echo set USERPROFILE=!home_dir!>> "!terminal_script!"
-echo if exist "!msvc_script!" call "!msvc_script!">> "!terminal_script!"
+echo set PATH=%%~dp0!gpg_w32_bin_dir!;%%PATH%%>> "!terminal_script!"
+echo set PATH=%%~dp0!gvim_dir!;%%PATH%%>> "!terminal_script!"
+echo set PATH=%%~dp0!llvm_bin_dir!;%%PATH%%>> "!terminal_script!"
+echo set PATH=%%~dp0!mingw_bin_dir!;%%PATH%%>> "!terminal_script!"
+echo set PATH=%%~dp0!python_bin_dir!;%%PATH%%>> "!terminal_script!"
+echo set PATH=%%~dp0!python_scripts_bin_dir!;%%PATH%%>> "!terminal_script!"
+echo set PATH=%%~dp0!rg_dir!;%%PATH%%>> "!terminal_script!"
+echo set PATH=%%~dp0!zig_dir!;%%PATH%%>> "!terminal_script!"
+echo set PATH=%%~dp0!zip7_dir!;%%PATH%%>> "!terminal_script!"
+echo set PYTHONHOME=%%~dp0!python_bin_dir!>> "!terminal_script!"
+echo set HOME=%%~dp0!home_dir!>> "!terminal_script!"
+echo set HOMEPATH=%%~dp0!home_dir!>> "!terminal_script!"
+echo set USERPROFILE=%%~dp0!home_dir!>> "!terminal_script!"
+echo if exist "%%~dp0!msvc_script!" call "%%~dp0!msvc_script!">> "!terminal_script!"
 echo call "!cmder_dir!\cmder.exe" %%*>> "!terminal_script!"
 
 REM ----------------------------------------------------------------------------
@@ -267,8 +280,8 @@ REM Background Application Scripts
 REM ----------------------------------------------------------------------------
 set terminal_script=!root_dir!\win32_start_background_apps.bat
 echo @echo off> "!terminal_script!"
-echo "!everything_dir!\everything.exe">> "!terminal_script!"
-echo "!keypirinha_dir!\keypirinha.exe">> "!terminal_script!"
+echo "%%~dp0!everything_dir!\everything.exe">> "!terminal_script!"
+echo "%%~dp0!keypirinha_dir!\keypirinha.exe">> "!terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM CTags Helper Script
