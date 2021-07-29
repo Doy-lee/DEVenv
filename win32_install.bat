@@ -273,7 +273,7 @@ echo set HOME=%%~dp0!home_dir!>> "!terminal_script!"
 echo set HOMEPATH=%%~dp0!home_dir!>> "!terminal_script!"
 echo set USERPROFILE=%%~dp0!home_dir!>> "!terminal_script!"
 echo if exist "%%~dp0!msvc_script!" call "%%~dp0!msvc_script!">> "!terminal_script!"
-echo call "!cmder_dir!\cmder.exe" %%*>> "!terminal_script!"
+echo call "%%~dp0!cmder_dir!\cmder.exe" %%*>> "!terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM Background Application Scripts
