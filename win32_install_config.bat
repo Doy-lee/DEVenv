@@ -12,6 +12,7 @@ set install_joplin=1
 set install_keypirinha=1
 set install_llvm_clang=1
 set install_mingw64=1
+set install_ooshutup10=1
 set install_process_hacker=1
 set install_python3=1
 set install_ripgrep=1

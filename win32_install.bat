@@ -194,7 +194,6 @@ if !install_llvm_clang! == 1 (
     set llvm_bin_dir=!llvm_dir!\bin
 )
 
-
 REM ----------------------------------------------------------------------------
 REM Misc Tools
 REM ----------------------------------------------------------------------------
@@ -220,6 +219,18 @@ if !install_mingw64! == 1 (
         call :VerifyFileSHA256 !mingw_zip! !mingw_sha256! || exit /B
         call :Unzip !mingw_zip! !mingw_dir! || exit /B
         call :Move !mingw_dir!\mingw64 !mingw_dir! || exit /B
+    )
+)
+
+REM ----------------------------------------------------------------------------
+REM O&O ShutUp10 (Privacy Tool for Windows)
+REM ----------------------------------------------------------------------------
+if !install_ooshutup10! == 1 (
+    set oo_shutup_10_dir=!tools_dir!\oo_shutup_10
+    set oo_shutup_10_file=!oo_shutup_10_dir!\oo_shutup_10.exe
+    if not exist "!oo_shutup_10_file!" (
+        if not exist "!oo_shutup_10_dir!" mkdir "!oo_shutup_10_dir!"
+        call :DownloadFile "https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe" "!oo_shutup_10_file!" || exit /B
     )
 )
 
