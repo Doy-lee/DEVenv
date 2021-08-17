@@ -291,21 +291,6 @@ if !install_ripgrep! == 1 (
 )
 
 REM ----------------------------------------------------------------------------
-REM solidity
-REM ----------------------------------------------------------------------------
-if !install_solidity! == 1 (
-    set solidity_sha256=82db83111c6e2c892179486cb7050d85f1517bf851027607eb7f4e589e714bc5
-    set solidity_version=0.8.7+commit.e28d00a7
-    set solidity_dir=!tools_dir!\solidity-windows-amd64-!solidity_version!
-    set solidity_exe=!solidity_dir!\solc.exe
-    if not exist "!solidity_exe!" (
-        if not exist "!solidity_dir!" mkdir "!solidity_dir!"
-        call :DownloadFile "https://binaries.soliditylang.org/windows-amd64/solc-windows-amd64-v!solidity_version!.exe" "!solidity_exe!" || exit /B
-    )
-    call :VerifyFileSHA256 "!solidity_exe!" "!solidity_sha256!" || exit /B
-)
-
-REM ----------------------------------------------------------------------------
 REM Zig
 REM ----------------------------------------------------------------------------
 if !install_zig! == 1 (
@@ -319,6 +304,39 @@ if !install_zig! == 1 (
         call :VerifyFileSHA256 "!zig_zip!" "!zig_sha256!" || exit /B
         call :Unzip "!zig_zip!" "!zig_dir!" || exit /B
     )
+)
+
+REM ----------------------------------------------------------------------------
+REM Ethereum
+REM ----------------------------------------------------------------------------
+REM ----------------------------------------------------------------------------
+REM remix_ide
+REM ----------------------------------------------------------------------------
+if !install_remix_ide! == 1 (
+    set remix_ide_sha256=19a56cb79459e612d8cbdd6b6729d06c7080d983537d2494a15fd25ea67b2499
+    set remix_ide_version=1.3.1
+    set remix_ide_zip=!downloads_dir!\win32_remix-ide-amd64-v!remix_ide_version!.zip
+    set remix_ide_dir=!tools_dir!\remix-ide-!remix_ide_version!
+    if not exist "!remix_ide_dir!\Remix IDE.exe" (
+        call :DownloadFile "https://github.com/ethereum/remix-desktop/releases/download/v!remix_ide_version!/Remix-IDE-!remix_ide_version!-win.zip" "!remix_ide_zip!" || exit /B
+        call :VerifyFileSHA256 "!remix_ide_zip!" "!remix_ide_sha256!" || exit /B
+        call :Unzip "!remix_ide_zip!" "!remix_ide_dir!" || exit /B
+    )
+)
+
+REM ----------------------------------------------------------------------------
+REM solidity
+REM ----------------------------------------------------------------------------
+if !install_solidity! == 1 (
+    set solidity_sha256=82db83111c6e2c892179486cb7050d85f1517bf851027607eb7f4e589e714bc5
+    set solidity_version=0.8.7+commit.e28d00a7
+    set solidity_dir=!tools_dir!\solidity-windows-amd64-!solidity_version!
+    set solidity_exe=!solidity_dir!\solc.exe
+    if not exist "!solidity_exe!" (
+        if not exist "!solidity_dir!" mkdir "!solidity_dir!"
+        call :DownloadFile "https://binaries.soliditylang.org/windows-amd64/solc-windows-amd64-v!solidity_version!.exe" "!solidity_exe!" || exit /B
+    )
+    call :VerifyFileSHA256 "!solidity_exe!" "!solidity_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -341,8 +359,10 @@ if !install_python3! == 1 (
 )
 
 if !install_ripgrep! == 1 ( echo set PATH=%%~dp0!rg_dir!;%%PATH%%>> "!terminal_script!" )
-if !install_solidity! == 1 ( echo set PATH=%%~dp0!solidity_dir!;%%PATH%%>> "!terminal_script!" )
 if !install_zig! == 1 ( echo set PATH=%%~dp0!zig_dir!;%%PATH%%>> "!terminal_script!" )
+
+if !install_remix_ide! == 1 ( echo set PATH=%%~dp0!remix_ide_dir!;%%PATH%%>> "!terminal_script!" )
+if !install_solidity! == 1 ( echo set PATH=%%~dp0!solidity_dir!;%%PATH%%>> "!terminal_script!" )
 
 echo set PATH=%%~dp0!zip7_dir!;%%PATH%%>> "!terminal_script!"
 echo set HOME=%%~dp0!home_dir!>> "!terminal_script!"

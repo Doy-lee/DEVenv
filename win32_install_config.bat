@@ -16,5 +16,8 @@ set install_mobaxterm=1
 set install_process_hacker=1
 set install_python3=1
 set install_ripgrep=1
-set install_solidity=1
 set install_zig=1
+
+REM Ethereum
+set install_remix_ide=1
+set install_solidity=1
