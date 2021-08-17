@@ -212,14 +212,29 @@ REM ------------------------------------------------------------------------
 if !install_mingw64! == 1 (
     set mingw_sha256=853970527b5de4a55ec8ca4d3fd732c00ae1c69974cc930c82604396d43e79f8
     set mingw_version=8.1.0
-    set mingw_zip=!downloads_dir!\mingw64-posix-seg-rt_v6-rev0!mingw_version!.7z
+    set mingw_zip=!downloads_dir!\win32_mingw64-posix-seg-rt_v6-rev0!mingw_version!.7z
     set mingw_dir=!tools_dir!\mingw64-posix-seh-rt_v6-rev0-!mingw_version!
     set mingw_bin_dir=!mingw_dir!\bin
     if not exist "!mingw_bin_dir!\gcc.exe" (
-        call :DownloadFile \"https://sourceforge.net/projects/mingw-w64/files/Toolchains targetting Win64/Personal Builds/mingw-builds/%mingw_version%/threads-posix/seh/x86_64-!mingw_version!-release-posix-seh-rt_v6-rev0.7z\" !mingw_zip! || exit /B
+        call :DownloadFile \"https://sourceforge.net/projects/mingw-w64/files/Toolchains targetting Win64/Personal Builds/mingw-builds/!mingw_version!/threads-posix/seh/x86_64-!mingw_version!-release-posix-seh-rt_v6-rev0.7z\" !mingw_zip! || exit /B
         call :VerifyFileSHA256 !mingw_zip! !mingw_sha256! || exit /B
         call :Unzip !mingw_zip! !mingw_dir! || exit /B
         call :Move !mingw_dir!\mingw64 !mingw_dir! || exit /B
+    )
+)
+
+REM ------------------------------------------------------------------------
+REM MobaXTerm
+REM ------------------------------------------------------------------------
+if !install_mobaxterm! == 1 (
+    set mobaxterm_sha256=91f80537f12c2ad34a5eba99a285c149781c6d35a144a965ce3aea8a9bc6868c
+    set mobaxterm_version=21.2
+    set mobaxterm_zip=!downloads_dir!\win32_mobaxterm-!mobaxterm_version!.zip
+    set mobaxterm_dir=!tools_dir!\mobaxterm-!mobaxterm_version!
+    if not exist "!mobaxterm_bin_dir!\mobaxterm.exe" (
+        call :DownloadFile "https://download.mobatek.net/2122021051924233/MobaXterm_Portable_v!mobaxterm_version!.zip" !mobaxterm_zip! || exit /B
+        call :VerifyFileSHA256 !mobaxterm_zip! !mobaxterm_sha256! || exit /B
+        call :Unzip !mobaxterm_zip! !mobaxterm_dir! || exit /B
     )
 )
 
@@ -276,6 +291,21 @@ if !install_ripgrep! == 1 (
 )
 
 REM ----------------------------------------------------------------------------
+REM solidity
+REM ----------------------------------------------------------------------------
+if !install_solidity! == 1 (
+    set solidity_sha256=82db83111c6e2c892179486cb7050d85f1517bf851027607eb7f4e589e714bc5
+    set solidity_version=0.8.7+commit.e28d00a7
+    set solidity_dir=!tools_dir!\solidity-windows-amd64-!solidity_version!
+    set solidity_exe=!solidity_dir!\solc.exe
+    if not exist "!solidity_exe!" (
+        if not exist "!solidity_dir!" mkdir "!solidity_dir!"
+        call :DownloadFile "https://binaries.soliditylang.org/windows-amd64/solc-windows-amd64-v!solidity_version!.exe" "!solidity_exe!" || exit /B
+    )
+    call :VerifyFileSHA256 "!solidity_exe!" "!solidity_sha256!" || exit /B
+)
+
+REM ----------------------------------------------------------------------------
 REM Zig
 REM ----------------------------------------------------------------------------
 if !install_zig! == 1 (
@@ -311,6 +341,7 @@ if !install_python3! == 1 (
 )
 
 if !install_ripgrep! == 1 ( echo set PATH=%%~dp0!rg_dir!;%%PATH%%>> "!terminal_script!" )
+if !install_solidity! == 1 ( echo set PATH=%%~dp0!solidity_dir!;%%PATH%%>> "!terminal_script!" )
 if !install_zig! == 1 ( echo set PATH=%%~dp0!zig_dir!;%%PATH%%>> "!terminal_script!" )
 
 echo set PATH=%%~dp0!zip7_dir!;%%PATH%%>> "!terminal_script!"
@@ -326,8 +357,8 @@ REM Background Application Scripts
 REM ----------------------------------------------------------------------------
 set terminal_script=!root_dir!\win32_start_background_apps.bat
 echo @echo off> "!terminal_script!"
-if !install_everything_void_tools! == 1 echo "%%~dp0!everything_dir!\everything.exe">> "!terminal_script!"
-if !install_keypirinha! == 1 echo "%%~dp0!keypirinha_dir!\keypirinha.exe">> "!terminal_script!"
+if !install_everything_void_tools! == 1 echo "call %%~dp0!everything_dir!\everything.exe">> "!terminal_script!"
+if !install_keypirinha! == 1 echo "call %%~dp0!keypirinha_dir!\keypirinha.exe">> "!terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM CTags Helper Script
