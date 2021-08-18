@@ -20,5 +20,6 @@ set install_ripgrep=1
 set install_zig=1
 
 REM Ethereum
+set install_geth=1
 set install_remix_ide=1
 set install_solidity=1

@@ -152,8 +152,8 @@ if !install_joplin! == 1 (
     if not exist "!joplin_exe!" (
         if not exist "!joplin_dir!" mkdir "!joplin_dir!"
         call :DownloadFile "https://github.com/laurent22/joplin/releases/download/v!joplin_version!/JoplinPortable.exe" "!joplin_exe!" || exit /B
+        call :VerifyFileSHA256 "!joplin_exe!" "!joplin_sha256!" || exit /B
     )
-    call :VerifyFileSHA256 "!joplin_exe!" "!joplin_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -230,7 +230,7 @@ if !install_mobaxterm! == 1 (
     set mobaxterm_version=21.2
     set mobaxterm_zip=!downloads_dir!\win32_mobaxterm-!mobaxterm_version!.zip
     set mobaxterm_dir=!tools_dir!\mobaxterm-!mobaxterm_version!
-    if not exist "!mobaxterm_bin_dir!\mobaxterm.exe" (
+    if not exist "!mobaxterm_dir!\MobaXterm_Personal_21.2.exe" (
         call :DownloadFile "https://download.mobatek.net/2122021051924233/MobaXterm_Portable_v!mobaxterm_version!.zip" !mobaxterm_zip! || exit /B
         call :VerifyFileSHA256 !mobaxterm_zip! !mobaxterm_sha256! || exit /B
         call :Unzip !mobaxterm_zip! !mobaxterm_dir! || exit /B
@@ -321,6 +321,27 @@ REM ----------------------------------------------------------------------------
 REM Ethereum
 REM ----------------------------------------------------------------------------
 REM ----------------------------------------------------------------------------
+REM geth
+REM ----------------------------------------------------------------------------
+if !install_geth! == 1 (
+    set geth_md5=35aecac473af02f886535e9a57530081
+    set geth_version=1.10.7-12f0ff40
+    set geth_zip=!downloads_dir!\win32_geth-amd64-v!geth_version!.zip
+    set geth_dir=!tools_dir!\geth-windows-amd64-!geth_version!
+    set geth_gpg_key=!downloads_dir!\..\geth-windows-builder-gpg-key.asc
+    set geth_gpg_sig=!geth_zip!.sig
+    if not exist "!geth_dir!\geth.exe" (
+        call :DownloadFile "https://gethstore.blob.core.windows.net/builds/geth-windows-amd64-!geth_version!.zip" "!geth_zip!" || exit /B
+        call :DownloadFile "https://gethstore.blob.core.windows.net/builds/geth-windows-amd64-!geth_version!.zip.sig" "!geth_gpg_sig! || exit /B
+        call :VerifyFileMD5 "!geth_zip!" "!geth_md5!" || exit /B
+
+        gpg --import "!geth_gpg_key!" || exit /B
+        gpg --verify "!geth_gpg_sig!" "!geth_zip!" || exit /B
+        call :Unzip "!geth_zip!" "!geth_dir!" || exit /B
+    )
+)
+
+REM ----------------------------------------------------------------------------
 REM remix_ide
 REM ----------------------------------------------------------------------------
 if !install_remix_ide! == 1 (
@@ -372,6 +393,7 @@ if !install_python3! == 1 (
 if !install_ripgrep! == 1 ( echo set PATH=%%~dp0!rg_dir!;%%PATH%%>> "!terminal_script!" )
 if !install_zig! == 1 ( echo set PATH=%%~dp0!zig_dir!;%%PATH%%>> "!terminal_script!" )
 
+if !install_geth! == 1 ( echo set PATH=%%~dp0!geth_dir!;%%PATH%%>> "!terminal_script!" )
 if !install_remix_ide! == 1 ( echo set PATH=%%~dp0!remix_ide_dir!;%%PATH%%>> "!terminal_script!" )
 if !install_solidity! == 1 ( echo set PATH=%%~dp0!solidity_dir!;%%PATH%%>> "!terminal_script!" )
 
@@ -424,10 +446,15 @@ REM ----------------------------------------------------------------------------
 :CopyFile
 set src_file=%~1
 set dest_file=%~2
+set msg=[Copy] !src_file! to !dest_file!
 
-call copy /Y !src_file! !dest_file! > nul
-if     exist "!dest_file!" echo - [Copy] !src_file! to !dest_file!
-if not exist "!dest_file!" echo - [Copy] Failed to copy file from !src_file! to !dest_file!
+if exist "!dest_file!" (
+    echo - [Cached] !msg!
+) else (
+    echo - !msg!
+    call copy /Y !src_file! !dest_file! > nul
+)
+
 exit /B !ERRORLEVEL!
 
 REM ------------------------------------------------------------------------------------------------
@@ -457,12 +484,34 @@ REM Verify Hash
 set /p actual_sha256=< !calculated_sha256_file!
 if "!expected_sha256!" neq "!actual_sha256!" (
     echo - [Verify] !file!
-    echo SHA256 Hash does not match, failing.
+    echo sha256 hash does not match, failing.
     echo Expected:   !expected_sha256!
     echo Calculated: !actual_sha256!
     exit /B -1
 ) else (
     echo - [Verify] !file! Hash OK: !expected_sha256!
+    exit /B 0
+)
+
+REM ------------------------------------------------------------------------------------------------
+:VerifyFileMD5
+set file=%~1
+set expected_md5=%~2
+
+REM Calculate hash
+set calculated_md5_file=!file!.md5.txt
+call powershell "$FileHash = Get-FileHash -algorithm md5 !file!; $FileHash.Hash.ToLower()" > !calculated_md5_file!
+
+REM Verify Hash
+set /p actual_md5=< !calculated_md5_file!
+if "!expected_md5!" neq "!actual_md5!" (
+    echo - [Verify] !file!
+    echo md5 hash does not match, failing.
+    echo Expected:   !expected_md5!
+    echo Calculated: !actual_md5!
+    exit /B -1
+) else (
+    echo - [Verify] !file! Hash OK: !expected_md5!
     exit /B 0
 )
 
