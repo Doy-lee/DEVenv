@@ -547,6 +547,7 @@ echo set HOME=%%~dp0!home_dir!>> "!terminal_script!"
 echo set HOMEPATH=%%~dp0!home_dir!>> "!terminal_script!"
 echo set USERPROFILE=%%~dp0!home_dir!>> "!terminal_script!"
 echo if exist "%%~dp0!msvc_script!" call "%%~dp0!msvc_script!">> "!terminal_script!"
+echo if exist "%%~dp0win32_terminal_user_config.bat" call "%%~dp0win32_terminal_user_config.bat">> "!terminal_script!"
 
 if !install_cmder! == 1 ( echo call "%%~dp0!cmder_dir!\cmder.exe" %%*>> "!terminal_script!" )
 
