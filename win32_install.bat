@@ -410,8 +410,8 @@ REM Background Application Scripts
 REM ----------------------------------------------------------------------------
 set terminal_script=!root_dir!\win32_start_background_apps.bat
 echo @echo off> "!terminal_script!"
-if !install_everything_void_tools! == 1 echo "call %%~dp0!everything_dir!\everything.exe">> "!terminal_script!"
-if !install_keypirinha! == 1 echo "call %%~dp0!keypirinha_dir!\keypirinha.exe">> "!terminal_script!"
+if !install_everything_void_tools! == 1 echo call "%%~dp0!everything_dir!\everything.exe">> "!terminal_script!"
+if !install_keypirinha! == 1 echo call "%%~dp0!keypirinha_dir!\keypirinha.exe">> "!terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM CTags Helper Script
