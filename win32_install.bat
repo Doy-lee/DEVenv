@@ -317,21 +317,25 @@ if !install_mobaxterm! == 1 (
 )
 
 REM ----------------------------------------------------------------------------
-REM node-js portable
+REM nodejs
 REM ----------------------------------------------------------------------------
 if !install_nodejs! == 1 (
-    set nodejs_sha256=fb951d3186b65a831453a187f6ee313af91de289c43c246f0e25a62657c919c8
-    set nodejs_version=2.10.0
+    set nodejs_sha256=f7b0e8b0bfcfad7d62eba16fa4db9f085983c12c661bd4c66d8e3bd783befa65
+    set nodejs_exe_sha256=7f33cbe04cb2940427e6dd97867c1fcf3ddd60911d2ae0260da3cab9f6ea6365
+    set nodejs_version=16.7.0
 
-    set nodejs_dir=!tools_dir!\nodejs-portable-!nodejs_version!
-    set nodejs_exe=!nodejs_dir!\nodejs-portable.exe
+    set nodejs_zip=!downloads_dir!\nodejs-!nodejs_version!-win-x64.7z
+    set nodejs_dir=!tools_dir!\nodejs-!nodejs_version!
+    set nodejs_exe=!nodejs_dir!\node.exe
 
     if not exist "!nodejs_exe!" (
-        if not exist "!nodejs_dir!" mkdir "!nodejs_dir!"
-        call :DownloadFile "https://github.com/crazy-max/nodejs-portable/releases/download/!nodejs_version!/nodejs-portable.exe" "!nodejs_exe!" || exit /B
+        call :DownloadFile "https://nodejs.org/dist/v!nodejs_version!/node-v!nodejs_version!-win-x64.7z" "!nodejs_zip!" || exit /B
+        call :VerifyFileSHA256 "!nodejs_zip!" "!nodejs_sha256!" || exit /B
+        call :Unzip "!nodejs_zip!" "!nodejs_dir!" || exit /B
+        call :Move "!nodejs_dir!\node-v!nodejs_version!-win-x64" "!nodejs_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!nodejs_exe!" "!nodejs_sha256!" || exit /B
+    call :VerifyFileSHA256 "!nodejs_exe!" "!nodejs_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -522,6 +526,12 @@ set terminal_script=!root_dir!\win32_terminal.bat
 set msvc_script=!tools_dir!\MSVC-2019-v16.9.2-VC-v14.28.29910-Win10-SDK-v10.0.19041.0-x64\msvc_env_x64.bat
 
 echo @echo off> "!terminal_script!"
+
+echo set APPDATA=%%~dp0!home_dir!\AppData>> "!terminal_script!"
+echo set HOME=%%~dp0!home_dir!>> "!terminal_script!"
+echo set HOMEPATH=%%~dp0!home_dir!>> "!terminal_script!"
+echo set USERPROFILE=%%~dp0!home_dir!>> "!terminal_script!"
+
 echo set PATH=%%~dp0!gpg_w32_bin_dir!;%%PATH%%>> "!terminal_script!"
 
 if !install_gvim! == 1 ( echo set PATH=%%~dp0!gvim_dir!;%%PATH%%>> "!terminal_script!" )
@@ -543,9 +553,6 @@ if !install_remix_ide! == 1 ( echo set PATH=%%~dp0!remix_ide_dir!;%%PATH%%>> "!t
 if !install_solidity! == 1 ( echo set PATH=%%~dp0!solidity_dir!;%%PATH%%>> "!terminal_script!" )
 
 echo set PATH=%%~dp0!zip7_dir!;%%PATH%%>> "!terminal_script!"
-echo set HOME=%%~dp0!home_dir!>> "!terminal_script!"
-echo set HOMEPATH=%%~dp0!home_dir!>> "!terminal_script!"
-echo set USERPROFILE=%%~dp0!home_dir!>> "!terminal_script!"
 echo if exist "%%~dp0!msvc_script!" call "%%~dp0!msvc_script!">> "!terminal_script!"
 echo if exist "%%~dp0win32_terminal_user_config.bat" call "%%~dp0win32_terminal_user_config.bat">> "!terminal_script!"
 
