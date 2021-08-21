@@ -1,9 +1,13 @@
-if [[ ! -f "${HOME}/.vim/autoload/plug.vim" ]]; then
-  wget --directory-prefix=../.vim/autoload https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+vim_dir=${HOME}/.vim
+vim_plug_dir=${vim_dir}/autoload
+mkdir --parents ${vim_plug_dir}
+
+if [[ ! -f "${vim_plug_dir}/plug.vim" ]]; then
+  wget --directory-prefix=${vim_plug_dir} https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
 
-if [[ ! -f "${HOME}/clang-format.py" ]]; then
-  wget --directory-prefix=${HOME}/.vim/clang-format.py https://raw.githubusercontent.com/llvm/llvm-project/main/clang/tools/clang-format/clang-format.py
+if [[ ! -f "${vim_dir}/clang-format.py" ]]; then
+  wget --directory-prefix=${vim_dir} https://raw.githubusercontent.com/llvm/llvm-project/main/clang/tools/clang-format/clang-format.py
 fi
 
 #
@@ -14,6 +18,8 @@ sudo apt install exuberant-ctags neovim clang-format ripgrep
 #
 # NVim
 #
+mkdir --parents ~/.config/nvim
+
 cp --force Installer/_vimrc ~/.vimrc
 cp --force Installer/unix_nvim_init.vim ~/.config/nvim/init.vim
 cp --force Installer/clang-format-style-file ~/_clang-format
