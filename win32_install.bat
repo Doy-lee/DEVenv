@@ -190,8 +190,8 @@ REM ----------------------------------------------------------------------------
 REM Joplin
 REM ----------------------------------------------------------------------------
 if !install_joplin! == 1 (
-    set joplin_sha256=1048da869657a889e27fc6c320161b806cc6e48de2d0ddaa602e92c6734f1c8c
-    set joplin_version=2.1.9
+    set joplin_sha256=719c949839fc489eb8a94a0489ea4f0948b8c9857f20ee26f7e94272a39c600d
+    set joplin_version=2.3.5
 
     set joplin_dir=!tools_dir!\joplin-x64-!joplin_version!
     set joplin_exe=!joplin_dir!\JoplinPortable.exe
