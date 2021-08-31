@@ -73,7 +73,7 @@ set fileformats=unix,dos
 set foldlevelstart=99    " Initially all folds open
 set foldmethod=indent    " Allow folding of
 set foldnestmax=1        " Maximum number of nested folds
-set guioptions=          " remove extra gui elements
+set guioptions=menu      " remove extra gui elements
 set laststatus=2         " always show status bar
 set linebreak            " When wrapping lines, don't break words
 set list                 " Show 'listchar' characters
