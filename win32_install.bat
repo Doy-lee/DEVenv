@@ -121,19 +121,19 @@ REM ----------------------------------------------------------------------------
 REM Programming
 REM ----------------------------------------------------------------------------
 REM ----------------------------------------------------------------------------
-REM Git (MinGit)
+REM Git
 REM ----------------------------------------------------------------------------
 if !install_git! == 1 (
-    set git_sha256=e28968ddd1c928eec233e0c692a90d6ac41eb7b53a9d7a408c13cb5b613afa95
+    set git_sha256=bc030848e282d49e562ae2392a72501cf539322ad06ffe4cea8cf766f148dfe8
     set git_exe_sha256=ae463cad04c2b15fc91de68ab096933ec08c44752e205aebd7d64c3a482df62d
     set git_version=2.33.0
 
-    set git_zip=!downloads_dir!\win32_git_!git_version!.zip
-    set git_dir=!tools_dir!\MinGit-!git_version!
+    set git_zip=!downloads_dir!\win32_git_!git_version!.7z.exe
+    set git_dir=!tools_dir!\PortableGit-!git_version!
     set git_exe=!git_dir!\cmd\git.exe
 
     if not exist "!git_exe!" (
-        call :DownloadFile "https://github.com/git-for-windows/git/releases/download/v!git_version!.windows.2/MinGit-!git_version!.2-64-bit.zip" "!git_zip!" || exit /B
+        call :DownloadFile "https://github.com/git-for-windows/git/releases/download/v!git_version!.windows.2/PortableGit-!git_version!.2-64-bit.7z.exe" "!git_zip!" || exit /B
         call :VerifyFileSHA256 "!git_zip!" "!git_sha256!" || exit /B
         call :Unzip "!git_zip!" "!git_dir!" || exit /B
     )
