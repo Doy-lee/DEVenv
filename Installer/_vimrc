@@ -15,7 +15,8 @@ Plug 'https://github.com/scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'https://github.com/tpope/vim-fugitive'
 Plug 'https://github.com/bfrg/vim-cpp-modern'
 Plug 'https://github.com/skywind3000/asyncrun.vim'
-Plug 'https://github.com/Yggdroot/LeaderF'
+Plug 'https://github.com/junegunn/fzf'
+Plug 'https://github.com/junegunn/fzf.vim'
 
 " Themes
 Plug 'https://github.com/tomasr/molokai'
@@ -190,34 +191,20 @@ if s:running_windows
 endif
 
 " ==============================================================================
-" Leaderf
+" FZF
 " ==============================================================================
-" Config
-let g:Lf_MruFileExclude = ['tags', '*.so', '.o', '*.exe', '*.dll']
-let g:Lf_UseVersionControlTool = 0
-let g:Lf_JumpToExistingWindow = 0
-let g:Lf_WildIgnore = {
-        \ 'dir': ['.git', '.svn', '.hg'],
-        \ 'file': ['tags', '*.so', '.o', '*.exe', '*.dll']
-        \}
+nnoremap <leader>f :FzfFiles<CR>
+nnoremap <leader>t :FzfTags<CR>
+nnoremap <leader>r :FzfRg<CR>
 
-let g:Lf_CtagsFuncOpts = {
-        \ 'c': '--c-kinds=fp',
-        \ 'c++': '--c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++',
-        \ 'rust': '--rust-kinds=f',
-        \ }
+" Empty value to disable preview window altogether
+let g:fzf_preview_window = []
 
-" Bindings
-nnoremap <leader>b :<C-U><C-R>=printf("Leaderf buffer %s", "")<CR><CR>
-nnoremap <leader>f :<C-U><C-R>=printf("Leaderf file %s", "")<CR><CR>
-nnoremap <leader>l :<C-U><C-R>=printf("Leaderf line %s", "")<CR><CR>
-nnoremap <leader>m :<C-U><C-R>=printf("Leaderf mru %s", "")<CR><CR>
-nnoremap <leader>p :<C-U><C-R>=printf("Leaderf function %s", "")<CR><CR>
-nnoremap <leader>t :<C-U><C-R>=printf("Leaderf tag %s", "")<CR><CR>
-nnoremap <leader>h :<C-U><C-R>=printf("Leaderf self %s", "")<CR><CR>
+" Prefix all commands with Fzf for discoverability
+let g:fzf_command_prefix = 'Fzf'
 
-noremap <C-P> :<C-U><C-R>=printf("Leaderf bufTag %s", "")<CR><CR>
-noremap <C-F> :<C-U><C-R>=printf("Leaderf! rg -e %s ", expand("<cword>"))<CR>
+" - down / up / left / right
+let g:fzf_layout = { 'down': '40%' }
 
 " ==============================================================================
 " Clang Format

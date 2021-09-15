@@ -162,6 +162,43 @@ if !install_everything_void_tools! == 1 (
 )
 
 REM ----------------------------------------------------------------------------
+REM fzf
+REM ----------------------------------------------------------------------------
+if !install_fzf! == 1 (
+    set fzf_sha256=c9b5c8bdbef06305a2d0a33b0d82218bebd5a81a3f2187624d4a9d8fe972fc09
+    set fzf_exe_sha256=83cdcb08d65edc734205f9de5e87ef3261358a4abf6f21e1c97d431205da8bc9
+    set fzf_version=0.27.2
+
+    set fzf_zip=!downloads_dir!\win32_fzf_v!fzf_version!.zip
+    set fzf_dir=!cmder_dir!\bin
+    set fzf_exe=!fzf_dir!\fzf.exe
+
+    if not exist "!fzf_exe!" (
+        call :DownloadFile "https://github.com/junegunn/fzf/releases/download/!fzf_version!/fzf-!fzf_version!-windows_amd64.zip" "!fzf_zip!" || exit /B
+        call :VerifyFileSHA256 "!fzf_zip!" "!fzf_sha256!" || exit /B
+        call :UnzipAndAlwaysOverwrite "!fzf_zip!" "!fzf_dir!" || exit /B
+    )
+
+    REM Windows integration tool
+    set ff_sha256=244e5f67b4fe7239b775af16586d5af7a5d59334ae00f7ead31bba1b91c1e51b
+    set ff_exe_sha256=244e5f67b4fe7239b775af16586d5af7a5d59334ae00f7ead31bba1b91c1e51b
+    set ff_version=0.1.1
+
+    set ff_zip=!downloads_dir!\win32_ff_v!ff_version!.zip
+    set ff_dir=!cmder_dir!\bin
+    set ff_exe=!ff_dir!\ff.exe
+
+    if not exist "!ff_exe!" (
+        call :DownloadFile "https://github.com/genotrance/ff/releases/download/v!ff_version!/ff-v!ff_version!.zip" "!ff_zip!" || exit /B
+        call :VerifyFileSHA256 "!ff_zip!" "!ff_sha256!" || exit /B
+        call :UnzipAndAlwaysOverwrite "!ff_zip!" "!ff_dir!" || exit /B
+    )
+
+    call :VerifyFileSHA256 "!fzf_exe!" "!fzf_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!ff_exe!" "!ff_exe_sha256!" || exit /B
+)
+
+REM ----------------------------------------------------------------------------
 REM GVim, Vim Plug, Vim Config
 REM ----------------------------------------------------------------------------
 if !install_gvim! == 1 (
@@ -534,6 +571,15 @@ echo set USERPROFILE=%%~dp0!home_dir!>> "!terminal_script!"
 
 echo set PATH=%%~dp0!gpg_w32_bin_dir!;%%PATH%%>> "!terminal_script!"
 
+if !install_fzf! == 1 (
+    echo set FZF_DEFAULT_OPTS=--multi --layout=reverse>> "!terminal_script!"
+
+    REM Use RG for FZF to make it ultra fast
+    if !install_ripgrep! == 1 (
+        echo set FZF_DEFAULT_COMMAND=rg --files --no-ignore-vcs --hidden>> "!terminal_script!"
+    )
+)
+
 if !install_gvim! == 1 ( echo set PATH=%%~dp0!gvim_dir!;%%PATH%%>> "!terminal_script!" )
 if !install_llvm_clang! == 1 ( echo set PATH=%%~dp0!llvm_bin_dir!;%%PATH%%>> "!terminal_script!" )
 if !install_mingw64! == 1 ( echo set PATH=%%~dp0!mingw_bin_dir!;%%PATH%%>> "!terminal_script!" )
@@ -617,6 +663,16 @@ if exist !dest! (
     echo - !msg!
     call !zip7_dir!\7z.exe x -y -spe -o!dest! !zip_file!
 )
+exit /B !ERROLEVEL!
+
+REM ------------------------------------------------------------------------------------------------
+:UnzipAndAlwaysOverwrite
+set zip_file=%~1
+set dest=%~2
+set msg=[Unzip] !zip_file! to !dest!
+
+echo - !msg!
+call !zip7_dir!\7z.exe x -y -spe -o!dest! !zip_file!
 exit /B !ERROLEVEL!
 
 REM ------------------------------------------------------------------------------------------------
