@@ -105,8 +105,9 @@ REM ----------------------------------------------------------------------------
 REM Cmder
 REM ----------------------------------------------------------------------------
 if !install_cmder! == 1 (
-    set cmder_exe_sha256=eac713108a49794aacc4797faa38a9397c7d334f309ef6c776039e8ef27efd02
-    set cmder_version=v1.3.16
+    set cmder_sha256=392A5A5C36CCB3FD212A2A703ADA209C9458EF4CF6EAB10A93A3F20BA351FDAB
+    set cmder_exe_sha256=8bae403304f87082c40322488745f1d0859c88f7bd2b6bfbeafb6d90458cb179
+    set cmder_version=v1.3.18
 
     set cmder_zip=!downloads_dir!\win32_cmder_!cmder_version!.7z
     set cmder_exe=!cmder_dir!\cmder.exe
@@ -114,6 +115,7 @@ if !install_cmder! == 1 (
     if not exist "!cmder_exe!" (
         call :DownloadFile https://github.com/cmderdev/cmder/releases/download/!cmder_version!/cmder.7z "!cmder_zip!" || exit /B
         call :Unzip "!cmder_zip!" "!cmder_dir!" || exit /B
+        call :VerifyFileSHA256 "!cmder_zip!" "!cmder_sha256!" || exit /B
     )
 
     call :VerifyFileSHA256 "!cmder_exe!" "!cmder_exe_sha256!" || exit /B
@@ -178,24 +180,7 @@ if !install_fzf! == 1 (
         call :VerifyFileSHA256 "!fzf_zip!" "!fzf_sha256!" || exit /B
         call :UnzipAndAlwaysOverwrite "!fzf_zip!" "!fzf_dir!" || exit /B
     )
-
-    REM Windows integration tool
-    set ff_sha256=244e5f67b4fe7239b775af16586d5af7a5d59334ae00f7ead31bba1b91c1e51b
-    set ff_exe_sha256=244e5f67b4fe7239b775af16586d5af7a5d59334ae00f7ead31bba1b91c1e51b
-    set ff_version=0.1.1
-
-    set ff_zip=!downloads_dir!\win32_ff_v!ff_version!.zip
-    set ff_dir=!cmder_dir!\bin
-    set ff_exe=!ff_dir!\ff.exe
-
-    if not exist "!ff_exe!" (
-        call :DownloadFile "https://github.com/genotrance/ff/releases/download/v!ff_version!/ff-v!ff_version!.zip" "!ff_zip!" || exit /B
-        call :VerifyFileSHA256 "!ff_zip!" "!ff_sha256!" || exit /B
-        call :UnzipAndAlwaysOverwrite "!ff_zip!" "!ff_dir!" || exit /B
-    )
-
     call :VerifyFileSHA256 "!fzf_exe!" "!fzf_exe_sha256!" || exit /B
-    call :VerifyFileSHA256 "!ff_exe!" "!ff_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
