@@ -4,11 +4,12 @@ REM ----------------------------------------------------------------------------
 REM Installation Configuration
 REM ----------------------------------------------------------------------------
 REM Set the 0 or 1 to enable or disable installation of a package
-set install_cmder=1
+set install_alacritty=1
 
 REM ----------------------------------------------------------------------------
 REM Programming
 REM ----------------------------------------------------------------------------
+set install_git=1
 set install_llvm_clang=1
 set install_mingw64=1
 set install_nodejs=1

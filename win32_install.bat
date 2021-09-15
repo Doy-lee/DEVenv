@@ -8,16 +8,17 @@ REM Setup Folder Locations
 REM ----------------------------------------------------------------------------
 set root_dir=!CD!
 set home_dir=Home
-set cmder_dir=Cmder
 set install_dir=Installer
 set downloads_dir=!install_dir!\Downloads
 set vim_dir=!home_dir!\vimfiles
 set tools_dir=Tools
+set bin_dir=!tools_dir!\Bin
 
 if not exist !home_dir! mkdir !home_dir!
 if not exist !install_dir! mkdir !install_dir!
 if not exist !downloads_dir! mkdir !downloads_dir!
 if not exist !tools_dir! mkdir !tools_dir!
+if not exist !bin_dir! mkdir !bin_dir!
 
 REM ----------------------------------------------------------------------------
 REM Setup tools for setting up the development environment
@@ -102,25 +103,176 @@ REM ----------------------------------------------------------------------------
 REM Download & verify the tools we want for development
 
 REM ----------------------------------------------------------------------------
-REM Cmder
+REM Alacritty
 REM ----------------------------------------------------------------------------
-if !install_cmder! == 1 (
-    set cmder_sha256=392A5A5C36CCB3FD212A2A703ADA209C9458EF4CF6EAB10A93A3F20BA351FDAB
-    set cmder_exe_sha256=8bae403304f87082c40322488745f1d0859c88f7bd2b6bfbeafb6d90458cb179
-    set cmder_version=v1.3.18
+if !install_alacritty! == 1 (
+    set alacritty_exe_sha256=c0d2e4f12bb362b039de1b87b8cb064cbc16ddb14d57c844840bd6e3efc96d07
+    set alacritty_version=0.9.0
+    set alacritty_exe=!tools_dir!\alacritty-v!alacritty_version!-portable.exe
 
-    set cmder_zip=!downloads_dir!\win32_cmder_!cmder_version!.7z
-    set cmder_exe=!cmder_dir!\cmder.exe
-
-    if not exist "!cmder_exe!" (
-        call :DownloadFile https://github.com/cmderdev/cmder/releases/download/!cmder_version!/cmder.7z "!cmder_zip!" || exit /B
-        call :Unzip "!cmder_zip!" "!cmder_dir!" || exit /B
-        call :VerifyFileSHA256 "!cmder_zip!" "!cmder_sha256!" || exit /B
+    if not exist "!alacritty_exe!" (
+        call :DownloadFile https://github.com/alacritty/alacritty/releases/download/v!alacritty_version!/Alacritty-v!alacritty_version!-portable.exe "!alacritty_exe!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!cmder_exe!" "!cmder_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!alacritty_exe!" "!alacritty_exe_sha256!" || exit /B
 )
 
+REM ----------------------------------------------------------------------------
+REM Programming
+REM ----------------------------------------------------------------------------
+REM ----------------------------------------------------------------------------
+REM Git (MinGit)
+REM ----------------------------------------------------------------------------
+if !install_git! == 1 (
+    set git_sha256=e28968ddd1c928eec233e0c692a90d6ac41eb7b53a9d7a408c13cb5b613afa95
+    set git_exe_sha256=ae463cad04c2b15fc91de68ab096933ec08c44752e205aebd7d64c3a482df62d
+    set git_version=2.33.0
+
+    set git_zip=!downloads_dir!\win32_git_!git_version!.zip
+    set git_dir=!tools_dir!\MinGit-!git_version!
+    set git_exe=!git_dir!\cmd\git.exe
+
+    if not exist "!git_exe!" (
+        call :DownloadFile "https://github.com/git-for-windows/git/releases/download/v!git_version!.windows.2/MinGit-!git_version!.2-64-bit.zip" "!git_zip!" || exit /B
+        call :VerifyFileSHA256 "!git_zip!" "!git_sha256!" || exit /B
+        call :Unzip "!git_zip!" "!git_dir!" || exit /B
+    )
+
+    call :VerifyFileSHA256 "!git_exe!" "!git_exe_sha256!" || exit /B
+)
+
+REM ----------------------------------------------------------------------------
+REM LLVM/Clang
+REM ----------------------------------------------------------------------------
+if !install_llvm_clang! == 1 (
+    set llvm_exe_sha256=9f0748de7f946c210a030452de226986bab46a0121d7236ea0e7b5079cb6dfef
+    set llvm_version=12.0.1
+
+    set llvm_zip=!downloads_dir!\win32_llvm_x64_v!llvm_version!.exe
+    set llvm_dir=!tools_dir!\llvm-!llvm_version!
+    set llvm_exe=!llvm_dir!\bin\clang.exe
+
+    set llvm_gpg_key=!downloads_dir!\llvm-tstellar-gpg-key.asc
+    set llvm_gpg_sig=!llvm_zip!.sig
+
+    if not exist "!llvm_exe!" (
+        call :DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/tstellar-gpg-key.asc" "!llvm_gpg_key!" || exit /B
+        call :DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-!llvm_version!/LLVM-!llvm_version!-win64.exe.sig" "!llvm_gpg_sig!" || exit /B
+        call :DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-!llvm_version!/LLVM-!llvm_version!-win64.exe" "!llvm_zip!" || exit /B
+
+        gpg --import "!llvm_gpg_key!" || exit /B
+        gpg --verify "!llvm_gpg_sig!" "!llvm_zip!" || exit /B
+        call :Unzip "!llvm_zip!" "!llvm_dir!" || exit /B
+    )
+
+    if !install_gvim! == 1 (
+        set clang_format_py_sha256=36ba7aa047f8a8ac8fdc278aaa733de801cc84dea60a4210973fd3e4f0d2a330
+        set vim_clang_format=!vim_dir!\clang-format.py
+        call :CopyAndAlwaysOverwriteFile "!llvm_dir!\share\clang\clang-format.py" "!vim_clang_format!" || exit /B
+        call :VerifyFileSHA256 !vim_clang_format! !clang_format_py_sha256! || exit /B
+    )
+
+    set llvm_bin_dir=!llvm_dir!\bin
+    call :VerifyFileSHA256 !llvm_exe! !llvm_exe_sha256! || exit /B
+)
+
+REM ------------------------------------------------------------------------
+REM MinGW64
+REM ------------------------------------------------------------------------
+if !install_mingw64! == 1 (
+    set mingw_sha256=853970527b5de4a55ec8ca4d3fd732c00ae1c69974cc930c82604396d43e79f8
+    set mingw_exe_sha256=c5f0953f7a71ddcdf0852e1e44a43cef9b8fe121beba4d4202bfe6d405de47c0
+    set mingw_version=8.1.0
+
+    set mingw_zip=!downloads_dir!\win32_mingw64-posix-seg-rt_v6-rev0!mingw_version!.7z
+    set mingw_dir=!tools_dir!\mingw64-posix-seh-rt_v6-rev0-!mingw_version!
+    set mingw_bin_dir=!mingw_dir!\bin
+    set mingw_exe=!mingw_bin_dir!\gcc.exe
+
+    if not exist "!mingw_exe!" (
+        call :DownloadFile \"https://sourceforge.net/projects/mingw-w64/files/Toolchains targetting Win64/Personal Builds/mingw-builds/!mingw_version!/threads-posix/seh/x86_64-!mingw_version!-release-posix-seh-rt_v6-rev0.7z\" !mingw_zip! || exit /B
+        call :VerifyFileSHA256 !mingw_zip! !mingw_sha256! || exit /B
+        call :Unzip !mingw_zip! !mingw_dir! || exit /B
+        call :Move !mingw_dir!\mingw64 !mingw_dir! || exit /B
+    )
+
+    call :VerifyFileSHA256 !mingw_exe! !mingw_exe_sha256! || exit /B
+)
+
+REM ----------------------------------------------------------------------------
+REM nodejs
+REM ----------------------------------------------------------------------------
+if !install_nodejs! == 1 (
+    set nodejs_sha256=f7b0e8b0bfcfad7d62eba16fa4db9f085983c12c661bd4c66d8e3bd783befa65
+    set nodejs_exe_sha256=7f33cbe04cb2940427e6dd97867c1fcf3ddd60911d2ae0260da3cab9f6ea6365
+    set nodejs_version=16.7.0
+
+    set nodejs_zip=!downloads_dir!\nodejs-!nodejs_version!-win-x64.7z
+    set nodejs_dir=!tools_dir!\nodejs-!nodejs_version!
+    set nodejs_exe=!nodejs_dir!\node.exe
+
+    if not exist "!nodejs_exe!" (
+        call :DownloadFile "https://nodejs.org/dist/v!nodejs_version!/node-v!nodejs_version!-win-x64.7z" "!nodejs_zip!" || exit /B
+        call :VerifyFileSHA256 "!nodejs_zip!" "!nodejs_sha256!" || exit /B
+        call :Unzip "!nodejs_zip!" "!nodejs_dir!" || exit /B
+        call :Move "!nodejs_dir!\node-v!nodejs_version!-win-x64" "!nodejs_dir!" || exit /B
+    )
+
+    call :VerifyFileSHA256 "!nodejs_exe!" "!nodejs_exe_sha256!" || exit /B
+)
+
+REM ----------------------------------------------------------------------------
+REM Python
+REM ----------------------------------------------------------------------------
+if !install_python3! == 1 (
+    set python_sha256=93cc3db75dffb4d56b9f64af43294f130f2c222a66de7a1325d0ce8f1ed62e26
+    set python_exe_sha256=9042daa88b2d3879a51bfabc2d90d4a56da05ebf184b6492a22a46fdc1c936a4
+    set python_version=3.9.0.2dot
+    set python_version_nodot=3902
+    set python_version_dot=3.9.0
+
+    set python_zip=!downloads_dir!\win32_Winpython64-!python_version!.exe
+    set python_dir=!tools_dir!\Winpython64-!python_version_nodot!
+    set python_exe=!python_dir!\python-3.9.0.amd64\python.exe
+
+    if not exist "!python_exe!" (
+        call :DownloadFile "https://github.com/winpython/winpython/releases/download/3.0.20201028/Winpython64-!python_version!.exe" "!python_zip!" || exit /B
+        call :VerifyFileSHA256 "!python_zip!" "!python_sha256!" || exit /B
+        call :Unzip "!python_zip!" "!python_dir!" || exit /B
+        call :Move "!python_dir!\WPy64-!python_version_nodot!" "!python_dir!" || exit /B
+    )
+
+    call :VerifyFileSHA256 "!python_exe!" "!python_exe_sha256!" || exit /B
+
+    set python_bin_dir=!python_dir!\python-!python_version_dot!.amd64
+    set python_scripts_bin_dir=!python_bin_dir!\Scripts
+)
+
+REM ----------------------------------------------------------------------------
+REM Zig
+REM ----------------------------------------------------------------------------
+if !install_zig! == 1 (
+    set zig_sha256=8580fbbf3afb72e9b495c7f8aeac752a03475ae0bbcf5d787f3775c7e1f4f807
+    set zig_exe_sha256=43ea220fa74b3adfc740719c1bcaabdc3d4016b0c5f11aed4bd0477fc42c23f0
+    set zig_version=0.8.0
+
+    set zig_file=zig-windows-x86_64-!zig_version!.zip
+    set zig_zip=!downloads_dir!\win32_!zig_file!
+    set zig_dir=!tools_dir!\zig-windows-x86_64-!zig_version!
+    set zig_exe=!zig_dir!\zig.exe
+
+    if not exist "!zig_exe!" (
+        call :DownloadFile "https://ziglang.org/download/!zig_version!/!zig_file!" "!zig_zip!" || exit /B
+        call :VerifyFileSHA256 "!zig_zip!" "!zig_sha256!" || exit /B
+        call :Unzip "!zig_zip!" "!zig_dir!" || exit /B
+    )
+
+    call :VerifyFileSHA256 "!zig_exe!" "!zig_exe_sha256!" || exit /B
+)
+
+REM ----------------------------------------------------------------------------
+REM QoL/Tools
+REM ----------------------------------------------------------------------------
 REM ----------------------------------------------------------------------------
 REM Dependencies (Walker) - For DLL dependency management
 REM ----------------------------------------------------------------------------
@@ -172,7 +324,7 @@ if !install_fzf! == 1 (
     set fzf_version=0.27.2
 
     set fzf_zip=!downloads_dir!\win32_fzf_v!fzf_version!.zip
-    set fzf_dir=!cmder_dir!\bin
+    set fzf_dir=!bin_dir!
     set fzf_exe=!fzf_dir!\fzf.exe
 
     if not exist "!fzf_exe!" (
@@ -249,73 +401,15 @@ if !install_keypirinha! == 1 (
 )
 
 REM ----------------------------------------------------------------------------
-REM LLVM/Clang
-REM ----------------------------------------------------------------------------
-if !install_llvm_clang! == 1 (
-    set llvm_exe_sha256=9f0748de7f946c210a030452de226986bab46a0121d7236ea0e7b5079cb6dfef
-    set llvm_version=12.0.1
-
-    set llvm_zip=!downloads_dir!\win32_llvm_x64_v!llvm_version!.exe
-    set llvm_dir=!tools_dir!\llvm-!llvm_version!
-    set llvm_exe=!llvm_dir!\bin\clang.exe
-
-    set llvm_gpg_key=!downloads_dir!\llvm-tstellar-gpg-key.asc
-    set llvm_gpg_sig=!llvm_zip!.sig
-
-    if not exist "!llvm_exe!" (
-        call :DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/tstellar-gpg-key.asc" "!llvm_gpg_key!" || exit /B
-        call :DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-!llvm_version!/LLVM-!llvm_version!-win64.exe.sig" "!llvm_gpg_sig!" || exit /B
-        call :DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-!llvm_version!/LLVM-!llvm_version!-win64.exe" "!llvm_zip!" || exit /B
-
-        gpg --import "!llvm_gpg_key!" || exit /B
-        gpg --verify "!llvm_gpg_sig!" "!llvm_zip!" || exit /B
-        call :Unzip "!llvm_zip!" "!llvm_dir!" || exit /B
-    )
-
-    if !install_gvim! == 1 (
-        set clang_format_py_sha256=36ba7aa047f8a8ac8fdc278aaa733de801cc84dea60a4210973fd3e4f0d2a330
-        set vim_clang_format=!vim_dir!\clang-format.py
-        call :CopyAndAlwaysOverwriteFile "!llvm_dir!\share\clang\clang-format.py" "!vim_clang_format!" || exit /B
-        call :VerifyFileSHA256 !vim_clang_format! !clang_format_py_sha256! || exit /B
-    )
-
-    set llvm_bin_dir=!llvm_dir!\bin
-    call :VerifyFileSHA256 !llvm_exe! !llvm_exe_sha256! || exit /B
-)
-
-REM ----------------------------------------------------------------------------
 REM Misc Tools
 REM ----------------------------------------------------------------------------
 REM ctags: C/C++ code annotation generator
 REM scanmapset: Bind capslock to escape via registry
 REM uncap: Bind capslock to escape via run-time program
-call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_ctags.exe" "!cmder_dir!\bin\ctags.exe" || exit /B
-call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_scanmapset.exe" "!cmder_dir!\bin\scanmapset.exe" || exit /B
-call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_uncap.exe" "!cmder_dir!\bin\uncap.exe" || exit /B
+call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_ctags.exe" "!bin_dir!\ctags.exe" || exit /B
+call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_scanmapset.exe" "!bin_dir!\scanmapset.exe" || exit /B
+call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_uncap.exe" "!bin_dir!\uncap.exe" || exit /B
 call :CopyAndAlwaysOverwriteFile "!install_dir!\clang-format-style-file" "!home_dir!\_clang-format" || exit /B
-
-REM ------------------------------------------------------------------------
-REM MinGW64
-REM ------------------------------------------------------------------------
-if !install_mingw64! == 1 (
-    set mingw_sha256=853970527b5de4a55ec8ca4d3fd732c00ae1c69974cc930c82604396d43e79f8
-    set mingw_exe_sha256=c5f0953f7a71ddcdf0852e1e44a43cef9b8fe121beba4d4202bfe6d405de47c0
-    set mingw_version=8.1.0
-
-    set mingw_zip=!downloads_dir!\win32_mingw64-posix-seg-rt_v6-rev0!mingw_version!.7z
-    set mingw_dir=!tools_dir!\mingw64-posix-seh-rt_v6-rev0-!mingw_version!
-    set mingw_bin_dir=!mingw_dir!\bin
-    set mingw_exe=!mingw_bin_dir!\gcc.exe
-
-    if not exist "!mingw_exe!" (
-        call :DownloadFile \"https://sourceforge.net/projects/mingw-w64/files/Toolchains targetting Win64/Personal Builds/mingw-builds/!mingw_version!/threads-posix/seh/x86_64-!mingw_version!-release-posix-seh-rt_v6-rev0.7z\" !mingw_zip! || exit /B
-        call :VerifyFileSHA256 !mingw_zip! !mingw_sha256! || exit /B
-        call :Unzip !mingw_zip! !mingw_dir! || exit /B
-        call :Move !mingw_dir!\mingw64 !mingw_dir! || exit /B
-    )
-
-    call :VerifyFileSHA256 !mingw_exe! !mingw_exe_sha256! || exit /B
-)
 
 REM ------------------------------------------------------------------------
 REM MobaXTerm
@@ -336,28 +430,6 @@ if !install_mobaxterm! == 1 (
     )
 
     call :VerifyFileSHA256 !mobaxterm_exe! !mobaxterm_exe_sha256! || exit /B
-)
-
-REM ----------------------------------------------------------------------------
-REM nodejs
-REM ----------------------------------------------------------------------------
-if !install_nodejs! == 1 (
-    set nodejs_sha256=f7b0e8b0bfcfad7d62eba16fa4db9f085983c12c661bd4c66d8e3bd783befa65
-    set nodejs_exe_sha256=7f33cbe04cb2940427e6dd97867c1fcf3ddd60911d2ae0260da3cab9f6ea6365
-    set nodejs_version=16.7.0
-
-    set nodejs_zip=!downloads_dir!\nodejs-!nodejs_version!-win-x64.7z
-    set nodejs_dir=!tools_dir!\nodejs-!nodejs_version!
-    set nodejs_exe=!nodejs_dir!\node.exe
-
-    if not exist "!nodejs_exe!" (
-        call :DownloadFile "https://nodejs.org/dist/v!nodejs_version!/node-v!nodejs_version!-win-x64.7z" "!nodejs_zip!" || exit /B
-        call :VerifyFileSHA256 "!nodejs_zip!" "!nodejs_sha256!" || exit /B
-        call :Unzip "!nodejs_zip!" "!nodejs_dir!" || exit /B
-        call :Move "!nodejs_dir!\node-v!nodejs_version!-win-x64" "!nodejs_dir!" || exit /B
-    )
-
-    call :VerifyFileSHA256 "!nodejs_exe!" "!nodejs_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -400,33 +472,6 @@ if !install_process_hacker! == 1 (
 )
 
 REM ----------------------------------------------------------------------------
-REM Python
-REM ----------------------------------------------------------------------------
-if !install_python3! == 1 (
-    set python_sha256=93cc3db75dffb4d56b9f64af43294f130f2c222a66de7a1325d0ce8f1ed62e26
-    set python_exe_sha256=9042daa88b2d3879a51bfabc2d90d4a56da05ebf184b6492a22a46fdc1c936a4
-    set python_version=3.9.0.2dot
-    set python_version_nodot=3902
-    set python_version_dot=3.9.0
-
-    set python_zip=!downloads_dir!\win32_Winpython64-!python_version!.exe
-    set python_dir=!tools_dir!\Winpython64-!python_version_nodot!
-    set python_exe=!python_dir!\python-3.9.0.amd64\python.exe
-
-    if not exist "!python_exe!" (
-        call :DownloadFile "https://github.com/winpython/winpython/releases/download/3.0.20201028/Winpython64-!python_version!.exe" "!python_zip!" || exit /B
-        call :VerifyFileSHA256 "!python_zip!" "!python_sha256!" || exit /B
-        call :Unzip "!python_zip!" "!python_dir!" || exit /B
-        call :Move "!python_dir!\WPy64-!python_version_nodot!" "!python_dir!" || exit /B
-    )
-
-    call :VerifyFileSHA256 "!python_exe!" "!python_exe_sha256!" || exit /B
-
-    set python_bin_dir=!python_dir!\python-!python_version_dot!.amd64
-    set python_scripts_bin_dir=!python_bin_dir!\Scripts
-)
-
-REM ----------------------------------------------------------------------------
 REM ripgrep
 REM ----------------------------------------------------------------------------
 if !install_ripgrep! == 1 (
@@ -446,28 +491,6 @@ if !install_ripgrep! == 1 (
     )
 
     call :VerifyFileSHA256 "!rg_exe!" "!rg_exe_sha256!" || exit /B
-)
-
-REM ----------------------------------------------------------------------------
-REM Zig
-REM ----------------------------------------------------------------------------
-if !install_zig! == 1 (
-    set zig_sha256=8580fbbf3afb72e9b495c7f8aeac752a03475ae0bbcf5d787f3775c7e1f4f807
-    set zig_exe_sha256=43ea220fa74b3adfc740719c1bcaabdc3d4016b0c5f11aed4bd0477fc42c23f0
-    set zig_version=0.8.0
-
-    set zig_file=zig-windows-x86_64-!zig_version!.zip
-    set zig_zip=!downloads_dir!\win32_!zig_file!
-    set zig_dir=!tools_dir!\zig-windows-x86_64-!zig_version!
-    set zig_exe=!zig_dir!\zig.exe
-
-    if not exist "!zig_exe!" (
-        call :DownloadFile "https://ziglang.org/download/!zig_version!/!zig_file!" "!zig_zip!" || exit /B
-        call :VerifyFileSHA256 "!zig_zip!" "!zig_sha256!" || exit /B
-        call :Unzip "!zig_zip!" "!zig_dir!" || exit /B
-    )
-
-    call :VerifyFileSHA256 "!zig_exe!" "!zig_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -555,6 +578,7 @@ echo set HOMEPATH=%%~dp0!home_dir!>> "!terminal_script!"
 echo set USERPROFILE=%%~dp0!home_dir!>> "!terminal_script!"
 
 echo set PATH=%%~dp0!gpg_w32_bin_dir!;%%PATH%%>> "!terminal_script!"
+echo set PATH=%%~dp0!bin_dir!;%%PATH%%>> "!terminal_script!"
 
 if !install_fzf! == 1 (
     echo set FZF_DEFAULT_OPTS=--multi --layout=reverse>> "!terminal_script!"
@@ -563,6 +587,12 @@ if !install_fzf! == 1 (
     if !install_ripgrep! == 1 (
         echo set FZF_DEFAULT_COMMAND=rg --files --no-ignore-vcs --hidden>> "!terminal_script!"
     )
+)
+
+if !install_git! == 1 (
+    echo set PATH=%%~dp0!git_dir!\cmd;%%PATH%%>> "!terminal_script!"
+    echo set PATH=%%~dp0!git_dir!\mingw64\bin;%%PATH%%>> "!terminal_script!"
+    echo set PATH=%%~dp0!git_dir!\usr\bin;%%PATH%%>> "!terminal_script!"
 )
 
 if !install_gvim! == 1 ( echo set PATH=%%~dp0!gvim_dir!;%%PATH%%>> "!terminal_script!" )
@@ -587,7 +617,7 @@ echo set PATH=%%~dp0!zip7_dir!;%%PATH%%>> "!terminal_script!"
 echo if exist "%%~dp0!msvc_script!" call "%%~dp0!msvc_script!">> "!terminal_script!"
 echo if exist "%%~dp0win32_terminal_user_config.bat" call "%%~dp0win32_terminal_user_config.bat">> "!terminal_script!"
 
-if !install_cmder! == 1 ( echo call "%%~dp0!cmder_dir!\cmder.exe" %%*>> "!terminal_script!" )
+if !install_alacritty! == 1 ( echo call "%%~dp0!alacritty_exe!" %%*>> "!terminal_script!" )
 
 REM ----------------------------------------------------------------------------
 REM Background Application Scripts
@@ -600,11 +630,11 @@ if !install_keypirinha! == 1 echo call "%%~dp0!keypirinha_dir!\keypirinha.exe">>
 REM ----------------------------------------------------------------------------
 REM CTags Helper Script
 REM ----------------------------------------------------------------------------
-set ctags_file=!cmder_dir!\bin\ctags_cpp.bat
+set ctags_file=!bin_dir!\ctags_cpp.bat
 echo @echo off> "!ctags_file!"
 echo ctags --c++-kinds=+p --fields=+iaS --extras=+q %%*>> !ctags_file!
 
-echo - Setup complete. Launch !cmder_dir!\cmder.exe [or restart Cmder instance if you're updating an existing installation]
+echo - Setup complete. Launch !root_dir!\win32_terminal.bat [or restart Alacritty instance if you're updating an existing installation]
 pause
 exit /B
 
