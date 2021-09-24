@@ -615,9 +615,9 @@ if !install_solidity! == 1 ( echo set PATH=%%~dp0!solidity_dir!;%%PATH%%>> "!ter
 
 echo set PATH=%%~dp0!zip7_dir!;%%PATH%%>> "!terminal_script!"
 echo if exist "%%~dp0!msvc_script!" call "%%~dp0!msvc_script!">> "!terminal_script!"
-echo if exist "%%~dp0win32_terminal_user_config.bat" cmd /c "%%~dp0win32_terminal_user_config.bat">> "!terminal_script!"
+echo if exist "%%~dp0win32_terminal_user_config.bat" call "%%~dp0win32_terminal_user_config.bat">> "!terminal_script!"
 
-if !install_alacritty! == 1 ( echo call "%%~dp0!alacritty_exe!" %%*>> "!terminal_script!" )
+if !install_alacritty! == 1 ( echo cmd /c "%%~dp0!alacritty_exe!" %%*>> "!terminal_script!" )
 
 REM ----------------------------------------------------------------------------
 REM Background Application Scripts
