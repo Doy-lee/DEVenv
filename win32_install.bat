@@ -500,9 +500,9 @@ REM ----------------------------------------------------------------------------
 REM geth
 REM ----------------------------------------------------------------------------
 if !install_geth! == 1 (
-    set geth_md5=35aecac473af02f886535e9a57530081
-    set geth_exe_sha256=f56ad63c929ed5dabf7ef211edef4aeed504b5380fed543bde6e7f7df74a0675
-    set geth_version=1.10.7-12f0ff40
+    set geth_md5=a975ba6591577b6f5b19f4fd8757fd03
+    set geth_exe_sha256=7d9fd1566f2fd07c741a64aad2865b25f8cd82388e15bed2d68e92105b1e0fd3
+    set geth_version=1.10.8-26675454
 
     set geth_zip=!downloads_dir!\win32_geth-amd64-v!geth_version!.zip
     set geth_dir=!tools_dir!\geth-windows-amd64-!geth_version!
