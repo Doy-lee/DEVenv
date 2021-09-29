@@ -617,7 +617,10 @@ echo set PATH=%%~dp0!zip7_dir!;%%PATH%%>> "!terminal_script!"
 echo if exist "%%~dp0!msvc_script!" call "%%~dp0!msvc_script!">> "!terminal_script!"
 echo if exist "%%~dp0win32_terminal_user_config.bat" call "%%~dp0win32_terminal_user_config.bat">> "!terminal_script!"
 
-if !install_alacritty! == 1 ( echo cmd /c "%%~dp0!alacritty_exe!" %%*>> "!terminal_script!" )
+if !install_alacritty! == 1 (
+    echo start "%%~dp0!alacritty_exe!" powershell %%*>> "!terminal_script!"
+    echo exit>> "!terminal_script!"
+)
 
 REM ----------------------------------------------------------------------------
 REM Background Application Scripts
