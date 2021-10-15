@@ -12,7 +12,7 @@ set install_dir=Installer
 set downloads_dir=!install_dir!\Downloads
 set vim_dir=!home_dir!\vimfiles
 set tools_dir=Tools
-set bin_dir=!tools_dir!\Bin
+set bin_dir=!tools_dir!\binaries
 
 if not exist !home_dir! mkdir !home_dir!
 if not exist !install_dir! mkdir !install_dir!
@@ -103,18 +103,26 @@ REM ----------------------------------------------------------------------------
 REM Download & verify the tools we want for development
 
 REM ----------------------------------------------------------------------------
-REM Alacritty
+REM Wezterm
 REM ----------------------------------------------------------------------------
-if !install_alacritty! == 1 (
-    set alacritty_exe_sha256=c0d2e4f12bb362b039de1b87b8cb064cbc16ddb14d57c844840bd6e3efc96d07
-    set alacritty_version=0.9.0
-    set alacritty_exe=!tools_dir!\alacritty-v!alacritty_version!-portable.exe
+if !install_wezterm! == 1 (
+    set wezterm_sha256=75242f12ea2d03ab8c1bcb1a8afdb872fb722c84be64b9a40dc41f3ed7d76492
+    set wezterm_exe_sha256=e1b8d680714c2c32bf04f3457915416d227b6704d8c29ecd772a827136882fd3
+    set wezterm_version=20210814-124438-54e29167
 
-    if not exist "!alacritty_exe!" (
-        call :DownloadFile https://github.com/alacritty/alacritty/releases/download/v!alacritty_version!/Alacritty-v!alacritty_version!-portable.exe "!alacritty_exe!" || exit /B
+    set wezterm_zip=!downloads_dir!\win32_wezterm-!wezterm_version!.zip
+    set wezterm_dir=!tools_dir!\wezterm-!wezterm_version!
+    set wezterm_exe=!wezterm_dir!\wezterm-gui.exe
+
+    if not exist "!wezterm_exe!" (
+        call :DownloadFile https://github.com/wez/wezterm/releases/download/!wezterm_version!/WezTerm-windows-!wezterm_version!.zip "!wezterm_zip!" || exit /B
+        call :VerifyFileSHA256 "!wezterm_zip!" "!wezterm_sha256!" || exit /B
+        call :Unzip "!wezterm_zip!" "!wezterm_dir!" || exit /B
+        call :Move "!wezterm_dir!\wezterm-windows-!wezterm_version!" "!wezterm_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!alacritty_exe!" "!alacritty_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!wezterm_exe!" "!wezterm_exe_sha256!" || exit /B
+    call :CopyAndAlwaysOverwriteFile "!install_dir!\wezterm.lua" "!wezterm_dir!\wezterm.lua" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -268,11 +276,36 @@ if !install_zig! == 1 (
     )
 
     call :VerifyFileSHA256 "!zig_exe!" "!zig_exe_sha256!" || exit /B
+    call :MakeBatchShortcutInBinDir "zig" "!zig_exe!"
 )
 
 REM ----------------------------------------------------------------------------
 REM QoL/Tools
 REM ----------------------------------------------------------------------------
+REM ----------------------------------------------------------------------------
+REM clink - Bash style tab completion in terminal
+REM ----------------------------------------------------------------------------
+if !install_clink! == 1 (
+    set clink_sha256=57618d5fab9f0f777430fde5beceffdfb99cc81cfbd353ca58f41b7faf84eddc
+    set clink_exe_sha256=e09a338081b83a42e97b60311d9af749baaedb226b155d9e7bd658de1c5a349d
+    set clink_version=0.4.9
+
+    set clink_zip=!downloads_dir!\win32_clink_!clink_version!.zip
+    set clink_dir=!tools_dir!\clink-!clink_version!
+    set clink_exe=!clink_dir!\clink_x64.exe
+    set clink_bat=!clink_dir!\clink.bat
+
+    if not exist "!clink_exe!" (
+        call :DownloadFile "https://github.com/mridgers/clink/releases/download/!clink_version!/clink_!clink_version!.zip" "!clink_zip!" || exit /B
+        call :VerifyFileSHA256 "!clink_zip!" "!clink_sha256!" || exit /B
+        call :Unzip "!clink_zip!" "!clink_dir!" || exit /B
+        call :Move "!clink_dir!\clink_!clink_version!" "!clink_dir!" || exit /B
+    )
+
+    call :VerifyFileSHA256 "!clink_exe!" "!clink_exe_sha256!" || exit /B
+    call :MakeBatchShortcutInBinDir "clink" "!clink_bat!"
+)
+
 REM ----------------------------------------------------------------------------
 REM Dependencies (Walker) - For DLL dependency management
 REM ----------------------------------------------------------------------------
@@ -491,6 +524,7 @@ if !install_ripgrep! == 1 (
     )
 
     call :VerifyFileSHA256 "!rg_exe!" "!rg_exe_sha256!" || exit /B
+    call :MakeBatchShortcutInBinDir "rg" "!rg_exe!"
 )
 
 REM ----------------------------------------------------------------------------
@@ -522,6 +556,7 @@ if !install_geth! == 1 (
     )
 
     call :VerifyFileSHA256 "!geth_exe!" "!geth_exe_sha256!" || exit /B
+    call :MakeBatchShortcutInBinDir "geth" "!geth_exe!"
 )
 
 REM ----------------------------------------------------------------------------
@@ -549,8 +584,7 @@ REM ----------------------------------------------------------------------------
 REM solidity
 REM ----------------------------------------------------------------------------
 if !install_solidity! == 1 (
-    set solidity_sha256=82db83111c6e2c892179486cb7050d85f1517bf851027607eb7f4e589e714bc5
-    set solidity_exe_sha256=
+    set solidity_exe_sha256=82db83111c6e2c892179486cb7050d85f1517bf851027607eb7f4e589e714bc5
     set solidity_version=0.8.7+commit.e28d00a7
 
     set solidity_dir=!tools_dir!\solidity-windows-amd64-!solidity_version!
@@ -561,7 +595,8 @@ if !install_solidity! == 1 (
         call :DownloadFile "https://binaries.soliditylang.org/windows-amd64/solc-windows-amd64-v!solidity_version!.exe" "!solidity_exe!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!solidity_exe!" "!solidity_sha256!" || exit /B
+    call :VerifyFileSHA256 "!solidity_exe!" "!solidity_exe_sha256!" || exit /B
+    call :MakeBatchShortcutInBinDir "solc" "!solidity_exe!"
 )
 
 REM ----------------------------------------------------------------------------
@@ -576,6 +611,7 @@ echo set APPDATA=%%~dp0!home_dir!\AppData>> "!terminal_script!"
 echo set HOME=%%~dp0!home_dir!>> "!terminal_script!"
 echo set HOMEPATH=%%~dp0!home_dir!>> "!terminal_script!"
 echo set USERPROFILE=%%~dp0!home_dir!>> "!terminal_script!"
+echo set LOCALAPPDATA=%%~dp0!home_dir!\AppData\Local>> "!terminal_script!"
 
 echo set PATH=%%~dp0!gpg_w32_bin_dir!;%%PATH%%>> "!terminal_script!"
 echo set PATH=%%~dp0!bin_dir!;%%PATH%%>> "!terminal_script!"
@@ -606,19 +642,12 @@ if !install_python3! == 1 (
     echo set PYTHONHOME=%%~dp0!python_bin_dir!>> "!terminal_script!"
 )
 
-if !install_ripgrep! == 1 ( echo set PATH=%%~dp0!rg_dir!;%%PATH%%>> "!terminal_script!" )
-if !install_zig! == 1 ( echo set PATH=%%~dp0!zig_dir!;%%PATH%%>> "!terminal_script!" )
-
-if !install_geth! == 1 ( echo set PATH=%%~dp0!geth_dir!;%%PATH%%>> "!terminal_script!" )
-if !install_remix_ide! == 1 ( echo set PATH=%%~dp0!remix_ide_dir!;%%PATH%%>> "!terminal_script!" )
-if !install_solidity! == 1 ( echo set PATH=%%~dp0!solidity_dir!;%%PATH%%>> "!terminal_script!" )
-
 echo set PATH=%%~dp0!zip7_dir!;%%PATH%%>> "!terminal_script!"
 echo if exist "%%~dp0!msvc_script!" call "%%~dp0!msvc_script!">> "!terminal_script!"
 echo if exist "%%~dp0win32_terminal_user_config.bat" call "%%~dp0win32_terminal_user_config.bat">> "!terminal_script!"
 
-if !install_alacritty! == 1 (
-    echo start "%%~dp0!alacritty_exe!" powershell %%*>> "!terminal_script!"
+if !install_wezterm! == 1 (
+    echo start "" /MAX "%%~dp0!wezterm_exe!">> "!terminal_script!"
     echo exit>> "!terminal_script!"
 )
 
@@ -627,8 +656,8 @@ REM Background Application Scripts
 REM ----------------------------------------------------------------------------
 set terminal_script=!root_dir!\win32_start_background_apps.bat
 echo @echo off> "!terminal_script!"
-if !install_everything_void_tools! == 1 echo call "%%~dp0!everything_dir!\everything.exe">> "!terminal_script!"
-if !install_keypirinha! == 1 echo call "%%~dp0!keypirinha_dir!\keypirinha.exe">> "!terminal_script!"
+if !install_everything_void_tools! == 1 echo start "" "%%~dp0!everything_dir!\everything.exe">> "!terminal_script!"
+if !install_keypirinha! == 1 echo start "" "%%~dp0!keypirinha_dir!\keypirinha.exe">> "!terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM CTags Helper Script
@@ -742,4 +771,14 @@ REM ----------------------------------------------------------------------------
 set src=%~1
 set dest=%~2
 if exist !src! robocopy !src! !dest! /E /MOVE /NP /NJS /NJS /NS /NC /NFL /NDL
+exit /B 0
+
+REM ------------------------------------------------------------------------------------------------
+:MakeBatchShortcutInBinDir
+REM NOTE we make a batch file instead of a symlink because symlinks require
+REM admin privileges in windows ...
+set script_name=%~1
+set executable=%~2
+echo @echo off> "!bin_dir!\!script_name!.bat"
+echo %%~dp0..\..\!executable! %%*>> "!bin_dir!\!script_name!.bat"
 exit /B 0

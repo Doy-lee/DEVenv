@@ -4,7 +4,7 @@ REM ----------------------------------------------------------------------------
 REM Installation Configuration
 REM ----------------------------------------------------------------------------
 REM Set the 0 or 1 to enable or disable installation of a package
-set install_alacritty=1
+set install_wezterm=1
 
 REM ----------------------------------------------------------------------------
 REM Programming
@@ -19,6 +19,7 @@ set install_zig=1
 REM ----------------------------------------------------------------------------
 REM QoL/Tools
 REM ----------------------------------------------------------------------------
+set install_clink=1
 set install_dependency_walker=1
 set install_everything_void_tools=1
 set install_fzf=1
