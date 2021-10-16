@@ -260,9 +260,9 @@ REM ----------------------------------------------------------------------------
 REM Zig
 REM ----------------------------------------------------------------------------
 if !install_zig! == 1 (
-    set zig_sha256=8580fbbf3afb72e9b495c7f8aeac752a03475ae0bbcf5d787f3775c7e1f4f807
-    set zig_exe_sha256=43ea220fa74b3adfc740719c1bcaabdc3d4016b0c5f11aed4bd0477fc42c23f0
-    set zig_version=0.8.0
+    set zig_sha256=43573db14cd238f7111d6bdf37492d363f11ecd1eba802567a172f277d003926
+    set zig_exe_sha256=465739a787178ded19efab55916b587f3ead2a9cdff8dcaaf1765fe907797917
+    set zig_version=0.8.1
 
     set zig_file=zig-windows-x86_64-!zig_version!.zip
     set zig_zip=!downloads_dir!\win32_!zig_file!
