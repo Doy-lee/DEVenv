@@ -108,7 +108,7 @@ if has("gui_running")
     " old listchars=tab:>-,eol:¬,trail:■,extends:»,precedes:«
     set listchars+=trail:■,extends:»,precedes:«
     if s:running_windows
-        set guifont=Consolas:h11
+        set guifont=JetBrains_Mono:h9, Consolas:h11
     else
         set guifont=InputMonoCondensed:h10
     endif

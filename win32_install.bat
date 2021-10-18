@@ -126,6 +126,25 @@ if !install_wezterm! == 1 (
 )
 
 REM ----------------------------------------------------------------------------
+REM Jetbrains Mono Font
+REM ----------------------------------------------------------------------------
+set jetbrains_mono_sha256=4e315b4ef176ce7ffc971b14997bdc8f646e3d1e5b913d1ecba3a3b10b4a1a9f
+set jetbrains_mono_file_sha256=50e1dcb40298fcfcc21a1ef3cbee9fe9e82709c48ad30ce617472c06a3bd9436
+set jetbrains_mono_version=2.242
+
+set jetbrains_mono_zip=!downloads_dir!\jetbrains_mono-!jetbrains_mono_version!.zip
+set jetbrains_mono_dir=!tools_dir!\jetbrains_mono-!jetbrains_mono_version!
+set jetbrains_mono_file=!jetbrains_mono_dir!\fonts\ttf\JetBrainsMono-Regular.ttf
+
+if not exist "!jetbrains_mono_file!" (
+    call :DownloadFile https://download.jetbrains.com/fonts/JetBrainsMono-!jetbrains_mono_version!.zip "!jetbrains_mono_zip!" || exit /B
+    call :VerifyFileSHA256 "!jetbrains_mono_zip!" "!jetbrains_mono_sha256!" || exit /B
+    call :Unzip "!jetbrains_mono_zip!" "!jetbrains_mono_dir!" || exit /B
+)
+
+call :VerifyFileSHA256 "!jetbrains_mono_file!" "!jetbrains_mono_file_sha256!" || exit /B
+
+REM ----------------------------------------------------------------------------
 REM Programming
 REM ----------------------------------------------------------------------------
 REM ----------------------------------------------------------------------------
@@ -666,7 +685,9 @@ set ctags_file=!bin_dir!\ctags_cpp.bat
 echo @echo off> "!ctags_file!"
 echo ctags --c++-kinds=+p --fields=+iaS --extras=+q %%*>> !ctags_file!
 
-echo - Setup complete. Launch !root_dir!\win32_terminal.bat [or restart Alacritty instance if you're updating an existing installation]
+echo - Setup complete. Launch !root_dir!\win32_terminal.bat [or restart Wezterm instance if you're updating an existing installation]
+echo - (Optional) A custom font is provided and requires manual intallation in Windows at !jetbrains_mono_file!
+echo              This font will be used in GVIM if it's available.
 pause
 exit /B
 
