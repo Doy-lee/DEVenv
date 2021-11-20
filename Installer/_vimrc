@@ -17,6 +17,7 @@ Plug 'https://github.com/bfrg/vim-cpp-modern'
 Plug 'https://github.com/skywind3000/asyncrun.vim'
 Plug 'https://github.com/junegunn/fzf'
 Plug 'https://github.com/junegunn/fzf.vim'
+Plug 'https://github.com/Tetralux/odin.vim'
 
 " Themes
 Plug 'https://github.com/tomasr/molokai'
@@ -108,7 +109,7 @@ if has("gui_running")
     " old listchars=tab:>-,eol:¬,trail:■,extends:»,precedes:«
     set listchars+=trail:■,extends:»,precedes:«
     if s:running_windows
-        set guifont=JetBrains_Mono:h9, Consolas:h11
+        set guifont=JetBrains_Mono:h9,Consolas:h11
     else
         set guifont=InputMonoCondensed:h10
     endif
