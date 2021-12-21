@@ -462,7 +462,6 @@ call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_ctags.exe" "!bin_dir!\ctag
 call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_scanmapset.exe" "!bin_dir!\scanmapset.exe" || exit /B
 call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_uncap.exe" "!bin_dir!\uncap.exe" || exit /B
 call :CopyAndAlwaysOverwriteFile "!install_dir!\clang_format_style_file" "!home_dir!\_clang-format" || exit /B
-call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_download_windows_symbols_pdb.bat" "!bin_dir!\download_windows_symbols_pdb.bat" || exit /B
 
 REM ------------------------------------------------------------------------
 REM MobaXTerm
