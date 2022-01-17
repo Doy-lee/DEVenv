@@ -197,6 +197,8 @@ endif
 nnoremap <leader>f :FzfFiles<CR>
 nnoremap <leader>t :FzfTags<CR>
 nnoremap <leader>r :FzfRg<CR>
+nnoremap <leader>b :FzfBuffers<CR>
+nnoremap <leader>l :FzfLines<CR>
 
 " Empty value to disable preview window altogether
 let g:fzf_preview_window = []
