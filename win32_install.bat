@@ -461,7 +461,7 @@ REM uncap: Bind capslock to escape via run-time program
 call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_ctags.exe" "!bin_dir!\ctags.exe" || exit /B
 call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_scanmapset.exe" "!bin_dir!\scanmapset.exe" || exit /B
 call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_uncap.exe" "!bin_dir!\uncap.exe" || exit /B
-call :CopyAndAlwaysOverwriteFile "!install_dir!\clang-format-style-file" "!home_dir!\_clang-format" || exit /B
+call :CopyAndAlwaysOverwriteFile "!install_dir!\clang_format_style_file" "!home_dir!\_clang-format" || exit /B
 
 REM ------------------------------------------------------------------------
 REM MobaXTerm
@@ -561,7 +561,7 @@ if !install_geth! == 1 (
     set geth_dir=!tools_dir!\geth-windows-amd64-!geth_version!
     set geth_exe=!geth_dir!\geth.exe
 
-    set geth_gpg_key=!downloads_dir!\..\geth-windows-builder-gpg-key.asc
+    set geth_gpg_key=!downloads_dir!\..\geth_windows_builder_gpg_key.asc
     set geth_gpg_sig=!geth_zip!.asc
 
     if not exist "!geth_exe!" (
