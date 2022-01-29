@@ -14,6 +14,7 @@ set install_llvm_clang=1
 set install_mingw64=1
 set install_nodejs=1
 set install_python3=1
+set install_renderdoc=1
 set install_zig=1
 
 REM ----------------------------------------------------------------------------

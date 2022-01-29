@@ -258,7 +258,7 @@ if !install_python3! == 1 (
     set python_version_nodot=3902
     set python_version_dot=3.9.0
 
-    set python_zip=!downloads_dir!\win32_Winpython64-!python_version!.exe
+    set python_zip=!downloads_dir!\win32_Winpython64-!python_version!.zip
     set python_dir=!tools_dir!\Winpython64-!python_version_nodot!
     set python_exe=!python_dir!\python-3.9.0.amd64\python.exe
 
@@ -273,6 +273,28 @@ if !install_python3! == 1 (
 
     set python_bin_dir=!python_dir!\python-!python_version_dot!.amd64
     set python_scripts_bin_dir=!python_bin_dir!\Scripts
+)
+
+REM ----------------------------------------------------------------------------
+REM RenderDoc
+REM ----------------------------------------------------------------------------
+if !install_renderdoc! == 1 (
+    set renderdoc_sha256=a97a9911850c8a93dc1dee8f94e339cd5933310513dddf0216d27cea3a5f25b1
+    set renderdoc_exe_sha256=27c28b813f01781573507b0d9b47546d323ae8add2695bbd03b941461868a7a2
+    set renderdoc_version=1.18
+
+    set renderdoc_zip=!downloads_dir!\win32_renderdoc-!renderdoc_version!.zip
+    set renderdoc_dir=!tools_dir!\renderdoc-x64-!renderdoc_version!
+    set renderdoc_exe=!renderdoc_dir!\qrenderdoc.exe
+
+    if not exist "!renderdoc_exe!" (
+        call :DownloadFile "https://renderdoc.org/stable/!renderdoc_version!/RenderDoc_!renderdoc_version!_64.zip" "!renderdoc_zip!" || exit /B
+        call :VerifyFileSHA256 "!renderdoc_zip!" "!renderdoc_sha256!" || exit /B
+        call :Unzip "!renderdoc_zip!" "!renderdoc_dir!" || exit /B
+        call :Move "!renderdoc_dir!\RenderDoc_!renderdoc_version!_64" "!renderdoc_dir!" || exit /B
+    )
+
+    call :VerifyFileSHA256 "!renderdoc_exe!" "!renderdoc_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
