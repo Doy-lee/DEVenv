@@ -106,9 +106,9 @@ REM ----------------------------------------------------------------------------
 REM Wezterm
 REM ----------------------------------------------------------------------------
 if !install_wezterm! == 1 (
-    set wezterm_sha256=75242f12ea2d03ab8c1bcb1a8afdb872fb722c84be64b9a40dc41f3ed7d76492
-    set wezterm_exe_sha256=e1b8d680714c2c32bf04f3457915416d227b6704d8c29ecd772a827136882fd3
-    set wezterm_version=20210814-124438-54e29167
+    set wezterm_sha256=7873a5bc829da97e2a4589c16877f730b8e48231c906124154683fb0283c7095
+    set wezterm_exe_sha256=1bab3b8b2d60c6e4c5d044f4e91f037a7dfe571640bd0b2a5c2808629eda5e3b
+    set wezterm_version=20220101-133340-7edc5b5a
 
     set wezterm_zip=!downloads_dir!\win32_wezterm-!wezterm_version!.zip
     set wezterm_dir=!tools_dir!\wezterm-!wezterm_version!
