@@ -81,7 +81,7 @@ set fileformats=unix,dos
 " <z,Shift+r> decreases the foldlevel to zero -- all folds will be open.
 set foldlevelstart=99    " Initially all folds open
 set foldmethod=indent    " Allow folding of
-set foldnestmax=1        " Maximum number of nested folds
+set foldnestmax=20       " Maximum number of nested folds
 set guioptions=menu      " remove extra gui elements
 set laststatus=2         " always show status bar
 set linebreak            " When wrapping lines, don't break words
