@@ -46,11 +46,11 @@ set zip7_bootstrap_exe=!zip7_bootstrap_dir!\7za.exe
 
 if not exist "!zip7_bootstrap_exe!" (
     call :DownloadFile "https://www.7-zip.org/a/7za!zip7_bootstrap_version!.zip" "!zip7_bootstrap_zip!" || exit /B
-    call :VerifyFileSHA256 "!zip7_bootstrap_zip!" "!zip7_bootstrap_sha256!" || exit /B
+    call :VerifyZipSHA256 "!zip7_bootstrap_zip!" "!zip7_bootstrap_sha256!" || exit /B
 )
 if not exist "!zip7_bootstrap_dir!" powershell "Expand-Archive !zip7_bootstrap_zip! -DestinationPath !zip7_bootstrap_dir!" || exit /B
 
-call :VerifyFileSHA256 "!zip7_bootstrap_exe!" "!zip7_bootstrap_exe_sha256!" || exit /B
+call :VerifyFileSHA256 "!zip7_bootstrap_exe!" "!zip7_bootstrap_version!" "!zip7_bootstrap_exe_sha256!" || exit /B
 
 REM ----------------------------------------------------------------------------
 REM 7zip
@@ -68,11 +68,11 @@ set zip7_exe=!zip7_dir!\7z.exe
 
 if not exist "!zip7_exe!" (
     call :DownloadFile "https://www.7-zip.org/a/7z!zip7_version!-x64.exe" "!zip7_zip!" || exit /B
-    call :VerifyFileSHA256 "!zip7_zip!" "!zip7_sha256!" || exit /B
+    call :VerifyZipSHA256 "!zip7_zip!" "!zip7_sha256!" || exit /B
     "!zip7_bootstrap_exe!" x -y -o"!zip7_dir!" !zip7_zip! || exit /B
 )
 
-call :VerifyFileSHA256 "!zip7_exe!" "!zip7_exe_sha256!" || exit /B
+call :VerifyFileSHA256 "!zip7_exe!" "!zip7_version!" "!zip7_exe_sha256!" || exit /B
 
 REM ----------------------------------------------------------------------------
 REM GPG Signature Verification
@@ -88,11 +88,11 @@ set gpg_w32_exe=!gpg_w32_dir!\bin\gpg.exe
 
 if not exist "!gpg_w32_exe!" (
     call :DownloadFile "https://gnupg.org/ftp/gcrypt/binary/gnupg-w32-!gpg_w32_version!_!gpg_w32_date!.exe" "!gpg_w32_zip!" || exit /B
-    call :VerifyFileSHA256 "!gpg_w32_zip!" "!gpg_w32_sha256!" || exit /B
+    call :VerifyZipSHA256 "!gpg_w32_zip!" "!gpg_w32_sha256!" || exit /B
     call :Unzip "!gpg_w32_zip!" "!gpg_w32_dir!" || exit /B
 )
 
-call :VerifyFileSHA256 "!gpg_w32_exe!" "!gpg_w32_exe_sha256!" || exit /B
+call :VerifyFileSHA256 "!gpg_w32_exe!" "!gpg_w32_version!" "!gpg_w32_exe_sha256!" || exit /B
 
 set gpg_w32_bin_dir=!gpg_w32_dir!\bin
 set PATH="!gpg_w32_bin_dir!";!PATH!
@@ -116,12 +116,12 @@ if !install_wezterm! == 1 (
 
     if not exist "!wezterm_exe!" (
         call :DownloadFile https://github.com/wez/wezterm/releases/download/!wezterm_version!/WezTerm-windows-!wezterm_version!.zip "!wezterm_zip!" || exit /B
-        call :VerifyFileSHA256 "!wezterm_zip!" "!wezterm_sha256!" || exit /B
+        call :VerifyZipSHA256 "!wezterm_zip!" "!wezterm_sha256!" || exit /B
         call :Unzip "!wezterm_zip!" "!wezterm_dir!" || exit /B
         call :Move "!wezterm_dir!\wezterm-windows-!wezterm_version!" "!wezterm_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!wezterm_exe!" "!wezterm_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!wezterm_exe!" "!wezterm_version!" "!wezterm_exe_sha256!" || exit /B
     call :CopyAndAlwaysOverwriteFile "!install_dir!\wezterm.lua" "!wezterm_dir!\wezterm.lua" || exit /B
 )
 
@@ -138,11 +138,11 @@ set jetbrains_mono_file=!jetbrains_mono_dir!\fonts\ttf\JetBrainsMono-Regular.ttf
 
 if not exist "!jetbrains_mono_file!" (
     call :DownloadFile https://download.jetbrains.com/fonts/JetBrainsMono-!jetbrains_mono_version!.zip "!jetbrains_mono_zip!" || exit /B
-    call :VerifyFileSHA256 "!jetbrains_mono_zip!" "!jetbrains_mono_sha256!" || exit /B
+    call :VerifyZipSHA256 "!jetbrains_mono_zip!" "!jetbrains_mono_sha256!" || exit /B
     call :Unzip "!jetbrains_mono_zip!" "!jetbrains_mono_dir!" || exit /B
 )
 
-call :VerifyFileSHA256 "!jetbrains_mono_file!" "!jetbrains_mono_file_sha256!" || exit /B
+call :VerifyFileSHA256 "!jetbrains_mono_file!" "!jetbrains_mono_version!" "!jetbrains_mono_file_sha256!" || exit /B
 
 REM ----------------------------------------------------------------------------
 REM Programming
@@ -161,11 +161,11 @@ if !install_git! == 1 (
 
     if not exist "!git_exe!" (
         call :DownloadFile "https://github.com/git-for-windows/git/releases/download/v!git_version!.windows.2/PortableGit-!git_version!.2-64-bit.7z.exe" "!git_zip!" || exit /B
-        call :VerifyFileSHA256 "!git_zip!" "!git_sha256!" || exit /B
+        call :VerifyZipSHA256 "!git_zip!" "!git_sha256!" || exit /B
         call :Unzip "!git_zip!" "!git_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!git_exe!" "!git_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!git_exe!" "!git_version!" "!git_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -196,11 +196,11 @@ if !install_llvm_clang! == 1 (
         set clang_format_py_sha256=36ba7aa047f8a8ac8fdc278aaa733de801cc84dea60a4210973fd3e4f0d2a330
         set vim_clang_format=!vim_dir!\clang-format.py
         call :CopyAndAlwaysOverwriteFile "!llvm_dir!\share\clang\clang-format.py" "!vim_clang_format!" || exit /B
-        call :VerifyFileSHA256 !vim_clang_format! !clang_format_py_sha256! || exit /B
+        call :VerifyFileSHA256 "!vim_clang_format!" "!llvm_version!" "!clang_format_py_sha256!" || exit /B
     )
 
     set llvm_bin_dir=!llvm_dir!\bin
-    call :VerifyFileSHA256 !llvm_exe! !llvm_exe_sha256! || exit /B
+    call :VerifyFileSHA256 "!llvm_exe!" "!llvm_version!" "!llvm_exe_sha256!" || exit /B
 )
 
 REM ------------------------------------------------------------------------
@@ -218,12 +218,12 @@ if !install_mingw64! == 1 (
 
     if not exist "!mingw_exe!" (
         call :DownloadFile \"https://sourceforge.net/projects/mingw-w64/files/Toolchains targetting Win64/Personal Builds/mingw-builds/!mingw_version!/threads-posix/seh/x86_64-!mingw_version!-release-posix-seh-rt_v6-rev0.7z\" !mingw_zip! || exit /B
-        call :VerifyFileSHA256 !mingw_zip! !mingw_sha256! || exit /B
+        call :VerifyZipSHA256 !mingw_zip! !mingw_sha256! || exit /B
         call :Unzip !mingw_zip! !mingw_dir! || exit /B
         call :Move !mingw_dir!\mingw64 !mingw_dir! || exit /B
     )
 
-    call :VerifyFileSHA256 !mingw_exe! !mingw_exe_sha256! || exit /B
+    call :VerifyFileSHA256 "!mingw_exe!" "!mingw_version!" "!mingw_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -240,12 +240,12 @@ if !install_nodejs! == 1 (
 
     if not exist "!nodejs_exe!" (
         call :DownloadFile "https://nodejs.org/dist/v!nodejs_version!/node-v!nodejs_version!-win-x64.7z" "!nodejs_zip!" || exit /B
-        call :VerifyFileSHA256 "!nodejs_zip!" "!nodejs_sha256!" || exit /B
+        call :VerifyZipSHA256 "!nodejs_zip!" "!nodejs_sha256!" || exit /B
         call :Unzip "!nodejs_zip!" "!nodejs_dir!" || exit /B
         call :Move "!nodejs_dir!\node-v!nodejs_version!-win-x64" "!nodejs_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!nodejs_exe!" "!nodejs_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!nodejs_exe!" "!nodejs_version!" "!nodejs_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -264,12 +264,12 @@ if !install_python3! == 1 (
 
     if not exist "!python_exe!" (
         call :DownloadFile "https://github.com/winpython/winpython/releases/download/3.0.20201028/Winpython64-!python_version!.exe" "!python_zip!" || exit /B
-        call :VerifyFileSHA256 "!python_zip!" "!python_sha256!" || exit /B
+        call :VerifyZipSHA256 "!python_zip!" "!python_sha256!" || exit /B
         call :Unzip "!python_zip!" "!python_dir!" || exit /B
         call :Move "!python_dir!\WPy64-!python_version_nodot!" "!python_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!python_exe!" "!python_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!python_exe!" "!python_version!" "!python_exe_sha256!" || exit /B
 
     set python_bin_dir=!python_dir!\python-!python_version_dot!.amd64
     set python_scripts_bin_dir=!python_bin_dir!\Scripts
@@ -289,12 +289,12 @@ if !install_renderdoc! == 1 (
 
     if not exist "!renderdoc_exe!" (
         call :DownloadFile "https://renderdoc.org/stable/!renderdoc_version!/RenderDoc_!renderdoc_version!_64.zip" "!renderdoc_zip!" || exit /B
-        call :VerifyFileSHA256 "!renderdoc_zip!" "!renderdoc_sha256!" || exit /B
+        call :VerifyZipSHA256 "!renderdoc_zip!" "!renderdoc_sha256!" || exit /B
         call :Unzip "!renderdoc_zip!" "!renderdoc_dir!" || exit /B
         call :Move "!renderdoc_dir!\RenderDoc_!renderdoc_version!_64" "!renderdoc_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!renderdoc_exe!" "!renderdoc_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!renderdoc_exe!" "!renderdoc_version!" "!renderdoc_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -312,11 +312,11 @@ if !install_zig! == 1 (
 
     if not exist "!zig_exe!" (
         call :DownloadFile "https://ziglang.org/download/!zig_version!/!zig_file!" "!zig_zip!" || exit /B
-        call :VerifyFileSHA256 "!zig_zip!" "!zig_sha256!" || exit /B
+        call :VerifyZipSHA256 "!zig_zip!" "!zig_sha256!" || exit /B
         call :Unzip "!zig_zip!" "!zig_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!zig_exe!" "!zig_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!zig_exe!" "!zig_version!" "!zig_exe_sha256!" || exit /B
     call :MakeBatchShortcutInBinDir "zig" "!zig_exe!"
 )
 
@@ -338,12 +338,12 @@ if !install_clink! == 1 (
 
     if not exist "!clink_exe!" (
         call :DownloadFile "https://github.com/mridgers/clink/releases/download/!clink_version!/clink_!clink_version!.zip" "!clink_zip!" || exit /B
-        call :VerifyFileSHA256 "!clink_zip!" "!clink_sha256!" || exit /B
+        call :VerifyZipSHA256 "!clink_zip!" "!clink_sha256!" || exit /B
         call :Unzip "!clink_zip!" "!clink_dir!" || exit /B
         call :Move "!clink_dir!\clink_!clink_version!" "!clink_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!clink_exe!" "!clink_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!clink_exe!" "!clink_version!" "!clink_exe_sha256!" || exit /B
     call :MakeBatchShortcutInBinDir "clink" "!clink_bat!"
 )
 
@@ -361,11 +361,11 @@ if !install_dependency_walker! == 1 (
 
     if not exist "!dependencies_exe!" (
         call :DownloadFile "https://github.com/lucasg/Dependencies/releases/download/!dependencies_version!/Dependencies_x64_Release.zip" "!dependencies_zip!" || exit /B
-        call :VerifyFileSHA256 "!dependencies_zip!" "!dependencies_sha256!" || exit /B
+        call :VerifyZipSHA256 "!dependencies_zip!" "!dependencies_sha256!" || exit /B
         call :Unzip "!dependencies_zip!" "!dependencies_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!dependencies_exe!" "!dependencies_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!dependencies_exe!" "!dependencies_version!" "!dependencies_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -382,31 +382,32 @@ if !install_everything_void_tools! == 1 (
 
     if not exist "!everything_exe!" (
         call :DownloadFile "https://www.voidtools.com/Everything-!everything_version!.x64.zip" "!everything_zip!" || exit /B
-        call :VerifyFileSHA256 "!everything_zip!" "!everything_sha256!" || exit /B
+        call :VerifyZipSHA256 "!everything_zip!" "!everything_sha256!" || exit /B
         call :Unzip "!everything_zip!" "!everything_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!everything_exe!" "!everything_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!everything_exe!" "!everything_version!" "!everything_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
 REM fzf
 REM ----------------------------------------------------------------------------
 if !install_fzf! == 1 (
-    set fzf_sha256=c9b5c8bdbef06305a2d0a33b0d82218bebd5a81a3f2187624d4a9d8fe972fc09
-    set fzf_exe_sha256=83cdcb08d65edc734205f9de5e87ef3261358a4abf6f21e1c97d431205da8bc9
-    set fzf_version=0.27.2
+    set fzf_sha256=f0797ceee089017108c80b09086c71b8eec43d4af11ce939b78b1d5cfd202540
+    set fzf_exe_sha256=5176c4c90957aa7e3d12f91b8ba55acac7524a83998517119ee19b61f4534140
+    set fzf_version=0.29.0
 
     set fzf_zip=!downloads_dir!\win32_fzf_v!fzf_version!.zip
     set fzf_dir=!bin_dir!
     set fzf_exe=!fzf_dir!\fzf.exe
 
-    if not exist "!fzf_exe!" (
+    if not exist "!fzf_exe!-!fzf_version!.sha256.txt" (
         call :DownloadFile "https://github.com/junegunn/fzf/releases/download/!fzf_version!/fzf-!fzf_version!-windows_amd64.zip" "!fzf_zip!" || exit /B
-        call :VerifyFileSHA256 "!fzf_zip!" "!fzf_sha256!" || exit /B
+        call :VerifyZipSHA256 "!fzf_zip!" "!fzf_sha256!" || exit /B
         call :UnzipAndAlwaysOverwrite "!fzf_zip!" "!fzf_dir!" || exit /B
     )
-    call :VerifyFileSHA256 "!fzf_exe!" "!fzf_exe_sha256!" || exit /B
+
+    call :VerifyFileSHA256 "!fzf_exe!" "!fzf_version!" "!fzf_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -426,7 +427,7 @@ if !install_gvim! == 1 (
     set gvim_fullscreen_dll_sha256=1c83747b67ed73c05d44c1af8222a860bc5a48b56bf54cd6e21465a2deb78456
     set gvim_fullscreen_dll=!gvim_dir!\gvim_fullscreen.dll
     call :CopyAndAlwaysOverwriteFile "!install_dir!\win32_gvim_fullscreen.dll" "!gvim_fullscreen_dll!" || exit /B
-    call :VerifyFileSHA256 "!gvim_fullscreen_dll!" "!gvim_fullscreen_dll_sha256!" || exit /B
+    call :VerifyFileSHA256 "!gvim_fullscreen_dll!" "none" "!gvim_fullscreen_dll_sha256!" || exit /B
 
     set vim_plug_dir=!vim_dir!\autoload
     set vim_plug=!vim_plug_dir!\plug.vim
@@ -449,7 +450,7 @@ if !install_joplin! == 1 (
         call :DownloadFile "https://github.com/laurent22/joplin/releases/download/v!joplin_version!/JoplinPortable.exe" "!joplin_exe!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!joplin_exe!" "!joplin_sha256!" || exit /B
+    call :VerifyFileSHA256 "!joplin_exe!" "!joplin_version!" "!joplin_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -466,12 +467,12 @@ if !install_keypirinha! == 1 (
 
     if not exist "!keypirinha_exe!" (
         call :DownloadFile "https://github.com/Keypirinha/Keypirinha/releases/download/v!keypirinha_version!/keypirinha-!keypirinha_version!-x64-portable.7z" "!keypirinha_zip!" || exit /B
-        call :VerifyFileSHA256 "!keypirinha_zip!" "!keypirinha_sha256!" || exit /B
+        call :VerifyZipSHA256 "!keypirinha_zip!" "!keypirinha_sha256!" || exit /B
         call :Unzip "!keypirinha_zip!" "!keypirinha_dir!" || exit /B
         call :Move "!keypirinha_dir!\keypirinha" "!keypirinha_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!keypirinha_exe!" "!keypirinha_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!keypirinha_exe!" "!keypirinha_version!" "!keypirinha_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -499,11 +500,11 @@ if !install_mobaxterm! == 1 (
 
     if not exist "!mobaxterm_exe!" (
         call :DownloadFile "https://download.mobatek.net/2122021051924233/MobaXterm_Portable_v!mobaxterm_version!.zip" !mobaxterm_zip! || exit /B
-        call :VerifyFileSHA256 !mobaxterm_zip! !mobaxterm_sha256! || exit /B
+        call :VerifyZipSHA256 !mobaxterm_zip! !mobaxterm_sha256! || exit /B
         call :Unzip !mobaxterm_zip! !mobaxterm_dir! || exit /B
     )
 
-    call :VerifyFileSHA256 !mobaxterm_exe! !mobaxterm_exe_sha256! || exit /B
+    call :VerifyFileSHA256 "!mobaxterm_exe!" "!mobaxterm_version!" "!mobaxterm_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -538,11 +539,11 @@ if !install_process_hacker! == 1 (
 
     if not exist "!process_hacker_exe!" (
         call :DownloadFile "https://ci.appveyor.com/api/buildjobs/8say005q9xy48cc3/artifacts/processhacker-!process_hacker_version!-bin.zip" "!process_hacker_zip!" || exit /B
-        call :VerifyFileSHA256 "!process_hacker_zip!" "!process_hacker_sha256!" || exit /B
+        call :VerifyZipSHA256 "!process_hacker_zip!" "!process_hacker_sha256!" || exit /B
         call :Unzip "!process_hacker_zip!" "!process_hacker_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!process_hacker_exe!" "!process_hacker_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!process_hacker_exe!" "!process_hacker_version!" "!process_hacker_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -559,12 +560,12 @@ if !install_ripgrep! == 1 (
 
     if not exist "!rg_exe!" (
         call :DownloadFile "https://github.com/BurntSushi/ripgrep/releases/download/!rg_version!/ripgrep-!rg_version!-x86_64-pc-windows-msvc.zip" "!rg_zip!" || exit /B
-        call :VerifyFileSHA256 "!rg_zip!" "!rg_sha256!" || exit /B
+        call :VerifyZipSHA256 "!rg_zip!" "!rg_sha256!" || exit /B
         call :Unzip "!rg_zip!" "!rg_dir!" || exit /B
         call :Move "!rg_dir!\ripgrep-!rg_version!-x86_64-pc-windows-msvc" "!rg_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!rg_exe!" "!rg_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!rg_exe!" "!rg_version!" "!rg_exe_sha256!" || exit /B
     call :MakeBatchShortcutInBinDir "rg" "!rg_exe!"
 )
 
@@ -589,14 +590,14 @@ if !install_geth! == 1 (
     if not exist "!geth_exe!" (
         call :DownloadFile "https://gethstore.blob.core.windows.net/builds/geth-windows-amd64-!geth_version!.zip" "!geth_zip!" || exit /B
         call :DownloadFile "https://gethstore.blob.core.windows.net/builds/geth-windows-amd64-!geth_version!.zip.asc" "!geth_gpg_sig! || exit /B
-        call :VerifyFileMD5 "!geth_zip!" "!geth_md5!" || exit /B
+        call :VerifyFileMD5 "!geth_zip!" "!geth_version!" "!geth_md5!" || exit /B
 
         gpg --import "!geth_gpg_key!" || exit /B
         gpg --verify "!geth_gpg_sig!" "!geth_zip!" || exit /B
         call :Unzip "!geth_zip!" "!geth_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!geth_exe!" "!geth_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!geth_exe!" "!geth_version!" "!geth_exe_sha256!" || exit /B
     call :MakeBatchShortcutInBinDir "geth" "!geth_exe!"
 )
 
@@ -614,11 +615,11 @@ if !install_remix_ide! == 1 (
 
     if not exist "!remix_ide_exe!" (
         call :DownloadFile "https://github.com/ethereum/remix-desktop/releases/download/v!remix_ide_version!/Remix-IDE-!remix_ide_version!-win.zip" "!remix_ide_zip!" || exit /B
-        call :VerifyFileSHA256 "!remix_ide_zip!" "!remix_ide_sha256!" || exit /B
+        call :VerifyZipSHA256 "!remix_ide_zip!" "!remix_ide_sha256!" || exit /B
         call :Unzip "!remix_ide_zip!" "!remix_ide_dir!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!remix_ide_exe!" "!remix_ide_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!remix_ide_exe!" "!remix_ide_version!" "!remix_ide_exe_sha256!" || exit /B
 )
 
 REM ----------------------------------------------------------------------------
@@ -636,7 +637,7 @@ if !install_solidity! == 1 (
         call :DownloadFile "https://binaries.soliditylang.org/windows-amd64/solc-windows-amd64-v!solidity_version!.exe" "!solidity_exe!" || exit /B
     )
 
-    call :VerifyFileSHA256 "!solidity_exe!" "!solidity_exe_sha256!" || exit /B
+    call :VerifyFileSHA256 "!solidity_exe!" "!solidity_version!" "!solidity_exe_sha256!" || exit /B
     call :MakeBatchShortcutInBinDir "solc" "!solidity_exe!"
 )
 
@@ -653,7 +654,6 @@ echo set HOME=%%~dp0!home_dir!>> "!terminal_script!"
 echo set HOMEPATH=%%~dp0!home_dir!>> "!terminal_script!"
 echo set USERPROFILE=%%~dp0!home_dir!>> "!terminal_script!"
 echo set LOCALAPPDATA=%%~dp0!home_dir!\AppData\Local>> "!terminal_script!"
-
 echo set PATH=%%~dp0!gpg_w32_bin_dir!;%%PATH%%>> "!terminal_script!"
 echo set PATH=%%~dp0!bin_dir!;%%PATH%%>> "!terminal_script!"
 
@@ -766,7 +766,7 @@ call !zip7_dir!\7z.exe x -y -spe -o!dest! !zip_file!
 exit /B !ERROLEVEL!
 
 REM ------------------------------------------------------------------------------------------------
-:VerifyFileSHA256
+:VerifyZipSHA256
 set file=%~1
 set expected_sha256=%~2
 
@@ -788,12 +788,36 @@ if "!expected_sha256!" neq "!actual_sha256!" (
 )
 
 REM ------------------------------------------------------------------------------------------------
-:VerifyFileMD5
+:VerifyFileSHA256
 set file=%~1
-set expected_md5=%~2
+set version=%~2
+set expected_sha256=%~3
 
 REM Calculate hash
-set calculated_md5_file=!file!.md5.txt
+set calculated_sha256_file=!file!-!version!.sha256.txt
+call powershell "$FileHash = Get-FileHash -algorithm sha256 \"!file!\"; $FileHash.Hash.ToLower()" > !calculated_sha256_file!
+
+REM Verify Hash
+set /p actual_sha256=< !calculated_sha256_file!
+if "!expected_sha256!" neq "!actual_sha256!" (
+    echo - [Verify] !file!
+    echo sha256 hash does not match, failing.
+    echo Expected:   !expected_sha256!
+    echo Calculated: !actual_sha256!
+    exit /B -1
+) else (
+    echo - [Verify] !file! Hash OK: !expected_sha256!
+    exit /B 0
+)
+
+REM ------------------------------------------------------------------------------------------------
+:VerifyFileMD5
+set file=%~1
+set version=%~2
+set expected_md5=%~3
+
+REM Calculate hash
+set calculated_md5_file=!file!-!version!.md5.txt
 call powershell "$FileHash = Get-FileHash -algorithm md5 \"!file!\"; $FileHash.Hash.ToLower()" > !calculated_md5_file!
 
 REM Verify Hash

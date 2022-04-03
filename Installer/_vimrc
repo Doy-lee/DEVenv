@@ -72,6 +72,13 @@ set cpoptions+=$         " $ as end marker for the change operator
 set cursorline           " Highlight current line
 set encoding=utf-8       " Consistent character encoding
 set fileformats=unix,dos
+" <z+o>       opens a fold at the cursor.
+" <z,Shift+o> opens all folds at the cursor.
+" <z,c>       closes a fold at the cursor.
+" <z,m>       increases the foldlevel by one.
+" <z,Shift+m> closes all open folds.
+" <z,r>       decreases the foldlevel by one.
+" <z,Shift+r> decreases the foldlevel to zero -- all folds will be open.
 set foldlevelstart=99    " Initially all folds open
 set foldmethod=indent    " Allow folding of
 set foldnestmax=1        " Maximum number of nested folds
