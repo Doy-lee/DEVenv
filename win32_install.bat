@@ -106,9 +106,9 @@ REM ----------------------------------------------------------------------------
 REM Wezterm
 REM ----------------------------------------------------------------------------
 if !install_wezterm! == 1 (
-    set wezterm_sha256=7873a5bc829da97e2a4589c16877f730b8e48231c906124154683fb0283c7095
-    set wezterm_exe_sha256=1bab3b8b2d60c6e4c5d044f4e91f037a7dfe571640bd0b2a5c2808629eda5e3b
-    set wezterm_version=20220101-133340-7edc5b5a
+    set wezterm_sha256=c634e98fa9715766bbb00cbc3c8a23d1d558c8cd5716ad2efca45ed4e0ef82f9
+    set wezterm_exe_sha256=b9b5bae20d0679127ca0c4da276dff3b7b32310bfbfaede26a9b8ecb55e295ce
+    set wezterm_version=20220408-101518-b908e2dd
 
     set wezterm_zip=!downloads_dir!\win32_wezterm-!wezterm_version!.zip
     set wezterm_dir=!tools_dir!\wezterm-!wezterm_version!
@@ -327,9 +327,10 @@ REM ----------------------------------------------------------------------------
 REM clink - Bash style tab completion in terminal
 REM ----------------------------------------------------------------------------
 if !install_clink! == 1 (
-    set clink_sha256=57618d5fab9f0f777430fde5beceffdfb99cc81cfbd353ca58f41b7faf84eddc
-    set clink_exe_sha256=e09a338081b83a42e97b60311d9af749baaedb226b155d9e7bd658de1c5a349d
-    set clink_version=0.4.9
+    set clink_sha256=31e286313e67a7269ca09ae142e569af7962b03b8f2bc7bd99240416222d8ee8
+    set clink_exe_sha256=38b1bb5a8392ac8d7f98d3dcc0a41dc7fc31344800d4facd83e10d9175daf9d8
+    set clink_version=1.3.13
+    set clink_git_hash=24b02e
 
     set clink_zip=!downloads_dir!\win32_clink_!clink_version!.zip
     set clink_dir=!tools_dir!\clink-!clink_version!
@@ -337,7 +338,7 @@ if !install_clink! == 1 (
     set clink_bat=!clink_dir!\clink.bat
 
     if not exist "!clink_exe!" (
-        call :DownloadFile "https://github.com/mridgers/clink/releases/download/!clink_version!/clink_!clink_version!.zip" "!clink_zip!" || exit /B
+        call :DownloadFile "https://github.com/chrisant996/clink/releases/download/v!clink_version!/clink.!clink_version!.!clink_git_hash!.zip" "!clink_zip!" || exit /B
         call :VerifyZipSHA256 "!clink_zip!" "!clink_sha256!" || exit /B
         call :Unzip "!clink_zip!" "!clink_dir!" || exit /B
         call :Move "!clink_dir!\clink_!clink_version!" "!clink_dir!" || exit /B
@@ -345,6 +346,15 @@ if !install_clink! == 1 (
 
     call :VerifyFileSHA256 "!clink_exe!" "!clink_version!" "!clink_exe_sha256!" || exit /B
     call :MakeBatchShortcutInBinDir "clink" "!clink_bat!"
+
+    if !install_git! == 1 (
+        set clink_completions_dir=!tools_dir!/clink-completions
+        if not exist "!clink_completions_dir!" (
+            call !git_exe! clone https://github.com/vladimir-kotikov/clink-completions !clink_completions_dir! || exit /B
+        )
+        call !git_exe! -C !clink_completions_dir! pull origin master || exit /B
+        call !git_exe! -C !clink_completions_dir! checkout 9ab9342 || exit /B
+    )
 )
 
 REM ----------------------------------------------------------------------------
