@@ -156,13 +156,15 @@ if !install_git! == 1 (
     set git_version=2.33.0
 
     set git_zip=!downloads_dir!\win32_git_!git_version!.7z.exe
-    set git_dir=!tools_dir!\PortableGit-!git_version!
-    set git_exe=!git_dir!\cmd\git.exe
+    REM Do *NOT* use an environment variable named git_dir as this will conflict
+    REM with git reading it as the directory to base off all git operations.
+    set git_install_dir=!tools_dir!\PortableGit-!git_version!
+    set git_exe=!git_install_dir!\cmd\git.exe
 
     if not exist "!git_exe!" (
         call :DownloadFile "https://github.com/git-for-windows/git/releases/download/v!git_version!.windows.2/PortableGit-!git_version!.2-64-bit.7z.exe" "!git_zip!" || exit /B
         call :VerifyZipSHA256 "!git_zip!" "!git_sha256!" || exit /B
-        call :Unzip "!git_zip!" "!git_dir!" || exit /B
+        call :Unzip "!git_zip!" "!git_install_dir!" || exit /B
     )
 
     call :VerifyFileSHA256 "!git_exe!" "!git_version!" "!git_exe_sha256!" || exit /B
@@ -342,13 +344,15 @@ if !install_clink! == 1 (
         call :VerifyZipSHA256 "!clink_zip!" "!clink_sha256!" || exit /B
         call :Unzip "!clink_zip!" "!clink_dir!" || exit /B
         call :Move "!clink_dir!\clink_!clink_version!" "!clink_dir!" || exit /B
+        call :CopyAndAlwaysOverwriteFile "!clink_dir!\_default_inputrc" "!clink_dir!\default_inputrc" || exit /B
+        call :CopyAndAlwaysOverwriteFile "!clink_dir!\_default_settings" "!clink_dir!\default_settings" || exit /B
     )
 
     call :VerifyFileSHA256 "!clink_exe!" "!clink_version!" "!clink_exe_sha256!" || exit /B
     call :MakeBatchShortcutInBinDir "clink" "!clink_bat!"
 
     if !install_git! == 1 (
-        set clink_completions_dir=!tools_dir!/clink-completions
+        set clink_completions_dir=!tools_dir!\clink-completions
         if not exist "!clink_completions_dir!" (
             call !git_exe! clone https://github.com/vladimir-kotikov/clink-completions !clink_completions_dir! || exit /B
         )
@@ -667,6 +671,12 @@ echo set LOCALAPPDATA=%%~dp0!home_dir!\AppData\Local>> "!terminal_script!"
 echo set PATH=%%~dp0!gpg_w32_bin_dir!;%%PATH%%>> "!terminal_script!"
 echo set PATH=%%~dp0!bin_dir!;%%PATH%%>> "!terminal_script!"
 
+if !install_clink! == 1 (
+    if !install_git! == 1 (
+        echo set CLINK_PATH=%%~dp0!clink_completions_dir!>> "!terminal_script!
+    )
+)
+
 if !install_fzf! == 1 (
     echo set FZF_DEFAULT_OPTS=--multi --layout=reverse>> "!terminal_script!"
 
@@ -677,9 +687,9 @@ if !install_fzf! == 1 (
 )
 
 if !install_git! == 1 (
-    echo set PATH=%%~dp0!git_dir!\cmd;%%PATH%%>> "!terminal_script!"
-    echo set PATH=%%~dp0!git_dir!\mingw64\bin;%%PATH%%>> "!terminal_script!"
-    echo set PATH=%%~dp0!git_dir!\usr\bin;%%PATH%%>> "!terminal_script!"
+    echo set PATH=%%~dp0!git_install_dir!\cmd;%%PATH%%>> "!terminal_script!"
+    echo set PATH=%%~dp0!git_install_dir!\mingw64\bin;%%PATH%%>> "!terminal_script!"
+    echo set PATH=%%~dp0!git_install_dir!\usr\bin;%%PATH%%>> "!terminal_script!"
 )
 
 if !install_gvim! == 1 ( echo set PATH=%%~dp0!gvim_dir!;%%PATH%%>> "!terminal_script!" )
