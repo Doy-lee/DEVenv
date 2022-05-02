@@ -450,6 +450,27 @@ if !install_gvim! == 1 (
 )
 
 REM ----------------------------------------------------------------------------
+REM ImHex
+REM ----------------------------------------------------------------------------
+if !install_imhex! == 1 (
+    set imhex_sha256=080f537d3ea58c002cc2112adbec1352144710b43764de9a1dc04f129d3a3343
+    set imhex_exe_sha256=6a4b0e70bf7c78af074af0de2346164d9f5aec28ea224f9ee903412e1c774d95
+    set imhex_version=1.17.0
+
+    set imhex_zip=!downloads_dir!\win32_imhex_v!imhex_version!.zip
+    set imhex_dir=!tools_dir!\imhex-x64-x!imhex_version!
+    set imhex_exe=!imhex_dir!\imhex.exe
+
+    if not exist "!imhex_exe!-!imhex_version!.sha256.txt" (
+        call :DownloadFile "https://github.com/WerWolv/ImHex/releases/download/v!imhex_version!/Windows.Portable.ZIP.zip" "!imhex_zip!" || exit /B
+        call :VerifyZipSHA256 "!imhex_zip!" "!imhex_sha256!" || exit /B
+        call :UnzipAndAlwaysOverwrite "!imhex_zip!" "!imhex_dir!" || exit /B
+    )
+
+    call :VerifyFileSHA256 "!imhex_exe!" "!imhex_version!" "!imhex_exe_sha256!" || exit /B
+)
+
+REM ----------------------------------------------------------------------------
 REM Joplin
 REM ----------------------------------------------------------------------------
 if !install_joplin! == 1 (

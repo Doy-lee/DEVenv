@@ -25,6 +25,7 @@ set install_dependency_walker=1
 set install_everything_void_tools=1
 set install_fzf=1
 set install_gvim=1
+set install_imhex=1
 set install_joplin=1
 set install_keypirinha=1
 set install_mobaxterm=1
