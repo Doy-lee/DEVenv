@@ -306,6 +306,7 @@ call :MakeBatchShortcutInBinDir "zig" "!zig_exe!"
 REM ----------------------------------------------------------------------------
 REM MSVC
 REM ----------------------------------------------------------------------------
+REM This depends on python, so it must be installed after it.
 set msvc_version=14.31
 set msvc_sdk_version=22000
 set msvc_dir=!tools_dir!\msvc-v!msvc_version!-win10-sdk-v!msvc_sdk_version!-x64
@@ -313,6 +314,10 @@ if not exist "!msvc_dir!" (
     call "!python_exe!" !tools_dir!\portable-msvc.py --accept-license --msvc-version !msvc_version! --sdk-version !msvc_sdk_version! || exit /B
     call :Move "!tools_dir!\msvc" "!msvc_dir!" || exit /B
 )
+
+REM Put the compiler into the path temporarily for compiling some programs on
+REM demand in this script.
+call !msvc_dir!\setup.bat
 
 REM ----------------------------------------------------------------------------
 REM Symget
@@ -324,6 +329,23 @@ if not exist "!symget_dir!" (
 
 call !git_exe! -C !symget_dir! pull origin main || exit /B
 call !git_exe! -C !symget_dir! checkout 79b026f || exit /B
+
+REM ----------------------------------------------------------------------------
+REM Odin
+REM ----------------------------------------------------------------------------
+set odin_dir=!tools_dir!\odin
+if not exist "!odin_dir!" (
+    call !git_exe! clone https://github.com/odin-lang/odin.git !odin_dir! || exit /B
+)
+
+call !git_exe! -C !odin_dir! pull origin master || exit /B
+call !git_exe! -C !odin_dir! checkout dc323cf || exit /B
+
+pushd !odin_dir!
+call build.bat
+popd
+
+call :MakeBatchShortcutInBinDir "odin" "!odin_dir!\odin.exe"
 
 REM ----------------------------------------------------------------------------
 REM QoL/Tools
