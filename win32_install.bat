@@ -144,6 +144,27 @@ REM ----------------------------------------------------------------------------
 REM Programming
 REM ----------------------------------------------------------------------------
 REM ----------------------------------------------------------------------------
+REM CMake
+REM ----------------------------------------------------------------------------
+set cmake_sha256=9b509cc4eb7191dc128cfa3f2170036f9cbc7d9d5f93ff7fafc5b2d77b3b40dc
+set cmake_exe_sha256=326ae6ce4bd46c27f6ce46c95b48efc19848fd9fc24d71d2e8a226dadfef810c
+set cmake_version=3.23.1
+
+set cmake_zip=!downloads_dir!\win32_cmake_!cmake_version!.zip
+set cmake_dir=!tools_dir!\cmake-!cmake_version!
+set cmake_exe=!cmake_dir!\bin\cmake.exe
+
+if not exist "!cmake_exe!" (
+    call :DownloadFile "https://github.com/Kitware/CMake/releases/download/v!cmake_version!/cmake-!cmake_version!-windows-x86_64.zip" "!cmake_zip!" || exit /B
+    call :VerifyZipSHA256 "!cmake_zip!" "!cmake_sha256!" || exit /B
+    call :Unzip "!cmake_zip!" "!cmake_dir!" || exit /B
+    call :Move "!cmake_dir!/cmake-!cmake_version!-windows-x86_64" "!cmake_dir!" || exit /B
+)
+
+call :VerifyFileSHA256 "!cmake_exe!" "!cmake_version!" "!cmake_exe_sha256!" || exit /B
+call :MakeBatchShortcutInBinDir "cmake" "!cmake_exe!"
+
+REM ----------------------------------------------------------------------------
 REM Git
 REM ----------------------------------------------------------------------------
 set git_sha256=bc030848e282d49e562ae2392a72501cf539322ad06ffe4cea8cf766f148dfe8
@@ -218,6 +239,22 @@ if not exist "!mingw_exe!" (
 call :VerifyFileSHA256 "!mingw_exe!" "!mingw_version!" "!mingw_exe_sha256!" || exit /B
 
 REM ----------------------------------------------------------------------------
+REM ninja
+REM ----------------------------------------------------------------------------
+set ninja_dir=!tools_dir!\ninja
+if not exist "!ninja_dir!" (
+    call !git_exe! clone https://github.com/ninja-build/ninja !ninja_dir! || exit /B
+)
+
+call !git_exe! -C !ninja_dir! pull origin master || exit /B
+call !git_exe! -C !ninja_dir! checkout 7905dee || exit /B
+
+pushd !ninja_dir!
+call cmake -DCMAKE_BUILD_TYPE=Release -Bbuild-cmake
+call cmake --build build-cmake
+popd
+
+REM ----------------------------------------------------------------------------
 REM nodejs
 REM ----------------------------------------------------------------------------
 set nodejs_sha256=f7b0e8b0bfcfad7d62eba16fa4db9f085983c12c661bd4c66d8e3bd783befa65
@@ -281,6 +318,26 @@ if not exist "!renderdoc_exe!" (
 )
 
 call :VerifyFileSHA256 "!renderdoc_exe!" "!renderdoc_version!" "!renderdoc_exe_sha256!" || exit /B
+
+REM ----------------------------------------------------------------------------
+REM Zeal
+REM ----------------------------------------------------------------------------
+set zeal_sha256=08e9992f620ba0a5ea348471d8ac9c85059e95eedd950118928be639746e3f94
+set zeal_exe_sha256=d1e687a33e117b6319210f40e2401b4a68ffeb0f33ef82f5fb6a31ce4514a423
+set zeal_version=0.6.1
+
+set zeal_zip=!downloads_dir!\win32_zeal-!zeal_version!.7z
+set zeal_dir=!tools_dir!\zeal-x64-!zeal_version!
+set zeal_exe=!zeal_dir!\zeal.exe
+
+if not exist "!zeal_exe!" (
+    call :DownloadFile "https://github.com/zealdocs/zeal/releases/download/v!zeal_version!/zeal-portable-!zeal_version!-windows-x64.7z" "!zeal_zip!" || exit /B
+    call :VerifyZipSHA256 "!zeal_zip!" "!zeal_sha256!" || exit /B
+    call :Unzip "!zeal_zip!" "!zeal_dir!" || exit /B
+    call :Move "!zeal_dir!\zeal-portable-!zeal_version!-windows-x64" "!zeal_dir!" || exit /B
+)
+
+call :VerifyFileSHA256 "!zeal_exe!" "!zeal_version!" "!zeal_exe_sha256!" || exit /B
 
 REM ----------------------------------------------------------------------------
 REM Zig
@@ -781,7 +838,7 @@ if exist !dest! (
     echo - !msg!
     call !zip7_dir!\7z.exe x -y -spe -o!dest! !zip_file!
 )
-exit /B !ERROLEVEL!
+exit /B !ERRORLEVEL!
 
 REM ------------------------------------------------------------------------------------------------
 :UnzipAndAlwaysOverwrite
@@ -791,7 +848,7 @@ set msg=[Unzip] !zip_file! to !dest!
 
 echo - !msg!
 call !zip7_dir!\7z.exe x -y -spe -o!dest! !zip_file!
-exit /B !ERROLEVEL!
+exit /B !ERRORLEVEL!
 
 REM ------------------------------------------------------------------------------------------------
 :VerifyZipSHA256
@@ -804,7 +861,7 @@ call powershell "$FileHash = Get-FileHash -algorithm sha256 \"!file!\"; $FileHas
 
 REM Verify Hash
 set /p actual_sha256=< !calculated_sha256_file!
-if "!expected_sha256!" neq "!actual_sha256!" (
+if /I "!expected_sha256!" neq "!actual_sha256!" (
     echo - [Verify] !file!
     echo sha256 hash does not match, failing.
     echo Expected:   !expected_sha256!
@@ -827,7 +884,7 @@ call powershell "$FileHash = Get-FileHash -algorithm sha256 \"!file!\"; $FileHas
 
 REM Verify Hash
 set /p actual_sha256=< !calculated_sha256_file!
-if "!expected_sha256!" neq "!actual_sha256!" (
+if /I "!expected_sha256!" neq "!actual_sha256!" (
     echo - [Verify] !file!
     echo sha256 hash does not match, failing.
     echo Expected:   !expected_sha256!
@@ -850,7 +907,7 @@ call powershell "$FileHash = Get-FileHash -algorithm md5 \"!file!\"; $FileHash.H
 
 REM Verify Hash
 set /p actual_md5=< !calculated_md5_file!
-if "!expected_md5!" neq "!actual_md5!" (
+if /I "!expected_md5!" neq "!actual_md5!" (
     echo - [Verify] !file!
     echo md5 hash does not match, failing.
     echo Expected:   !expected_md5!
