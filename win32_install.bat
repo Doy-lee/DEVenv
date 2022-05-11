@@ -250,8 +250,8 @@ call !git_exe! -C !ninja_dir! pull origin master || exit /B
 call !git_exe! -C !ninja_dir! checkout 7905dee || exit /B
 
 pushd !ninja_dir!
-call cmake -DCMAKE_BUILD_TYPE=Release -Bbuild-cmake
-call cmake --build build-cmake
+call cmake -DCMAKE_BUILD_TYPE=Release -B build
+call cmake --build build --parallel 8
 popd
 
 REM ----------------------------------------------------------------------------
@@ -396,7 +396,7 @@ if not exist "!odin_dir!" (
 )
 
 call !git_exe! -C !odin_dir! pull origin master || exit /B
-call !git_exe! -C !odin_dir! checkout dc323cf || exit /B
+call !git_exe! -C !odin_dir! checkout a4cb6f9 || exit /B
 
 pushd !odin_dir!
 call build.bat
@@ -666,9 +666,9 @@ REM ----------------------------------------------------------------------------
 REM ----------------------------------------------------------------------------
 REM geth
 REM ----------------------------------------------------------------------------
-set geth_md5=a975ba6591577b6f5b19f4fd8757fd03
-set geth_exe_sha256=7d9fd1566f2fd07c741a64aad2865b25f8cd82388e15bed2d68e92105b1e0fd3
-set geth_version=1.10.8-26675454
+set geth_md5=753cab189bd175d9fc6fea965ff7161b
+set geth_exe_sha256=7374e1c761f27a24a1d66299935b03b46ac354b6dc5f48505178d014a56f12df
+set geth_version=1.10.17-25c9b49f
 
 set geth_zip=!downloads_dir!\win32_geth-amd64-v!geth_version!.zip
 set geth_dir=!tools_dir!\geth-windows-amd64-!geth_version!
@@ -776,6 +776,28 @@ echo if exist "%%~dp0win32_terminal_user_config.bat" call "%%~dp0win32_terminal_
 REM WezTerm
 echo start "" /MAX "%%~dp0!wezterm_exe!">> "!terminal_script!"
 echo exit>> "!terminal_script!"
+
+REM ----------------------------------------------------------------------------
+REM Odin & Portable MSVC Work-around
+REM ----------------------------------------------------------------------------
+REM Odin uses J. Blow's Microsoft craziness SDK locator which relies on the
+REM registry. Here we inject the registry entry that the SDK locator checks for
+REM finding our portable MSVC installation.
+set odin_install_workaround_script=!root_dir!\win32_install_odin_msvc_workaround.reg
+set odin_uninstall_workaround_script=!root_dir!\win32_uninstall_odin_msvc_workaround.reg
+
+set kits_root_10=%~dp0%msvc_dir%\Windows Kits\10\
+set kits_root_10=%kits_root_10:\=\\%
+
+echo Windows Registry Editor Version 5.00>!odin_install_workaround_script!
+echo.>>!odin_install_workaround_script!
+echo [HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots]>>!odin_install_workaround_script!
+echo "KitsRoot10"="%kits_root_10%">>!odin_install_workaround_script!
+
+echo Windows Registry Editor Version 5.00>!odin_uninstall_workaround_script!
+echo.>>!odin_uninstall_workaround_script!
+echo [HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots]>>!odin_uninstall_workaround_script!
+echo "KitsRoot10"=->>!odin_uninstall_workaround_script!
 
 REM ----------------------------------------------------------------------------
 REM Background Application Scripts
