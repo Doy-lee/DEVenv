@@ -2,21 +2,33 @@
 setlocal EnableDelayedExpansion
 
 REM ----------------------------------------------------------------------------
-REM Setup Folder Locations
+REM Setup
 REM ----------------------------------------------------------------------------
-set root_dir=!CD!
-set home_dir=Home
-set install_dir=Installer
-set downloads_dir=!install_dir!\Downloads
-set vim_dir=!home_dir!\vimfiles
-set tools_dir=Tools
-set bin_dir=!tools_dir!\binaries
+set root_dir=%~dp0
 
+set home_dir=!root_dir!Home
+set install_dir=!root_dir!Installer
+set tools_dir=!root_dir!Tools
 if not exist !home_dir! mkdir !home_dir!
 if not exist !install_dir! mkdir !install_dir!
-if not exist !downloads_dir! mkdir !downloads_dir!
 if not exist !tools_dir! mkdir !tools_dir!
+
+set downloads_dir=!install_dir!\Downloads
+set vim_dir=!home_dir!\vimfiles
+set bin_dir=!tools_dir!\binaries
+if not exist !downloads_dir! mkdir !downloads_dir!
+if not exist !vim_dir! mkdir !vim_dir!
 if not exist !bin_dir! mkdir !bin_dir!
+
+set tmp_terminal_script=!root_dir!win32_terminal.bat.tmp
+set terminal_script=!root_dir!win32_terminal.bat
+echo @echo off> "!tmp_terminal_script!"
+echo set HOME=!home_dir!>> "!tmp_terminal_script!"
+echo set HOMEPATH=!home_dir!>> "!tmp_terminal_script!"
+echo set USERPROFILE=!home_dir!>> "!tmp_terminal_script!"
+echo set APPDATA=!home_dir!\AppData>> "!tmp_terminal_script!"
+echo set LOCALAPPDATA=!home_dir!\AppData\Local>> "!tmp_terminal_script!"
+echo set PATH=!bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM Setup tools for setting up the development environment
@@ -56,9 +68,9 @@ REM ----------------------------------------------------------------------------
 REM Use our bootstrap 7z from above to download the latest 7zip version
 REM NOTE: We do not use 7za because it can not unzip a NSIS installer. The full
 REM version however can.
-set zip7_sha256=0f5d4dbbe5e55b7aa31b91e5925ed901fdf46a367491d81381846f05ad54c45e
-set zip7_exe_sha256=344f076bb1211cb02eca9e5ed2c0ce59bcf74ccbc749ec611538fa14ecb9aad2
-set zip7_version=1900
+set zip7_sha256=0b461f0a0eccfc4f39733a80d70fd1210fdd69f600fb6b657e03940a734e5fc1
+set zip7_exe_sha256=ed24ed04b5d4a20b3f50fc088a455195c756d7b5315d1965e8c569472b43d939
+set zip7_version=2107
 
 set zip7_zip=!downloads_dir!\win32_7zip_v!zip7_version!.exe
 set zip7_dir=!tools_dir!\7zip-!zip7_version!
@@ -72,17 +84,21 @@ if not exist "!zip7_exe!" (
 
 call :VerifyFileSHA256 "!zip7_exe!" "!zip7_version!" "!zip7_exe_sha256!" || exit /B
 
+REM Terminal
+echo set PATH=!zip7_dir!;%%PATH%%>> "!tmp_terminal_script!"
+
 REM ----------------------------------------------------------------------------
 REM GPG Signature Verification
 REM ----------------------------------------------------------------------------
-set gpg_w32_sha256=77cec7f274ee6347642a488efdfa324e8c3ab577286e611c397e69b1b396ab16
-set gpg_w32_exe_sha256=551bfc44b1c90c66908379ec4035756b812545eee19b36bdbe1f659cfcd6bc0b
-set gpg_w32_version=2.3.1
-set gpg_w32_date=20210420
+set gpg_w32_sha256=1a18adbb24868e14a40ccbd60003108840e238c0893e7bb6908805ae067eb0e8
+set gpg_w32_exe_sha256=ac181fb744df2950880458f8e18eb005de38e5c9858d13f0f772b5ae18c6b157
+set gpg_w32_version=2.3.6
+set gpg_w32_date=20220425
 
 set gpg_w32_zip=!downloads_dir!\win32_gpg_w32_v!gpg_w32_version!.exe
 set gpg_w32_dir=!tools_dir!\gpg_w32-!gpg_w32_version!
-set gpg_w32_exe=!gpg_w32_dir!\bin\gpg.exe
+set gpg_w32_bin_dir=!gpg_w32_dir!\bin
+set gpg_w32_exe=!gpg_w32_bin_dir!\gpg.exe
 
 if not exist "!gpg_w32_exe!" (
     call :DownloadFile "https://gnupg.org/ftp/gcrypt/binary/gnupg-w32-!gpg_w32_version!_!gpg_w32_date!.exe" "!gpg_w32_zip!" || exit /B
@@ -91,9 +107,10 @@ if not exist "!gpg_w32_exe!" (
 )
 
 call :VerifyFileSHA256 "!gpg_w32_exe!" "!gpg_w32_version!" "!gpg_w32_exe_sha256!" || exit /B
-
-set gpg_w32_bin_dir=!gpg_w32_dir!\bin
 set PATH="!gpg_w32_bin_dir!";!PATH!
+
+REM Terminal
+echo set PATH=!gpg_w32_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM Application Setup
@@ -185,6 +202,11 @@ if not exist "!git_exe!" (
 
 call :VerifyFileSHA256 "!git_exe!" "!git_version!" "!git_exe_sha256!" || exit /B
 
+REM Terminal
+echo set PATH=!git_install_dir!\cmd;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=!git_install_dir!\mingw64\bin;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=!git_install_dir!\usr\bin;%%PATH%%>> "!tmp_terminal_script!"
+
 REM ----------------------------------------------------------------------------
 REM LLVM/Clang
 REM ----------------------------------------------------------------------------
@@ -193,7 +215,8 @@ set llvm_version=12.0.1
 
 set llvm_zip=!downloads_dir!\win32_llvm_x64_v!llvm_version!.exe
 set llvm_dir=!tools_dir!\llvm-!llvm_version!
-set llvm_exe=!llvm_dir!\bin\clang.exe
+set llvm_bin_dir=!llvm_dir!\bin
+set llvm_exe=!llvm_bin_dir!\clang.exe
 
 set llvm_gpg_key=!downloads_dir!\llvm-tstellar-gpg-key.asc
 set llvm_gpg_sig=!llvm_zip!.sig
@@ -208,14 +231,16 @@ if not exist "!llvm_exe!" (
     call :Unzip "!llvm_zip!" "!llvm_dir!" || exit /B
 )
 
+call :VerifyFileSHA256 "!llvm_exe!" "!llvm_version!" "!llvm_exe_sha256!" || exit /B
+
 REM Clang Format
 set clang_format_py_sha256=36ba7aa047f8a8ac8fdc278aaa733de801cc84dea60a4210973fd3e4f0d2a330
 set vim_clang_format=!vim_dir!\clang-format.py
 call :CopyAndAlwaysOverwriteFile "!llvm_dir!\share\clang\clang-format.py" "!vim_clang_format!" || exit /B
 call :VerifyFileSHA256 "!vim_clang_format!" "!llvm_version!" "!clang_format_py_sha256!" || exit /B
 
-set llvm_bin_dir=!llvm_dir!\bin
-call :VerifyFileSHA256 "!llvm_exe!" "!llvm_version!" "!llvm_exe_sha256!" || exit /B
+REM Terminal
+echo set PATH=!llvm_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM ------------------------------------------------------------------------
 REM MinGW64
@@ -238,21 +263,28 @@ if not exist "!mingw_exe!" (
 
 call :VerifyFileSHA256 "!mingw_exe!" "!mingw_version!" "!mingw_exe_sha256!" || exit /B
 
+REM Terminal
+echo set PATH=!mingw_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
+
 REM ----------------------------------------------------------------------------
 REM ninja
 REM ----------------------------------------------------------------------------
-set ninja_dir=!tools_dir!\ninja
-if not exist "!ninja_dir!" (
-    call !git_exe! clone https://github.com/ninja-build/ninja !ninja_dir! || exit /B
+set ninja_sha256=bbde850d247d2737c5764c927d1071cbb1f1957dcabda4a130fa8547c12c695f
+set ninja_exe_sha256=6a71c03f88897419f19548a8eadd941ed94144bb671be289822080f991c1ab79
+set ninja_version=1.10.2
+
+set ninja_zip=!downloads_dir!\ninja-!ninja_version!.zip
+set ninja_dir=!tools_dir!\ninja-!ninja_version!
+set ninja_exe=!ninja_dir!\ninja.exe
+
+if not exist "!ninja_exe!" (
+    call :DownloadFile "https://github.com/ninja-build/ninja/releases/download/v!ninja_version!/ninja-win.zip" "!ninja_zip!" || exit /B
+    call :VerifyZipSHA256 "!ninja_zip!" "!ninja_sha256!" || exit /B
+    call :Unzip "!ninja_zip!" "!ninja_dir!" || exit /B
 )
 
-call !git_exe! -C !ninja_dir! pull origin master || exit /B
-call !git_exe! -C !ninja_dir! checkout 7905dee || exit /B
-
-pushd !ninja_dir!
-call cmake -DCMAKE_BUILD_TYPE=Release -B build
-call cmake --build build --parallel 8
-popd
+call :VerifyFileSHA256 "!ninja_exe!" "!ninja_version!" "!ninja_exe_sha256!" || exit /B
+call :MakeBatchShortcutInBinDir "ninja" "!ninja_exe!"
 
 REM ----------------------------------------------------------------------------
 REM nodejs
@@ -273,6 +305,9 @@ if not exist "!nodejs_exe!" (
 )
 
 call :VerifyFileSHA256 "!nodejs_exe!" "!nodejs_version!" "!nodejs_exe_sha256!" || exit /B
+
+REM Terminal
+echo set PATH=!nodejs_dir!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM Python
@@ -299,12 +334,17 @@ call :VerifyFileSHA256 "!python_exe!" "!python_version!" "!python_exe_sha256!" |
 set python_bin_dir=!python_dir!\python-!python_version_dot!.amd64
 set python_scripts_bin_dir=!python_bin_dir!\Scripts
 
+REM Terminal
+echo set PATH=!python_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=!python_scripts_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
+echo set PYTHONHOME=!python_bin_dir!>> "!tmp_terminal_script!"
+
 REM ----------------------------------------------------------------------------
 REM RenderDoc
 REM ----------------------------------------------------------------------------
-set renderdoc_sha256=a97a9911850c8a93dc1dee8f94e339cd5933310513dddf0216d27cea3a5f25b1
-set renderdoc_exe_sha256=27c28b813f01781573507b0d9b47546d323ae8add2695bbd03b941461868a7a2
-set renderdoc_version=1.18
+set renderdoc_sha256=ed1c1228b8fc30e53d3560dbae9d7bf47b85e0e15e30e6f3e4f36173a74f77bc
+set renderdoc_exe_sha256=3b4874f1677f08e4c329696eaa8281b7ee86b16ad5679932a72085a3e7abc658
+set renderdoc_version=1.19
 
 set renderdoc_zip=!downloads_dir!\win32_renderdoc-!renderdoc_version!.zip
 set renderdoc_dir=!tools_dir!\renderdoc-x64-!renderdoc_version!
@@ -342,9 +382,9 @@ call :VerifyFileSHA256 "!zeal_exe!" "!zeal_version!" "!zeal_exe_sha256!" || exit
 REM ----------------------------------------------------------------------------
 REM Zig
 REM ----------------------------------------------------------------------------
-set zig_sha256=43573db14cd238f7111d6bdf37492d363f11ecd1eba802567a172f277d003926
-set zig_exe_sha256=465739a787178ded19efab55916b587f3ead2a9cdff8dcaaf1765fe907797917
-set zig_version=0.8.1
+set zig_sha256=443da53387d6ae8ba6bac4b3b90e9fef4ecbe545e1c5fa3a89485c36f5c0e3a2
+set zig_exe_sha256=63c2f819cfdb1a35cb954791fc0aa48910a42065a5e1c6ff89ee16775c75a112
+set zig_version=0.9.1
 
 set zig_file=zig-windows-x86_64-!zig_version!.zip
 set zig_zip=!downloads_dir!\win32_!zig_file!
@@ -364,17 +404,20 @@ REM ----------------------------------------------------------------------------
 REM MSVC
 REM ----------------------------------------------------------------------------
 REM This depends on python, so it must be installed after it.
-set msvc_version=14.31
-set msvc_sdk_version=22000
+set msvc_version=14.32
+set msvc_sdk_version=20348
 set msvc_dir=!tools_dir!\msvc-v!msvc_version!-win10-sdk-v!msvc_sdk_version!-x64
 if not exist "!msvc_dir!" (
     call "!python_exe!" !tools_dir!\portable-msvc.py --accept-license --msvc-version !msvc_version! --sdk-version !msvc_sdk_version! || exit /B
-    call :Move "!tools_dir!\msvc" "!msvc_dir!" || exit /B
+    call :Move "msvc" "!msvc_dir!" || exit /B
 )
 
 REM Put the compiler into the path temporarily for compiling some programs on
 REM demand in this script.
 call !msvc_dir!\setup.bat
+
+REM Terminal
+echo call "!msvc_dir!\setup.bat">> "!tmp_terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM Symget
@@ -391,18 +434,29 @@ REM ----------------------------------------------------------------------------
 REM Odin
 REM ----------------------------------------------------------------------------
 set odin_dir=!tools_dir!\odin
+set odin_git_hash=a4cb6f9
+set odin_exe_dir=!odin_dir!\build\!odin_git_hash!
+set odin_exe=!odin_exe_dir!\odin.exe
+set odin_exe_sha256=3dce3048cfbb4db9928ff4c8a54184a3e0ab3c6b16dc298578ed5aba9d3faa35
+
 if not exist "!odin_dir!" (
     call !git_exe! clone https://github.com/odin-lang/odin.git !odin_dir! || exit /B
 )
 
-call !git_exe! -C !odin_dir! pull origin master || exit /B
-call !git_exe! -C !odin_dir! checkout a4cb6f9 || exit /B
+if not exist "!odin_exe!" (
+    call !git_exe! -C !odin_dir! pull origin master || exit /B
+    call !git_exe! -C !odin_dir! checkout !odin_git_hash! || exit /B
 
-pushd !odin_dir!
-call build.bat
-popd
+    pushd !odin_dir!
+    call build.bat
+    if not exist !odin_exe_dir! mkdir !odin_exe_dir!
+    call move /Y odin.exe !odin_exe_dir!\odin.exe
+    call move /Y odin.pdb !odin_exe_dir!\odin.pdb
+    popd
+)
 
-call :MakeBatchShortcutInBinDir "odin" "!odin_dir!\odin.exe"
+call :MakeBatchShortcutInBinDir "odin" "!odin_exe!"
+call :VerifyFileSHA256 "!odin_exe!" "!odin_git_hash!" "!odin_exe_sha256!" || exit /B
 
 REM ----------------------------------------------------------------------------
 REM QoL/Tools
@@ -440,12 +494,15 @@ if not exist "!clink_completions_dir!" (
 call !git_exe! -C !clink_completions_dir! pull origin master || exit /B
 call !git_exe! -C !clink_completions_dir! checkout 9ab9342 || exit /B
 
+REM Terminal Script
+echo set CLINK_PATH=!clink_completions_dir!>> "!tmp_terminal_script!
+
 REM ----------------------------------------------------------------------------
 REM Dependencies (Walker) - For DLL dependency management
 REM ----------------------------------------------------------------------------
-set dependencies_sha256=44df956dbe267e0a705224c3b85d515fee2adc87509861e24fb6c6b0ea1b86d6
-set dependencies_exe_sha256=f9c9d78284d03b0457061cfb33751071c8c1ceeb26bc9b75ae9b7e0465e99858
-set dependencies_version=v1.10
+set dependencies_sha256=7d22dc00f1c09fd4415d48ad74d1cf801893e83b9a39944b0fce6dea7ceaea99
+set dependencies_exe_sha256=1737e5406128c3560bbb2bced3ac62d77998e592444f94b10cc0aa0bb1e617e6
+set dependencies_version=v1.11.1
 
 set dependencies_zip=!downloads_dir!\win32_dependencies_!dependencies_version!.zip
 set dependencies_dir=!tools_dir!\dependencies-!dependencies_version!
@@ -462,11 +519,11 @@ call :VerifyFileSHA256 "!dependencies_exe!" "!dependencies_version!" "!dependenc
 REM ----------------------------------------------------------------------------
 REM everything (void tools search program)
 REM ----------------------------------------------------------------------------
-set everything_sha256=f61b601acba59d61fb0631a654e48a564db34e279b6f2cc45e20a42ce9d9c466
-set everything_exe_sha256=48a17c3c22476f642c2b1ab2da8dfd789e39882997d7a8e266104f7404a0ded9
-set everything_version=1.4.1.1009
+set everything_sha256=656ff3946222048a5558160023da6fd8abc6fa9569f7ac1dff058410a3db6f28
+set everything_exe_sha256=8f853443c0b0e8c144315a27d1e8bf1595bd09cb364393226accfe105c0a2c85
+set everything_version=1.4.1.1015
 
-set everything_zip=!downloads_dir!\win32_everything_v!everything_version!.7z
+set everything_zip=!downloads_dir!\win32_everything_v!everything_version!.zip
 set everything_dir=!tools_dir!\everything-!everything_version!
 set everything_exe=!everything_dir!\everything.exe
 
@@ -497,6 +554,11 @@ if not exist "!fzf_exe!-!fzf_version!.sha256.txt" (
 
 call :VerifyFileSHA256 "!fzf_exe!" "!fzf_version!" "!fzf_exe_sha256!" || exit /B
 
+REM Terminal
+REM Use RG for FZF to make it ultra fast
+echo set FZF_DEFAULT_OPTS=--multi --layout=reverse>> "!tmp_terminal_script!"
+echo set FZF_DEFAULT_COMMAND=rg --files --no-ignore-vcs --hidden>> "!tmp_terminal_script!"
+
 REM ----------------------------------------------------------------------------
 REM GVim, Vim Plug, Vim Config
 REM ----------------------------------------------------------------------------
@@ -519,6 +581,9 @@ set vim_plug_dir=!vim_dir!\autoload
 set vim_plug=!vim_plug_dir!\plug.vim
 if not exist "!vim_plug_dir!" mkdir "!vim_plug_dir!"
 call :DownloadFile "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim" "!vim_plug!" || exit /B
+
+REM Terminal
+echo set PATH=!gvim_dir!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM ImHex
@@ -623,16 +688,16 @@ if not exist "!oo_shutup_10_file!" (
 REM ----------------------------------------------------------------------------
 REM ProcessHacker
 REM ----------------------------------------------------------------------------
-set process_hacker_sha256=e8836365abab7478d8e4c2d3fb3bb1fce82048cd4da54bab41cacbae1f45b1ff
-set process_hacker_exe_sha256=46367bfcf4b150da573a74d91aa2f7caf7a0789741bc65878a028e91ffbf5e42
-set process_hacker_version=3.0.4212
+set process_hacker_sha256=c662b756324c9727760b4e921459d31a30f99cf8d3f24b64f4fcb3b29a26beb4
+set process_hacker_exe_sha256=22b1b8f080a41a07f23eae8ab0ad2e5f88d3c5af5d8c1cd1bb4f6856482e945c
+set process_hacker_version=3.0.4861
 
 set process_hacker_zip=!downloads_dir!\win32_process_hacker-!process_hacker_version!.zip
 set process_hacker_dir=!tools_dir!\process_hacker-!process_hacker_version!
 set process_hacker_exe=!process_hacker_dir!\64bit\ProcessHacker.exe
 
 if not exist "!process_hacker_exe!" (
-    call :DownloadFile "https://ci.appveyor.com/api/buildjobs/8say005q9xy48cc3/artifacts/processhacker-!process_hacker_version!-bin.zip" "!process_hacker_zip!" || exit /B
+    call :DownloadFile "https://github.com/ProcessHackerRepoTool/nightly-builds-mirror/releases/download/v!process_hacker_version!/processhacker-!process_hacker_version!-bin.zip" "!process_hacker_zip!" || exit /B
     call :VerifyZipSHA256 "!process_hacker_zip!" "!process_hacker_sha256!" || exit /B
     call :Unzip "!process_hacker_zip!" "!process_hacker_dir!" || exit /B
 )
@@ -727,55 +792,12 @@ call :VerifyFileSHA256 "!solidity_exe!" "!solidity_version!" "!solidity_exe_sha2
 call :MakeBatchShortcutInBinDir "solc" "!solidity_exe!"
 
 REM ----------------------------------------------------------------------------
-REM Super Terminal
+REM Finish Terminal Script
 REM ----------------------------------------------------------------------------
-set terminal_script=!root_dir!\win32_terminal.bat
-
-echo @echo off> "!terminal_script!"
-
-echo set APPDATA=%%~dp0!home_dir!\AppData>> "!terminal_script!"
-echo set HOME=%%~dp0!home_dir!>> "!terminal_script!"
-echo set HOMEPATH=%%~dp0!home_dir!>> "!terminal_script!"
-echo set USERPROFILE=%%~dp0!home_dir!>> "!terminal_script!"
-echo set LOCALAPPDATA=%%~dp0!home_dir!\AppData\Local>> "!terminal_script!"
-echo set PATH=%%~dp0!gpg_w32_bin_dir!;%%PATH%%>> "!terminal_script!"
-echo set PATH=%%~dp0!bin_dir!;%%PATH%%>> "!terminal_script!"
-
-REM Clink
-echo set CLINK_PATH=%%~dp0!clink_completions_dir!>> "!terminal_script!
-
-REM FZF
-echo set FZF_DEFAULT_OPTS=--multi --layout=reverse>> "!terminal_script!"
-
-REM Use RG for FZF to make it ultra fast
-echo set FZF_DEFAULT_COMMAND=rg --files --no-ignore-vcs --hidden>> "!terminal_script!"
-
-REM Git
-echo set PATH=%%~dp0!git_install_dir!\cmd;%%PATH%%>> "!terminal_script!"
-echo set PATH=%%~dp0!git_install_dir!\mingw64\bin;%%PATH%%>> "!terminal_script!"
-echo set PATH=%%~dp0!git_install_dir!\usr\bin;%%PATH%%>> "!terminal_script!"
-
-REM GVim/Clang/MinGW/NodeJS
-echo set PATH=%%~dp0!gvim_dir!;%%PATH%%>> "!terminal_script!"
-echo set PATH=%%~dp0!llvm_bin_dir!;%%PATH%%>> "!terminal_script!"
-echo set PATH=%%~dp0!mingw_bin_dir!;%%PATH%%>> "!terminal_script!"
-echo set PATH=%%~dp0!nodejs_dir!;%%PATH%%>> "!terminal_script!"
-
-REM Python3
-echo set PATH=%%~dp0!python_bin_dir!;%%PATH%%>> "!terminal_script!"
-echo set PATH=%%~dp0!python_scripts_bin_dir!;%%PATH%%>> "!terminal_script!"
-echo set PYTHONHOME=%%~dp0!python_bin_dir!>> "!terminal_script!"
-
-echo set PATH=%%~dp0!zip7_dir!;%%PATH%%>> "!terminal_script!"
-
-REM MSVC
-echo call "%%~dp0!msvc_dir!\setup.bat">> "!terminal_script!"
-
-echo if exist "%%~dp0win32_terminal_user_config.bat" call "%%~dp0win32_terminal_user_config.bat">> "!terminal_script!"
-
-REM WezTerm
-echo start "" /MAX "%%~dp0!wezterm_exe!">> "!terminal_script!"
-echo exit>> "!terminal_script!"
+echo if exist "!root_dir!win32_terminal_user_config.bat" call "!root_dir!win32_terminal_user_config.bat">> "!tmp_terminal_script!"
+echo start "" /MAX "!wezterm_exe!">> "!tmp_terminal_script!"
+echo exit>> "!tmp_terminal_script!"
+move /Y !tmp_terminal_script! !terminal_script!
 
 REM ----------------------------------------------------------------------------
 REM Odin & Portable MSVC Work-around
@@ -786,7 +808,7 @@ REM finding our portable MSVC installation.
 set odin_install_workaround_script=!root_dir!\win32_install_odin_msvc_workaround.reg
 set odin_uninstall_workaround_script=!root_dir!\win32_uninstall_odin_msvc_workaround.reg
 
-set kits_root_10=%~dp0%msvc_dir%\Windows Kits\10\
+set kits_root_10=%msvc_dir%\Windows Kits\10\
 set kits_root_10=%kits_root_10:\=\\%
 
 echo Windows Registry Editor Version 5.00>!odin_install_workaround_script!
@@ -802,10 +824,10 @@ echo "KitsRoot10"=->>!odin_uninstall_workaround_script!
 REM ----------------------------------------------------------------------------
 REM Background Application Scripts
 REM ----------------------------------------------------------------------------
-set terminal_script=!root_dir!\win32_start_background_apps.bat
-echo @echo off> "!terminal_script!"
-echo start "" "%%~dp0!everything_dir!\everything.exe">> "!terminal_script!"
-echo start "" "%%~dp0!keypirinha_dir!\keypirinha.exe">> "!terminal_script!"
+set bg_app_script=!root_dir!\win32_start_background_apps.bat
+echo @echo off> "!bg_app_script!"
+echo start "" "!everything_dir!\everything.exe">> "!bg_app_script!"
+echo start "" "!keypirinha_dir!\keypirinha.exe">> "!bg_app_script!"
 
 REM ----------------------------------------------------------------------------
 REM CTags Helper Script
@@ -814,7 +836,7 @@ set ctags_file=!bin_dir!\ctags_cpp.bat
 echo @echo off> "!ctags_file!"
 echo ctags --c++-kinds=+p --fields=+iaS --extras=+q %%*>> !ctags_file!
 
-echo - Setup complete. Launch !root_dir!\win32_terminal.bat [or restart Wezterm instance if you're updating an existing installation]
+echo - Setup complete. Launch !root_dir!win32_terminal.bat [or restart Wezterm instance if you're updating an existing installation]
 echo - (Optional) A custom font is provided and requires manual intallation in Windows at !jetbrains_mono_file!
 echo              This font will be used in GVIM if it's available.
 pause
@@ -954,5 +976,5 @@ REM admin privileges in windows ...
 set script_name=%~1
 set executable=%~2
 echo @echo off> "!bin_dir!\!script_name!.bat"
-echo %%~dp0..\..\!executable! %%*>> "!bin_dir!\!script_name!.bat"
+echo !executable! %%*>> "!bin_dir!\!script_name!.bat"
 exit /B 0
