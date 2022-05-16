@@ -422,13 +422,13 @@ echo call "!msvc_dir!\setup.bat">> "!tmp_terminal_script!"
 REM ----------------------------------------------------------------------------
 REM Symget
 REM ----------------------------------------------------------------------------
-set symget_dir=!tools_dir!\symget
-if not exist "!symget_dir!" (
-    call !git_exe! clone https://github.com/mmozeiko/symget.git !symget_dir! || exit /B
-)
-
-call !git_exe! -C !symget_dir! pull origin main || exit /B
-call !git_exe! -C !symget_dir! checkout 79b026f || exit /B
+REM set symget_dir=!tools_dir!\symget
+REM if not exist "!symget_dir!" (
+REM     call !git_exe! clone https://github.com/mmozeiko/symget.git !symget_dir! || exit /B
+REM )
+REM
+REM call !git_exe! -C !symget_dir! pull origin main || exit /B
+REM call !git_exe! -C !symget_dir! checkout 79b026f || exit /B
 
 REM ----------------------------------------------------------------------------
 REM Odin
@@ -583,6 +583,26 @@ call :DownloadFile "https://raw.githubusercontent.com/junegunn/vim-plug/master/p
 
 REM Terminal
 echo set PATH=!gvim_dir!;%%PATH%%>> "!tmp_terminal_script!"
+
+REM ----------------------------------------------------------------------------
+REM Sublime Text
+REM ----------------------------------------------------------------------------
+set sublime_text_sha256=0a27933a49a9de6d9b8d3fd93a4a5eb80b5a4307c915f8e745bbb8350832e09c
+set sublime_text_exe_sha256=a8e651e933fa7155a266c394f8550ffbf5d37dc4dc5825565cfd0feb03b3c578
+set sublime_text_version=4126
+
+set sublime_text_zip=!downloads_dir!\sublime_text_v!sublime_text_version!.zip
+set sublime_text_dir=!tools_dir!\sublime_text-!sublime_text_version!
+set sublime_text_exe=!sublime_text_dir!\sublime_text.exe
+
+if not exist "!sublime_text_exe!" (
+    call :DownloadFile "https://download.sublimetext.com/sublime_text_build_!sublime_text_version!_x64.zip" "!sublime_text_zip!" || exit /B
+    call :FileHashCheck sha256 "!sublime_text_zip!" "!sublime_text_sha256!" || exit /B
+    call :Unzip "!sublime_text_zip!" "!sublime_text_dir!" || exit /B
+)
+
+call :FileHashCheck sha256 "!sublime_text_exe!" "!sublime_text_exe_sha256!" || exit /B
+call :MakeBatchShortcutInBinDir "subl" "!sublime_text_dir!\subl.exe"
 
 REM ----------------------------------------------------------------------------
 REM ImHex
