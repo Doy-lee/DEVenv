@@ -25,13 +25,13 @@ sudo apt install exuberant-ctags neovim clang-format ripgrep
 # ------------------------------------------------------------------------------
 # NVim
 # ------------------------------------------------------------------------------
-cp --force ${script_dir}/Installer/_vimrc ~/.vimrc
+cp --force ${script_dir}/Installer/os_vimrc ~/.vimrc
+cp --force ${script_dir}/Installer/os_clang_format_style_file ~/_clang-format
 cp --force ${script_dir}/Installer/unix_nvim_init.vim ~/.config/nvim/init.vim
-cp --force ${script_dir}/Installer/clang_format_style_file ~/_clang-format
 
 # ------------------------------------------------------------------------------
 # Ctags
 # ------------------------------------------------------------------------------
 rm --force ${bin_dir}/ctags_cpp.sh
 echo ctags --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ \$\@ >> ${bin_dir}/ctags_cpp.sh
-chmod +x Bin/ctags_cpp.sh
+chmod +x ${bin_dir}/ctags_cpp.sh
