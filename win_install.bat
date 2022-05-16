@@ -433,24 +433,27 @@ REM call !git_exe! -C !symget_dir! checkout 79b026f || exit /B
 REM ----------------------------------------------------------------------------
 REM Odin
 REM ----------------------------------------------------------------------------
+set odin_git_hash=a4cb6f96
 set odin_dir=!tools_dir!\odin
-set odin_git_hash=a4cb6f9
-set odin_exe_dir=!odin_dir!\build\!odin_git_hash!
-set odin_exe=!odin_exe_dir!\odin.exe
+set odin_exe=!odin_dir!\odin.exe
 
 if not exist "!odin_dir!" (
     call !git_exe! clone https://github.com/odin-lang/odin.git !odin_dir! || exit /B
 )
 
-if not exist "!odin_exe!" (
+REM Extract current git hash of the repository. Remove the last character as
+REM rev-parse has a trailing whitespace.
+for /F "tokens=1 USEBACKQ" %%F IN (`"!git_exe!" -C !odin_dir! rev-parse --short HEAD`) do ( SET odin_curr_git_hash=%%F )
+set odin_curr_git_hash=!odin_curr_git_hash:~0,-1!
+
+if !odin_curr_git_hash! neq !odin_git_hash! (
     call !git_exe! -C !odin_dir! pull origin master || exit /B
     call !git_exe! -C !odin_dir! checkout !odin_git_hash! || exit /B
+)
 
+if not exist "!odin_exe!" (
     pushd !odin_dir!
     call build.bat
-    if not exist !odin_exe_dir! mkdir !odin_exe_dir!
-    call move /Y odin.exe !odin_exe_dir!\odin.exe
-    call move /Y odin.pdb !odin_exe_dir!\odin.pdb
     popd
 )
 
