@@ -761,7 +761,7 @@ set geth_zip=!downloads_dir!\geth-amd64-v!geth_version!.zip
 set geth_dir=!tools_dir!\geth-windows-amd64-!geth_version!
 set geth_exe=!geth_dir!\geth.exe
 
-set geth_gpg_key=!downloads_dir!\..\geth_windows_builder_gpg_key.asc
+set geth_gpg_key=!installer_dir!\win_geth_windows_builder_gpg_key.asc
 set geth_gpg_sig=!geth_zip!.asc
 
 if not exist "!geth_exe!" (
