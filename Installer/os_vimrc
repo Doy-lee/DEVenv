@@ -201,9 +201,9 @@ endif
 " ==============================================================================
 " FZF
 " ==============================================================================
-nnoremap <leader>f :FzfFiles<CR>
+nnoremap <leader>f :FzfFiles
 nnoremap <leader>t :FzfTags<CR>
-nnoremap <leader>r :FzfRg<CR>
+nnoremap <leader>r :FzfRg
 nnoremap <leader>b :FzfBuffers<CR>
 nnoremap <leader>l :FzfLines<CR>
 

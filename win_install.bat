@@ -539,9 +539,9 @@ call :FileHashCheck sha256 "!everything_exe!" "!everything_exe_sha256!" || exit 
 REM ----------------------------------------------------------------------------
 REM fzf
 REM ----------------------------------------------------------------------------
-set fzf_sha256=f0797ceee089017108c80b09086c71b8eec43d4af11ce939b78b1d5cfd202540
-set fzf_exe_sha256=5176c4c90957aa7e3d12f91b8ba55acac7524a83998517119ee19b61f4534140
-set fzf_version=0.29.0
+set fzf_sha256=AB0ED3255564DF1A6643FF492EBC728C25F3DF9EAA5C11AC7A28CF661667412F
+set fzf_exe_sha256=C41293D9E632C5A3604AD863389C0BEC7AC2AD1E3C1F51B60EA2271A63BBB3D2
+set fzf_version=0.30.0
 
 set fzf_zip=!downloads_dir!\fzf_v!fzf_version!.zip
 set fzf_dir=!tools_dir!\fzf-!fzf_version!
