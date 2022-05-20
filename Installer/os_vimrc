@@ -177,9 +177,9 @@ nnoremap <A-p> :cp<CR>
 " ==============================================================================
 " FZF
 " ==============================================================================
-nnoremap <leader>f :FzfFiles
+nnoremap <leader>f :FzfFiles 
 nnoremap <leader>t :FzfTags<CR>
-nnoremap <leader>r :FzfRg
+nnoremap <leader>r :FzfRg 
 nnoremap <leader>b :FzfBuffers<CR>
 nnoremap <leader>l :FzfLines<CR>
 
