@@ -2,13 +2,7 @@
 " Plugins
 " ==============================================================================
 let s:running_windows = has("win16") || has("win32") || has("win64")
-if s:running_windows
-  let g:myvimdir ="~/vimfiles"
-  silent! call plug#begin('~/vimfiles/plugged')
-else
-  let g:myvimdir ="~/.vim"
-  silent! call plug#begin('~/.vim/plugged')
-endif
+silent! call plug#begin('~/.vim/plugged')
 
 Plug 'https://github.com/ervandew/supertab'
 Plug 'https://github.com/scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
@@ -54,7 +48,7 @@ set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe,*.obj,*.vcxproj,*.pdb,*.idb
 " Undo Settings
 silent! set undofile                       " Save undo history to file
 set undolevels=1000                        " Maximum number of undos that can be done
-let &undodir=expand(g:myvimdir."/undodir") " Set location to save undo files
+let &undodir=expand("~/.vim/undodir") " Set location to save undo files
 
 " Create the undo history folder if it doesn't exist
 if !isdirectory(expand(&undodir))
@@ -193,11 +187,6 @@ nnoremap <leader>s :vs<CR>
 nnoremap <A-n> :cn<CR>
 nnoremap <A-p> :cp<CR>
 
-" Fullscreen
-if s:running_windows
-    noremap <f11> <esc>:call libcallnr('gvim_fullscreen.dll', 'ToggleFullScreen', 0)<cr>
-endif
-
 " ==============================================================================
 " FZF
 " ==============================================================================
@@ -219,25 +208,7 @@ let g:fzf_layout = { 'down': '40%' }
 " ==============================================================================
 " Clang Format
 " ==============================================================================
-if s:running_windows
-    if has('python')
-        map <C-I> :pyf ~/vimfiles/clang-format.py<CR>
-        imap <C-I> <c-o>:pyf ~/vimfiles/clang-format.py<CR>
-    elseif has('python3')
-        map <C-I> :py3f ~/vimfiles/clang-format.py<CR>
-        imap <C-I> <c-o>:py3f ~/vimfiles/clang-format.py<CR>
-    endif
-else
-    if has('python')
-        map <C-I> :pyf ~/.vim/clang-format.py<CR>
-        imap <C-I> <c-o>:pyf ~/.vim/clang-format.py<CR>
-    elseif has('python3')
-        map <C-I> :py3f ~/.vim/clang-format.py<CR>
-        imap <C-I> <c-o>:py3f ~/.vim/clang-format.py<CR>
-    endif
-endif
-
-
+map <C-I> :py3file ~/.vim/clang-format.py<CR>
 
 " ==============================================================================
 " Compiling / AsyncRun

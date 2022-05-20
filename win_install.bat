@@ -14,8 +14,8 @@ if not exist !home_dir! mkdir !home_dir!
 if not exist !tools_dir! mkdir !tools_dir!
 if not exist !downloads_dir! mkdir !downloads_dir!
 
-set vim_dir=!home_dir!\vimfiles
-set bin_dir=!tools_dir!\binaries
+set vim_dir=!home_dir!\.vim
+set bin_dir=!tools_dir!\Binaries
 if not exist !vim_dir! mkdir !vim_dir!
 if not exist !bin_dir! mkdir !bin_dir!
 
@@ -320,7 +320,8 @@ set python_version_dot=3.9.0
 
 set python_zip=!downloads_dir!\Winpython64-!python_version!.zip
 set python_dir=!tools_dir!\Winpython64-!python_version_nodot!
-set python_exe=!python_dir!\python-3.9.0.amd64\python.exe
+set python_bin_dir=!python_dir!\python-!python_version_dot!.amd64\
+set python_exe=!python_bin_dir!\python.exe
 
 if not exist "!python_exe!" (
     call :DownloadFile "https://github.com/winpython/winpython/releases/download/3.0.20201028/Winpython64-!python_version!.exe" "!python_zip!" || exit /B
@@ -562,50 +563,66 @@ echo set FZF_DEFAULT_OPTS=--multi --layout=reverse>> "!tmp_terminal_script!"
 echo set FZF_DEFAULT_COMMAND=rg --files --no-ignore-vcs --hidden>> "!tmp_terminal_script!"
 
 REM ----------------------------------------------------------------------------
-REM GVim, Vim Plug, Vim Config
+REM NVIM
 REM ----------------------------------------------------------------------------
-set gvim_zip=!downloads_dir!\gvim_x64.7z
-set gvim_dir=!tools_dir!\GVim
-if not exist "!gvim_dir!\gvim.exe" (
-    call :DownloadFile https://tuxproject.de/projects/vim/complete-x64.7z !gvim_zip! || exit /B
-    call :Unzip "!gvim_zip!" "!gvim_dir!" || exit /B
+set nvim_sha256=a72a90e2897ea296b777c325a37c981a0b51e2fe0c8b8735e3366b65e958cddc
+set nvim_exe_sha256=E2B9B9C38EE169475EEAE4501278A36A93C7A4F08F6E5379CA65A166041B8DA8
+set nvim_version=0.7.0
+
+set nvim_zip=!downloads_dir!\nvim_v!nvim_version!.zip
+set nvim_dir=!tools_dir!\nvim-!nvim_version!
+set nvim_exe=!nvim_dir!\bin\nvim.exe
+
+if not exist "!nvim_exe!" (
+    call :DownloadFile "https://github.com/neovim/neovim/releases/download/v!nvim_version!/nvim-win64.zip" "!nvim_zip!" || exit /B
+    call :FileHashCheck sha256 "!nvim_zip!" "!nvim_sha256!" || exit /B
+    call :Unzip "!nvim_zip!" "!nvim_dir!" || exit /B
+    call :Move "!nvim_dir!\nvim-win64" "!nvim_dir!" || exit /B
 )
 
-call :CopyAndAlwaysOverwriteFile "!installer_dir!\os_vimrc" "!home_dir!\_vimrc"
+call :FileHashCheck sha256 "!nvim_exe!" "!nvim_exe_sha256!" || exit /B
+call :MakeBatchShortcutInBinDir "nvim" "!nvim_exe!"
 
-REM DLL that hooks into GVIM and provides fullscreen with F11
-set gvim_fullscreen_dll_sha256=1c83747b67ed73c05d44c1af8222a860bc5a48b56bf54cd6e21465a2deb78456
-set gvim_fullscreen_dll=!gvim_dir!\gvim_fullscreen.dll
-call :CopyAndAlwaysOverwriteFile "!installer_dir!\win_gvim_fullscreen.dll" "!gvim_fullscreen_dll!" || exit /B
-call :FileHashCheck sha256 "!gvim_fullscreen_dll!" "!gvim_fullscreen_dll_sha256!" || exit /B
+REM ----------------------------------------------------------------------------
+REM Neovide
+REM ----------------------------------------------------------------------------
+set neovide_sha256=EF4EBCF41ACB38B418859DD7AEDBCB7B2741EEC9BE0B8D7E1EC5F3001A07E5D8
+set neovide_exe_sha256=BA2CDCE2DE1D4A1DAF6DE6CE1AE132B606CC51A87AA6C9483824829117248AE2
+set neovide_version=0.8.0
 
+set neovide_zip=!downloads_dir!\neovide_v!neovide_version!.zip
+set neovide_dir=!tools_dir!\neovide-!neovide_version!
+set neovide_exe=!neovide_dir!\neovide.exe
+
+if not exist "!neovide_exe!" (
+    call :DownloadFile "https://github.com/neovide/neovide/releases/download/!neovide_version!/neovide-windows.zip" "!neovide_zip!" || exit /B
+    call :FileHashCheck sha256 "!neovide_zip!" "!neovide_sha256!" || exit /B
+    call :Unzip "!neovide_zip!" "!neovide_dir!" || exit /B
+    call :Move "!neovide_dir!\neovide-windows" "!neovide_dir!" || exit /B
+)
+
+call :FileHashCheck sha256 "!neovide_exe!" "!neovide_exe_sha256!" || exit /B
+call :MakeBatchShortcutInBinDir "neovide" "!neovide_exe!"
+
+REM ----------------------------------------------------------------------------
+REM Vim Configuration
+REM ----------------------------------------------------------------------------
+REM Vim Config
+call :CopyAndAlwaysOverwriteFile "!installer_dir!\os_vimrc" "!home_dir!\.vimrc"
+
+REM Vim -> Nvim Config
+set nvim_init_dir=!home_dir!\AppData\Local\nvim
+if not exist "!nvim_init_dir!" mkdir "!nvim_init_dir!"
+call :CopyAndAlwaysOverwriteFile "!installer_dir!\os_nvim_init.vim" "!nvim_init_dir!\init.vim"
+
+REM Vim Package Manager
 set vim_plug_dir=!vim_dir!\autoload
 set vim_plug=!vim_plug_dir!\plug.vim
 if not exist "!vim_plug_dir!" mkdir "!vim_plug_dir!"
 call :DownloadFile "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim" "!vim_plug!" || exit /B
 
-REM Terminal
-echo set PATH=!gvim_dir!;%%PATH%%>> "!tmp_terminal_script!"
-
-REM ----------------------------------------------------------------------------
-REM Sublime Text
-REM ----------------------------------------------------------------------------
-set sublime_text_sha256=0a27933a49a9de6d9b8d3fd93a4a5eb80b5a4307c915f8e745bbb8350832e09c
-set sublime_text_exe_sha256=a8e651e933fa7155a266c394f8550ffbf5d37dc4dc5825565cfd0feb03b3c578
-set sublime_text_version=4126
-
-set sublime_text_zip=!downloads_dir!\sublime_text_v!sublime_text_version!.zip
-set sublime_text_dir=!tools_dir!\sublime_text-!sublime_text_version!
-set sublime_text_exe=!sublime_text_dir!\sublime_text.exe
-
-if not exist "!sublime_text_exe!" (
-    call :DownloadFile "https://download.sublimetext.com/sublime_text_build_!sublime_text_version!_x64.zip" "!sublime_text_zip!" || exit /B
-    call :FileHashCheck sha256 "!sublime_text_zip!" "!sublime_text_sha256!" || exit /B
-    call :Unzip "!sublime_text_zip!" "!sublime_text_dir!" || exit /B
-)
-
-call :FileHashCheck sha256 "!sublime_text_exe!" "!sublime_text_exe_sha256!" || exit /B
-call :MakeBatchShortcutInBinDir "subl" "!sublime_text_dir!\subl.exe"
+REM Install Python NVIM module, for :py3 support
+!python_bin_dir!\Scripts\pip.exe install pynvim
 
 REM ----------------------------------------------------------------------------
 REM ImHex
