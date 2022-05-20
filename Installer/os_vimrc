@@ -105,47 +105,34 @@ let g:gruvbox_italic=0
 let g:gruvbox_bold=0
 colorscheme gruvbox
 
-if has("gui_running")
-    " NOTE(doyle): Some list chars in gui don't show correctly in terminal so separate logic
-    " old listchars=tab:>-,eol:¬,trail:■,extends:»,precedes:«
-    set listchars+=trail:■,extends:»,precedes:«
-    if s:running_windows
-        set guifont=JetBrains_Mono:h9,Consolas:h11
-    else
-        set guifont=InputMonoCondensed:h10
-    endif
-
-    " Don't show trailing spaces in insert mode
-    augroup trailing
-      au!
-      au InsertEnter * :set listchars-=trail:■
-      au InsertLeave * :set listchars+=trail:■
-    augroup END
-
-    " Increase font size using (Ctrl+Up Arrow) or (Ctrl+Down Arrow) if we are using
-    " gvim Otherwise font size is determined in terminal
-    nnoremap <C-Up> :silent! let &guifont = substitute(
-     \ &guifont,
-     \ ':h\zs\d\+',
-     \ '\=eval(submatch(0)+1)',
-     \ 'g')<CR>
-    nnoremap <C-Down> :silent! let &guifont = substitute(
-     \ &guifont,
-     \ ':h\zs\d\+',
-     \ '\=eval(submatch(0)-1)',
-     \ 'g')<CR>
-
+" NOTE(doyle): Some list chars in gui don't show correctly in terminal so separate logic
+" old listchars=tab:>-,eol:¬,trail:■,extends:»,precedes:«
+set listchars+=trail:■,extends:»,precedes:«
+if s:running_windows
+    set guifont=JetBrains_Mono:h9,Consolas:h9
 else
-    set t_Co=256            " 256 colors
-    let &t_AB="\e[48;5;%dm" " vodoo magic for CONEMU
-    let &t_AF="\e[38;5;%dm" " vodoo magic for CONEMU
-
-    set listchars+=trail:$,extends:>,precedes:<
-
-    " Fix Cmder backspace bug
-    inoremap <Char-0x07F> <BS>
-    nnoremap <Char-0x07F> <BS>
+    set guifont=InputMonoCondensed:h9
 endif
+
+" Don't show trailing spaces in insert mode
+augroup trailing
+  au!
+  au InsertEnter * :set listchars-=trail:■
+  au InsertLeave * :set listchars+=trail:■
+augroup END
+
+" Increase font size using (Ctrl+Up Arrow) or (Ctrl+Down Arrow) if we are using
+" gvim Otherwise font size is determined in terminal
+nnoremap <C-Up> :silent! let &guifont = substitute(
+ \ &guifont,
+ \ ':h\zs\d\+',
+ \ '\=eval(submatch(0)+1)',
+ \ 'g')<CR>
+nnoremap <C-Down> :silent! let &guifont = substitute(
+ \ &guifont,
+ \ ':h\zs\d\+',
+ \ '\=eval(submatch(0)-1)',
+ \ 'g')<CR>
 
 " Formatting options (see :h fo-table)
 augroup persistent_settings

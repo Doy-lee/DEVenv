@@ -582,6 +582,7 @@ if not exist "!nvim_exe!" (
 
 call :FileHashCheck sha256 "!nvim_exe!" "!nvim_exe_sha256!" || exit /B
 call :MakeBatchShortcutInBinDir "nvim" "!nvim_exe!"
+call :MakeBatchShortcutInBinDir "nvim-qt" "!nvim_dir!\bin\nvim-qt.exe"
 
 REM ----------------------------------------------------------------------------
 REM Neovide
