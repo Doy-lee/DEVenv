@@ -798,11 +798,11 @@ call :MakeBatchShortcutInBinDir "geth" "!geth_exe!"
 REM ----------------------------------------------------------------------------
 REM remix_ide
 REM ----------------------------------------------------------------------------
-set remix_ide_sha256=19a56cb79459e612d8cbdd6b6729d06c7080d983537d2494a15fd25ea67b2499
-set remix_ide_exe_sha256=960bc454e37a718b86018b596d14ed977d1a8e1a5bc57b5afd573fc5e9b84a47
-set remix_ide_version=1.3.1
+set remix_ide_sha256=E3736B66ECF30384B88FD4D626F788412C0117E18C4D26F2289469CD0E33752A
+set remix_ide_exe_sha256=BEE0A36255D16A9888BA421D95CFC3B672265790E70AE56924E27022E8A2BA0D
+set remix_ide_version=1.3.3
 
-set remix_ide_zip=!downloads_dir!\remix-ide-amd64-v!remix_ide_version!.zip
+set remix_ide_zip=!downloads_dir!\remix-ide-v!remix_ide_version!.zip
 set remix_ide_dir=!tools_dir!\remix-ide-!remix_ide_version!
 set remix_ide_exe=!remix_ide_dir!\Remix IDE.exe
 
@@ -817,15 +817,15 @@ call :FileHashCheck sha256 "!remix_ide_exe!" "!remix_ide_exe_sha256!" || exit /B
 REM ----------------------------------------------------------------------------
 REM solidity
 REM ----------------------------------------------------------------------------
-set solidity_exe_sha256=82db83111c6e2c892179486cb7050d85f1517bf851027607eb7f4e589e714bc5
-set solidity_version=0.8.7+commit.e28d00a7
+set solidity_exe_sha256=70A5A7EAA9135D13BD036CA55735F489559368AF819C5810CFAF0315DF56AB53
+set solidity_version=0.8.14
 
-set solidity_dir=!tools_dir!\solidity-windows-amd64-!solidity_version!
+set solidity_dir=!tools_dir!\solidity-!solidity_version!
 set solidity_exe=!solidity_dir!\solc.exe
 
 if not exist "!solidity_exe!" (
     if not exist "!solidity_dir!" mkdir "!solidity_dir!"
-    call :DownloadFile "https://binaries.soliditylang.org/windows-amd64/solc-windows-amd64-v!solidity_version!.exe" "!solidity_exe!" || exit /B
+    call :DownloadFile "https://github.com/ethereum/solidity/releases/download/v!solidity_version!/solc-windows.exe" "!solidity_exe!" || exit /B
 )
 
 call :FileHashCheck sha256 "!solidity_exe!" "!solidity_exe_sha256!" || exit /B
