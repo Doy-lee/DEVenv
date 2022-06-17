@@ -670,6 +670,7 @@ if not exist "!vim_plug_dir!" mkdir "!vim_plug_dir!"
 call :DownloadFile "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim" "!vim_plug!" || exit /B
 
 REM Install Python NVIM module, for :py3 support
+set PYTHONHOME=!python_bin_dir!
 !python_bin_dir!\Scripts\pip.exe install pynvim
 
 REM ----------------------------------------------------------------------------
