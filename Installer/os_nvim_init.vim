@@ -6,7 +6,15 @@ call plug#begin(stdpath('config') . '/plugged')
     Plug 'https://github.com/junegunn/fzf.vim'
     Plug 'https://github.com/Tetralux/odin.vim'
     Plug 'https://github.com/morhetz/gruvbox'
+    Plug 'https://github.com/neovim/nvim-lspconfig'
 call plug#end()
+
+" Setup LSP
+" ==============================================================================
+lua <<EOF
+require('lspconfig').clangd.setup {
+}
+EOF
 
 " Theme
 " ==============================================================================
