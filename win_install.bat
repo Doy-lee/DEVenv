@@ -838,7 +838,7 @@ set solidity_version=0.8.14
 
 set solidity_label=solidity_win64_!solidity_version!
 set solidity_dir=!tools_dir!
-set solidity_exe=!solidity_dir!\!solidity_label!
+set solidity_exe=!solidity_dir!\!solidity_label!.exe
 
 if not exist "!solidity_exe!" (
     if not exist "!solidity_dir!" mkdir "!solidity_dir!"
