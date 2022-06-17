@@ -187,6 +187,27 @@ call :FileHashCheck sha256 "!cmake_exe!" "!cmake_exe_sha256!" || exit /B
 echo set PATH=!cmake_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM ----------------------------------------------------------------------------
+REM ctags
+REM ----------------------------------------------------------------------------
+set ctags_sha256=B82648E9A3B2C8E50E0283A47B4F013F1B52E0F0E56DBB4F1C805D17578C4DF2
+set ctags_exe_sha256=7465E2D34EAF5F901AC45D7E9ED4AC8E7D3A532964D0D77A94F2D0EE3AE145AA
+set ctags_version=p5.9.20220612.0
+
+set ctags_label=ctags_win64_!ctags_version!
+set ctags_zip=!downloads_dir!\!ctags_label!.zip
+set ctags_dir=!tools_dir!\!ctags_label!
+set ctags_exe=!ctags_dir!\ctags.exe
+
+if not exist "!ctags_exe!" (
+    call :DownloadFile "https://github.com/universal-ctags/ctags-win32/releases/download/!ctags_version!/ctags-!ctags_version!-x64.zip" "!ctags_zip!" || exit /B
+    call :FileHashCheck sha256 "!ctags_zip!" "!ctags_sha256!" || exit /B
+    call :Unzip "!ctags_zip!" "!ctags_dir!" || exit /B
+    call :Move "!ctags_dir!/ctags-!ctags_version!-windows-x86_64" "!ctags_dir!" || exit /B
+)
+call :FileHashCheck sha256 "!ctags_exe!" "!ctags_exe_sha256!" || exit /B
+call :MakeBatchShortcutInBinDir "ctags" "!ctags_exe!"
+
+REM ----------------------------------------------------------------------------
 REM Git
 REM ----------------------------------------------------------------------------
 set git_sha256=bc030848e282d49e562ae2392a72501cf539322ad06ffe4cea8cf766f148dfe8
@@ -698,7 +719,6 @@ REM ----------------------------------------------------------------------------
 REM ctags: C/C++ code annotation generator
 REM scanmapset: Bind capslock to escape via registry
 REM uncap: Bind capslock to escape via run-time program
-call :CopyAndAlwaysOverwriteFile "!installer_dir!\win_ctags.exe"              "!bin_dir!\ctags.exe" || exit /B
 call :CopyAndAlwaysOverwriteFile "!installer_dir!\win_scanmapset.exe"         "!bin_dir!\scanmapset.exe" || exit /B
 call :CopyAndAlwaysOverwriteFile "!installer_dir!\win_uncap.exe"              "!bin_dir!\uncap.exe" || exit /B
 call :CopyAndAlwaysOverwriteFile "!installer_dir!\os_clang_format_style_file" "!home_dir!\_clang-format" || exit /B
