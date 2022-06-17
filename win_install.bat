@@ -505,10 +505,10 @@ REM ----------------------------------------------------------------------------
 REM ----------------------------------------------------------------------------
 REM clink - Bash style tab completion in terminal
 REM ----------------------------------------------------------------------------
-set clink_sha256=31e286313e67a7269ca09ae142e569af7962b03b8f2bc7bd99240416222d8ee8
-set clink_exe_sha256=38b1bb5a8392ac8d7f98d3dcc0a41dc7fc31344800d4facd83e10d9175daf9d8
-set clink_version=1.3.13
-set clink_git_hash=24b02e
+set clink_sha256=A31C5433FBD6CB295AC1569EAB6B13B1169AFF6D6F0F6A5538BCA35E25B59C28
+set clink_exe_sha256=83BC9F48E4FB54FD35F472AB017A9CA71A49496C6AD474E57A496FEB44492E46
+set clink_version=1.3.23
+set clink_git_hash=5d5aed
 
 set clink_label=clink_win64_!clink_version!
 set clink_zip=!downloads_dir!\!clink_label!.zip
@@ -544,7 +544,7 @@ REM Dependencies (Walker) - For DLL dependency management
 REM ----------------------------------------------------------------------------
 set dependencies_sha256=7d22dc00f1c09fd4415d48ad74d1cf801893e83b9a39944b0fce6dea7ceaea99
 set dependencies_exe_sha256=1737e5406128c3560bbb2bced3ac62d77998e592444f94b10cc0aa0bb1e617e6
-set dependencies_version=v1.11.1
+set dependencies_version=1.11.1
 
 set dependencies_label=dependencies_win64_!dependencies_version!
 set dependencies_zip=!downloads_dir!\!dependencies_label!.zip
@@ -552,7 +552,7 @@ set dependencies_dir=!tools_dir!\!dependencies_label!
 set dependencies_exe=!dependencies_dir!\DependenciesGui.exe
 
 if not exist "!dependencies_exe!" (
-    call :DownloadFile "https://github.com/lucasg/Dependencies/releases/download/!dependencies_version!/Dependencies_x64_Release.zip" "!dependencies_zip!" || exit /B
+    call :DownloadFile "https://github.com/lucasg/Dependencies/releases/download/v!dependencies_version!/Dependencies_x64_Release.zip" "!dependencies_zip!" || exit /B
     call :FileHashCheck sha256 "!dependencies_zip!" "!dependencies_sha256!" || exit /B
     call :Unzip "!dependencies_zip!" "!dependencies_dir!" || exit /B
 )
