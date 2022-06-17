@@ -715,9 +715,10 @@ REM ----------------------------------------------------------------------------
 REM ctags: C/C++ code annotation generator
 REM scanmapset: Bind capslock to escape via registry
 REM uncap: Bind capslock to escape via run-time program
-call :CopyAndAlwaysOverwriteFile "!installer_dir!\win_scanmapset.exe"         "!bin_dir!\scanmapset.exe" || exit /B
-call :CopyAndAlwaysOverwriteFile "!installer_dir!\win_uncap.exe"              "!bin_dir!\uncap.exe" || exit /B
-call :CopyAndAlwaysOverwriteFile "!installer_dir!\os_clang_format_style_file" "!home_dir!\_clang-format" || exit /B
+call :CopyAndAlwaysOverwriteFile "!installer_dir!\win_clang_merge_compilation_command_files.bat" "!bin_dir!\clang_merge_compilation_command_files.bat" || exit /B
+call :CopyAndAlwaysOverwriteFile "!installer_dir!\win_scanmapset.exe"                            "!bin_dir!\scanmapset.exe" || exit /B
+call :CopyAndAlwaysOverwriteFile "!installer_dir!\win_uncap.exe"                                 "!bin_dir!\uncap.exe" || exit /B
+call :CopyAndAlwaysOverwriteFile "!installer_dir!\os_clang_format_style_file"                    "!home_dir!\_clang-format" || exit /B
 
 REM ------------------------------------------------------------------------
 REM MobaXTerm

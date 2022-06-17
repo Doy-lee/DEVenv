@@ -7,6 +7,7 @@ call plug#begin(stdpath('config') . '/plugged')
     Plug 'https://github.com/Tetralux/odin.vim'
     Plug 'https://github.com/morhetz/gruvbox'
     Plug 'https://github.com/neovim/nvim-lspconfig'
+    Plug 'https://github.com/tpope/vim-dispatch'
 call plug#end()
 
 " Setup LSP
@@ -42,6 +43,7 @@ set number                    " Show line numbers
 set relativenumber            " Show relative line numbers
 set shiftwidth=4              " Number of spaces for each autoindent step
 set textwidth=80              " On format, format to 80 char long lines
+set nohlsearch
 " Show EOL type and last modified timestamp, right after the filename
 set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(expand(\"%:p\")))})%=%l,%c%V\ %P
 set guifont=JetBrains_Mono:h9,Consolas:h9,InputMonoCondensed:h9
@@ -160,3 +162,16 @@ set errorformat+=\\\ %#%s\ :\ error\ %m                        " MSVC: link.exe,
 set errorformat+=\\\ %#%s\ :\ fatal\ error\ %m                 " MSVC: link.exe, fatal errors is badly implemented
 set errorformat+=\\\ %#%f(%l\\\,%c-%*[0-9]):\ %#%t%[A-z]%#\ %m " MSVC: HLSL fxc.exe
 set errorformat+=%\\%%(CTIME%\\)%\\@=%m                        " ctime.exe -stats
+
+" Vim Dispatch
+" ==============================================================================
+let s:running_windows = has("win16") || has("win32") || has("win64")
+if s:running_windows
+    set makeprg=build
+    nnoremap <f5> :Make ./build.bat<cr>
+else
+    " Set vim terminal to enter normal mode using escape like normal vim behaviour
+    tnoremap <Esc> <C-\><C-n>
+    nnoremap <f5> :Make ./build.sh<cr>
+    set makeprg=./build.sh
+endif
