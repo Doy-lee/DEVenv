@@ -267,10 +267,8 @@ call :MakeBatchShortcutInBinDir "clang++-!llvm_version!" "!llvm_bin_dir!\clang++
 call :MakeBatchShortcutInBinDir "clang-cl++-!llvm_version!" "!llvm_bin_dir!\clang-cl++.exe"
 
 REM Clang Format
-set clang_format_py_sha256=36ba7aa047f8a8ac8fdc278aaa733de801cc84dea60a4210973fd3e4f0d2a330
-set vim_clang_format=!vim_dir!\clang-format.py
-call :CopyAndAlwaysOverwriteFile "!llvm_dir!\share\clang\clang-format.py" "!vim_clang_format!" || exit /B
-call :FileHashCheck sha256 "!vim_clang_format!" "!clang_format_py_sha256!" || exit /B
+set clang_format=!home_dir!\clang-format.py
+call :CopyAndAlwaysOverwriteFile "!llvm_dir!\share\clang\clang-format.py" "!clang_format!" || exit /B
 
 REM Terminal
 echo set PATH=!llvm_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
@@ -655,16 +653,13 @@ call :MakeBatchShortcutInBinDir "neovide" "!neovide_exe!"
 REM ----------------------------------------------------------------------------
 REM Vim Configuration
 REM ----------------------------------------------------------------------------
-REM Vim Config
-call :CopyAndAlwaysOverwriteFile "!installer_dir!\os_vimrc" "!home_dir!\.vimrc"
-
-REM Vim -> Nvim Config
+REM Nvim Config
 set nvim_init_dir=!home_dir!\AppData\Local\nvim
 if not exist "!nvim_init_dir!" mkdir "!nvim_init_dir!"
 call :CopyAndAlwaysOverwriteFile "!installer_dir!\os_nvim_init.vim" "!nvim_init_dir!\init.vim"
 
 REM Vim Package Manager
-set vim_plug_dir=!vim_dir!\autoload
+set vim_plug_dir=!nvim_init_dir!\autoload
 set vim_plug=!vim_plug_dir!\plug.vim
 if not exist "!vim_plug_dir!" mkdir "!vim_plug_dir!"
 call :DownloadFile "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim" "!vim_plug!" || exit /B
