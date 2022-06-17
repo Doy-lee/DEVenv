@@ -49,8 +49,9 @@ set zip7_bootstrap_sha256=2a3afe19c180f8373fa02ff00254d5394fec0349f5804e0ad2f606
 set zip7_bootstrap_exe_sha256=c136b1467d669a725478a6110ebaaab3cb88a3d389dfa688e06173c066b76fcf
 set zip7_bootstrap_version=920
 
-set zip7_bootstrap_zip=!downloads_dir!\7zip_bootstrap_v!zip7_bootstrap_version!.zip
-set zip7_bootstrap_dir=!tools_dir!\7zip_bootstrap-!zip7_bootstrap_version!
+set zip7_bootstrap_label=7zip_bootstrap_win32_!zip7_bootstrap_version!
+set zip7_bootstrap_zip=!downloads_dir!\!zip7_bootstrap_label!.zip
+set zip7_bootstrap_dir=!tools_dir!\!zip7_bootstrap_label!
 set zip7_bootstrap_exe=!zip7_bootstrap_dir!\7za.exe
 
 if not exist "!zip7_bootstrap_exe!" (
@@ -58,7 +59,6 @@ if not exist "!zip7_bootstrap_exe!" (
     call :FileHashCheck sha256 "!zip7_bootstrap_zip!" "!zip7_bootstrap_sha256!" || exit /B
 )
 if not exist "!zip7_bootstrap_dir!" powershell "Expand-Archive !zip7_bootstrap_zip! -DestinationPath !zip7_bootstrap_dir!" || exit /B
-
 call :FileHashCheck sha256 "!zip7_bootstrap_exe!" "!zip7_bootstrap_exe_sha256!" || exit /B
 
 REM ----------------------------------------------------------------------------
@@ -71,8 +71,9 @@ set zip7_sha256=0b461f0a0eccfc4f39733a80d70fd1210fdd69f600fb6b657e03940a734e5fc1
 set zip7_exe_sha256=ed24ed04b5d4a20b3f50fc088a455195c756d7b5315d1965e8c569472b43d939
 set zip7_version=2107
 
-set zip7_zip=!downloads_dir!\7zip_v!zip7_version!.exe
-set zip7_dir=!tools_dir!\7zip-!zip7_version!
+set zip7_label=7zip_win64_!zip7_version!
+set zip7_zip=!downloads_dir!\!zip7_label!.exe
+set zip7_dir=!tools_dir!\!zip7_label!
 set zip7_exe=!zip7_dir!\7z.exe
 
 if not exist "!zip7_exe!" (
@@ -94,8 +95,9 @@ set gpg_w32_exe_sha256=ac181fb744df2950880458f8e18eb005de38e5c9858d13f0f772b5ae1
 set gpg_w32_version=2.3.6
 set gpg_w32_date=20220425
 
-set gpg_w32_zip=!downloads_dir!\gpg_w32_v!gpg_w32_version!.exe
-set gpg_w32_dir=!tools_dir!\gpg_w32-!gpg_w32_version!
+set gpg_w32_label=gpg_win32_!gpg_w32_version!
+set gpg_w32_zip=!downloads_dir!\!gpg_w32_label!.exe
+set gpg_w32_dir=!tools_dir!\!gpg_w32_label!
 set gpg_w32_bin_dir=!gpg_w32_dir!\bin
 set gpg_w32_exe=!gpg_w32_bin_dir!\gpg.exe
 
@@ -123,8 +125,9 @@ set wezterm_sha256=c634e98fa9715766bbb00cbc3c8a23d1d558c8cd5716ad2efca45ed4e0ef8
 set wezterm_exe_sha256=b9b5bae20d0679127ca0c4da276dff3b7b32310bfbfaede26a9b8ecb55e295ce
 set wezterm_version=20220408-101518-b908e2dd
 
-set wezterm_zip=!downloads_dir!\wezterm-!wezterm_version!.zip
-set wezterm_dir=!tools_dir!\wezterm-!wezterm_version!
+set wezterm_label=wezterm_win64_!wezterm_version!
+set wezterm_zip=!downloads_dir!\!wezterm_label!.zip
+set wezterm_dir=!tools_dir!\!wezterm_label!
 set wezterm_exe=!wezterm_dir!\wezterm-gui.exe
 
 if not exist "!wezterm_exe!" (
@@ -144,8 +147,9 @@ set jetbrains_mono_sha256=4e315b4ef176ce7ffc971b14997bdc8f646e3d1e5b913d1ecba3a3
 set jetbrains_mono_file_sha256=50e1dcb40298fcfcc21a1ef3cbee9fe9e82709c48ad30ce617472c06a3bd9436
 set jetbrains_mono_version=2.242
 
-set jetbrains_mono_zip=!downloads_dir!\jetbrains_mono-!jetbrains_mono_version!.zip
-set jetbrains_mono_dir=!tools_dir!\jetbrains_mono-!jetbrains_mono_version!
+set jetbrains_mono_label=jetbrains_mono_!jetbrains_mono_version!
+set jetbrains_mono_zip=!downloads_dir!\!jetbrains_mono_label!.zip
+set jetbrains_mono_dir=!tools_dir!\!jetbrains_mono_label!
 set jetbrains_mono_file=!jetbrains_mono_dir!\fonts\ttf\JetBrainsMono-Regular.ttf
 
 if not exist "!jetbrains_mono_file!" (
@@ -166,8 +170,9 @@ set cmake_sha256=9b509cc4eb7191dc128cfa3f2170036f9cbc7d9d5f93ff7fafc5b2d77b3b40d
 set cmake_exe_sha256=326ae6ce4bd46c27f6ce46c95b48efc19848fd9fc24d71d2e8a226dadfef810c
 set cmake_version=3.23.1
 
-set cmake_zip=!downloads_dir!\cmake_!cmake_version!.zip
-set cmake_dir=!tools_dir!\cmake-!cmake_version!
+set cmake_label=cmake_win64_!cmake_version!
+set cmake_zip=!downloads_dir!\!cmake_label!.zip
+set cmake_dir=!tools_dir!\!cmake_label!
 set cmake_bin_dir=!cmake_dir!\bin
 set cmake_exe=!cmake_dir!\bin\cmake.exe
 
@@ -188,10 +193,11 @@ set git_sha256=bc030848e282d49e562ae2392a72501cf539322ad06ffe4cea8cf766f148dfe8
 set git_exe_sha256=ae463cad04c2b15fc91de68ab096933ec08c44752e205aebd7d64c3a482df62d
 set git_version=2.33.0
 
-set git_zip=!downloads_dir!\git_!git_version!.7z.exe
+set git_label=PortableGit_win64_!git_version!
+set git_zip=!downloads_dir!\!git_label!.7z.exe
 REM Do *NOT* use an environment variable named git_dir as this will conflict
 REM with git reading it as the directory to base off all git operations.
-set git_install_dir=!tools_dir!\PortableGit-!git_version!
+set git_install_dir=!tools_dir!\!git_label!
 set git_exe=!git_install_dir!\cmd\git.exe
 
 if not exist "!git_exe!" (
@@ -210,28 +216,34 @@ echo set PATH=!git_install_dir!\usr\bin;%%PATH%%>> "!tmp_terminal_script!"
 REM ----------------------------------------------------------------------------
 REM LLVM/Clang
 REM ----------------------------------------------------------------------------
-set llvm_exe_sha256=9f0748de7f946c210a030452de226986bab46a0121d7236ea0e7b5079cb6dfef
-set llvm_version=12.0.1
+set llvm_exe_12_0_1_sha256=9f0748de7f946c210a030452de226986bab46a0121d7236ea0e7b5079cb6dfef
+set llvm_exe_sha256=568AF18A583341BD3A4C84D8852AFF97218A67033B565C76BCD58C3430C2E0A5
+set llvm_version=14.0.5
 
-set llvm_zip=!downloads_dir!\llvm_x64_v!llvm_version!.exe
-set llvm_dir=!tools_dir!\llvm-!llvm_version!
+set llvm_label=llvm_win64_!llvm_version!
+set llvm_zip=!downloads_dir!\!llvm_label!.exe
+set llvm_dir=!tools_dir!\!llvm_label!
 set llvm_bin_dir=!llvm_dir!\bin
 set llvm_exe=!llvm_bin_dir!\clang.exe
 
-set llvm_gpg_key=!downloads_dir!\llvm-tstellar-gpg-key.asc
+set llvm_gpg_key=!downloads_dir!\llvm_tstellar_gpg_key.asc
 set llvm_gpg_sig=!llvm_zip!.sig
 
 if not exist "!llvm_exe!" (
     call :DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/tstellar-gpg-key.asc" "!llvm_gpg_key!" || exit /B
-    call :DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-!llvm_version!/LLVM-!llvm_version!-win64.exe.sig" "!llvm_gpg_sig!" || exit /B
     call :DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-!llvm_version!/LLVM-!llvm_version!-win64.exe" "!llvm_zip!" || exit /B
 
-    gpg --import "!llvm_gpg_key!" || exit /B
-    gpg --verify "!llvm_gpg_sig!" "!llvm_zip!" || exit /B
+    REM Version 14.0.5 doesn't ship with signatures?
+    REM call :DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-!llvm_version!/LLVM-!llvm_version!-win64.exe.sig" "!llvm_gpg_sig!" || exit /B
+    REM gpg --import "!llvm_gpg_key!" || exit /B
+    REM gpg --verify "!llvm_gpg_sig!" "!llvm_zip!" || exit /B
+
     call :Unzip "!llvm_zip!" "!llvm_dir!" || exit /B
 )
-
 call :FileHashCheck sha256 "!llvm_exe!" "!llvm_exe_sha256!" || exit /B
+call :MakeBatchShortcutInBinDir "clang-!llvm_version!" "!llvm_bin_dir!\clang.exe"
+call :MakeBatchShortcutInBinDir "clang++-!llvm_version!" "!llvm_bin_dir!\clang++.exe"
+call :MakeBatchShortcutInBinDir "clang-cl++-!llvm_version!" "!llvm_bin_dir!\clang-cl++.exe"
 
 REM Clang Format
 set clang_format_py_sha256=36ba7aa047f8a8ac8fdc278aaa733de801cc84dea60a4210973fd3e4f0d2a330
@@ -249,13 +261,14 @@ set mingw_sha256=853970527b5de4a55ec8ca4d3fd732c00ae1c69974cc930c82604396d43e79f
 set mingw_exe_sha256=c5f0953f7a71ddcdf0852e1e44a43cef9b8fe121beba4d4202bfe6d405de47c0
 set mingw_version=8.1.0
 
-set mingw_zip=!downloads_dir!\mingw64-posix-seg-rt_v6-rev0!mingw_version!.7z
-set mingw_dir=!tools_dir!\mingw64-posix-seh-rt_v6-rev0-!mingw_version!
+set mingw_label=mingw64-posix-seg-rt_v6-rev0_win64_!mingw_version!
+set mingw_zip=!downloads_dir!\!mingw_label!.7z
+set mingw_dir=!tools_dir!\!mingw_label!
 set mingw_bin_dir=!mingw_dir!\bin
 set mingw_exe=!mingw_bin_dir!\gcc.exe
 
 if not exist "!mingw_exe!" (
-    call :DownloadFile "https://sourceforge.net/projects/mingw-w64/files/Toolchains targetting Win64/Personal Builds/mingw-builds/!mingw_version!/threads-posix/seh/x86_64-!mingw_version!-release-posix-seh-rt_v6-rev0.7z" !mingw_zip! || exit /B
+    call :DownloadFile \"https://sourceforge.net/projects/mingw-w64/files/Toolchains targetting Win64/Personal Builds/mingw-builds/!mingw_version!/threads-posix/seh/x86_64-!mingw_version!-release-posix-seh-rt_v6-rev0.7z\" !mingw_zip! || exit /B
     call :FileHashCheck sha256 !mingw_zip! !mingw_sha256! || exit /B
     call :Unzip !mingw_zip! !mingw_dir! || exit /B
     call :Move !mingw_dir!\mingw64 !mingw_dir! || exit /B
@@ -273,8 +286,9 @@ set ninja_sha256=bbde850d247d2737c5764c927d1071cbb1f1957dcabda4a130fa8547c12c695
 set ninja_exe_sha256=6a71c03f88897419f19548a8eadd941ed94144bb671be289822080f991c1ab79
 set ninja_version=1.10.2
 
-set ninja_zip=!downloads_dir!\ninja-!ninja_version!.zip
-set ninja_dir=!tools_dir!\ninja-!ninja_version!
+set ninja_label=ninja_win64_!ninja_version!
+set ninja_zip=!downloads_dir!\!ninja_label!.zip
+set ninja_dir=!tools_dir!\!ninja_label!
 set ninja_exe=!ninja_dir!\ninja.exe
 
 if not exist "!ninja_exe!" (
@@ -293,8 +307,9 @@ set nodejs_sha256=f7b0e8b0bfcfad7d62eba16fa4db9f085983c12c661bd4c66d8e3bd783befa
 set nodejs_exe_sha256=7f33cbe04cb2940427e6dd97867c1fcf3ddd60911d2ae0260da3cab9f6ea6365
 set nodejs_version=16.7.0
 
-set nodejs_zip=!downloads_dir!\nodejs-!nodejs_version!-win-x64.7z
-set nodejs_dir=!tools_dir!\nodejs-!nodejs_version!
+set nodejs_label=nodejs_win64_!nodejs_version!
+set nodejs_zip=!downloads_dir!\!nodejs_label!.7z
+set nodejs_dir=!tools_dir!\!nodejs_label!
 set nodejs_exe=!nodejs_dir!\node.exe
 
 if not exist "!nodejs_exe!" (
@@ -318,8 +333,9 @@ set python_version=3.9.0.2dot
 set python_version_nodot=3902
 set python_version_dot=3.9.0
 
-set python_zip=!downloads_dir!\Winpython64-!python_version!.zip
-set python_dir=!tools_dir!\Winpython64-!python_version_nodot!
+set python_label=Winpython64_win64_!python_version_nodot!
+set python_zip=!downloads_dir!\!python_label!.zip
+set python_dir=!tools_dir!\!python_label!
 set python_bin_dir=!python_dir!\python-!python_version_dot!.amd64\
 set python_exe=!python_bin_dir!\python.exe
 
@@ -347,8 +363,9 @@ set renderdoc_sha256=ed1c1228b8fc30e53d3560dbae9d7bf47b85e0e15e30e6f3e4f36173a74
 set renderdoc_exe_sha256=3b4874f1677f08e4c329696eaa8281b7ee86b16ad5679932a72085a3e7abc658
 set renderdoc_version=1.19
 
-set renderdoc_zip=!downloads_dir!\renderdoc-!renderdoc_version!.zip
-set renderdoc_dir=!tools_dir!\renderdoc-x64-!renderdoc_version!
+set renderdoc_label=renderdoc_win64_!renderdoc_version!
+set renderdoc_zip=!downloads_dir!\!renderdoc_label!.zip
+set renderdoc_dir=!tools_dir!\!renderdoc_label!
 set renderdoc_exe=!renderdoc_dir!\qrenderdoc.exe
 
 if not exist "!renderdoc_exe!" (
@@ -367,8 +384,9 @@ set zeal_sha256=08e9992f620ba0a5ea348471d8ac9c85059e95eedd950118928be639746e3f94
 set zeal_exe_sha256=d1e687a33e117b6319210f40e2401b4a68ffeb0f33ef82f5fb6a31ce4514a423
 set zeal_version=0.6.1
 
-set zeal_zip=!downloads_dir!\zeal-!zeal_version!.7z
-set zeal_dir=!tools_dir!\zeal-x64-!zeal_version!
+set zeal_label=zeal_win64_!zeal_version!
+set zeal_zip=!downloads_dir!\!zeal_label!.7z
+set zeal_dir=!tools_dir!\!zeal_label!
 set zeal_exe=!zeal_dir!\zeal.exe
 
 if not exist "!zeal_exe!" (
@@ -387,19 +405,21 @@ set zig_sha256=443da53387d6ae8ba6bac4b3b90e9fef4ecbe545e1c5fa3a89485c36f5c0e3a2
 set zig_exe_sha256=63c2f819cfdb1a35cb954791fc0aa48910a42065a5e1c6ff89ee16775c75a112
 set zig_version=0.9.1
 
-set zig_file=zig-windows-x86_64-!zig_version!.zip
-set zig_zip=!downloads_dir!\!zig_file!
-set zig_dir=!tools_dir!\zig-windows-x86_64-!zig_version!
+set zig_label=zig_win64_!zig_version!
+set zig_zip=!downloads_dir!\!zig_label!.zip
+set zig_dir=!tools_dir!\!zig_label!
 set zig_exe=!zig_dir!\zig.exe
 
 if not exist "!zig_exe!" (
-    call :DownloadFile "https://ziglang.org/download/!zig_version!/!zig_file!" "!zig_zip!" || exit /B
+    call :DownloadFile "https://ziglang.org/download/!zig_version!/zig-windows-x86_64-!zig_version!.zip" "!zig_zip!" || exit /B
     call :FileHashCheck sha256 "!zig_zip!" "!zig_sha256!" || exit /B
     call :Unzip "!zig_zip!" "!zig_dir!" || exit /B
+    call :Move "!zig_dir!\zig-windows-x86_64-!zig_version!" "!zig_dir!" || exit /B
 )
 
 call :FileHashCheck sha256 "!zig_exe!" "!zig_exe_sha256!" || exit /B
 call :MakeBatchShortcutInBinDir "zig" "!zig_exe!"
+call :MakeBatchShortcutInBinDir "zig-!zig_version!" "!zig_exe!"
 
 REM ----------------------------------------------------------------------------
 REM MSVC
@@ -407,9 +427,9 @@ REM ----------------------------------------------------------------------------
 REM This depends on python, so it must be installed after it.
 set msvc_version=14.32
 set msvc_sdk_version=20348
-set msvc_dir=!tools_dir!\msvc-v!msvc_version!-win10-sdk-v!msvc_sdk_version!-x64
+set msvc_dir=!tools_dir!\msvc_win64_!msvc_version!_win10_sdk_!msvc_sdk_version!
 if not exist "!msvc_dir!" (
-    call "!python_exe!" !tools_dir!\portable-msvc.py --accept-license --msvc-version !msvc_version! --sdk-version !msvc_sdk_version! || exit /B
+    call "!python_exe!" !installer_dir!\win_portable-msvc.py --accept-license --msvc-version !msvc_version! --sdk-version !msvc_sdk_version! || exit /B
     call :Move "msvc" "!msvc_dir!" || exit /B
 )
 
@@ -435,7 +455,7 @@ REM ----------------------------------------------------------------------------
 REM Odin
 REM ----------------------------------------------------------------------------
 set odin_git_hash=a4cb6f96
-set odin_dir=!tools_dir!\odin
+set odin_dir=!tools_dir!\odin_win64
 set odin_exe=!odin_dir!\odin.exe
 
 if not exist "!odin_dir!" (
@@ -471,8 +491,9 @@ set clink_exe_sha256=38b1bb5a8392ac8d7f98d3dcc0a41dc7fc31344800d4facd83e10d9175d
 set clink_version=1.3.13
 set clink_git_hash=24b02e
 
-set clink_zip=!downloads_dir!\clink_!clink_version!.zip
-set clink_dir=!tools_dir!\clink-!clink_version!
+set clink_label=clink_win64_!clink_version!
+set clink_zip=!downloads_dir!\!clink_label!.zip
+set clink_dir=!tools_dir!\!clink_label!
 set clink_exe=!clink_dir!\clink_x64.exe
 set clink_bat=!clink_dir!\clink.bat
 
@@ -506,8 +527,9 @@ set dependencies_sha256=7d22dc00f1c09fd4415d48ad74d1cf801893e83b9a39944b0fce6dea
 set dependencies_exe_sha256=1737e5406128c3560bbb2bced3ac62d77998e592444f94b10cc0aa0bb1e617e6
 set dependencies_version=v1.11.1
 
-set dependencies_zip=!downloads_dir!\dependencies_!dependencies_version!.zip
-set dependencies_dir=!tools_dir!\dependencies-!dependencies_version!
+set dependencies_label=dependencies_win64_!dependencies_version!
+set dependencies_zip=!downloads_dir!\!dependencies_label!.zip
+set dependencies_dir=!tools_dir!\!dependencies_label!
 set dependencies_exe=!dependencies_dir!\DependenciesGui.exe
 
 if not exist "!dependencies_exe!" (
@@ -525,8 +547,9 @@ set everything_sha256=656ff3946222048a5558160023da6fd8abc6fa9569f7ac1dff058410a3
 set everything_exe_sha256=8f853443c0b0e8c144315a27d1e8bf1595bd09cb364393226accfe105c0a2c85
 set everything_version=1.4.1.1015
 
-set everything_zip=!downloads_dir!\everything_v!everything_version!.zip
-set everything_dir=!tools_dir!\everything-!everything_version!
+set everything_label=everything_win64_!everything_version!
+set everything_zip=!downloads_dir!\!everything_label!.zip
+set everything_dir=!tools_dir!\!everything_label!
 set everything_exe=!everything_dir!\everything.exe
 
 if not exist "!everything_exe!" (
@@ -544,8 +567,9 @@ set fzf_sha256=AB0ED3255564DF1A6643FF492EBC728C25F3DF9EAA5C11AC7A28CF661667412F
 set fzf_exe_sha256=C41293D9E632C5A3604AD863389C0BEC7AC2AD1E3C1F51B60EA2271A63BBB3D2
 set fzf_version=0.30.0
 
-set fzf_zip=!downloads_dir!\fzf_v!fzf_version!.zip
-set fzf_dir=!tools_dir!\fzf-!fzf_version!
+set fzf_label=fzf_win64_!fzf_version!
+set fzf_zip=!downloads_dir!\!fzf_label!.zip
+set fzf_dir=!tools_dir!\!fzf_label!
 set fzf_exe=!fzf_dir!\fzf.exe
 
 if not exist "!fzf_exe!" (
@@ -569,8 +593,9 @@ set nvim_sha256=a72a90e2897ea296b777c325a37c981a0b51e2fe0c8b8735e3366b65e958cddc
 set nvim_exe_sha256=E2B9B9C38EE169475EEAE4501278A36A93C7A4F08F6E5379CA65A166041B8DA8
 set nvim_version=0.7.0
 
-set nvim_zip=!downloads_dir!\nvim_v!nvim_version!.zip
-set nvim_dir=!tools_dir!\nvim-!nvim_version!
+set nvim_label=nvim_win64_!nvim_version!
+set nvim_zip=!downloads_dir!\!nvim_label!.zip
+set nvim_dir=!tools_dir!\!nvim_label!
 set nvim_exe=!nvim_dir!\bin\nvim.exe
 
 if not exist "!nvim_exe!" (
@@ -591,8 +616,9 @@ set neovide_sha256=EF4EBCF41ACB38B418859DD7AEDBCB7B2741EEC9BE0B8D7E1EC5F3001A07E
 set neovide_exe_sha256=BA2CDCE2DE1D4A1DAF6DE6CE1AE132B606CC51A87AA6C9483824829117248AE2
 set neovide_version=0.8.0
 
-set neovide_zip=!downloads_dir!\neovide_v!neovide_version!.zip
-set neovide_dir=!tools_dir!\neovide-!neovide_version!
+set neovide_label=neovide_win64_!neovide_version!
+set neovide_zip=!downloads_dir!\!neovide_label!.zip
+set neovide_dir=!tools_dir!\!neovide_label!
 set neovide_exe=!neovide_dir!\neovide.exe
 
 if not exist "!neovide_exe!" (
@@ -632,8 +658,9 @@ set imhex_sha256=080f537d3ea58c002cc2112adbec1352144710b43764de9a1dc04f129d3a334
 set imhex_exe_sha256=6a4b0e70bf7c78af074af0de2346164d9f5aec28ea224f9ee903412e1c774d95
 set imhex_version=1.17.0
 
-set imhex_zip=!downloads_dir!\imhex_v!imhex_version!.zip
-set imhex_dir=!tools_dir!\imhex-!imhex_version!
+set imhex_label=imhex_win64_!imhex_version!
+set imhex_zip=!downloads_dir!\!imhex_label!.zip
+set imhex_dir=!tools_dir!\!imhex_label!
 set imhex_exe=!imhex_dir!\imhex.exe
 
 if not exist "!imhex_exe!" (
@@ -645,30 +672,15 @@ if not exist "!imhex_exe!" (
 call :FileHashCheck sha256 "!imhex_exe!" "!imhex_exe_sha256!" || exit /B
 
 REM ----------------------------------------------------------------------------
-REM Joplin
-REM ----------------------------------------------------------------------------
-set joplin_sha256=2dba85ba6887d9318b10aafda00531f804f311ef9d1c899eefbcba116bf50ed2
-set joplin_version=2.6.10
-
-set joplin_dir=!tools_dir!\joplin-x64-!joplin_version!
-set joplin_exe=!joplin_dir!\JoplinPortable.exe
-
-if not exist "!joplin_exe!" (
-    if not exist "!joplin_dir!" mkdir "!joplin_dir!"
-    call :DownloadFile "https://github.com/laurent22/joplin/releases/download/v!joplin_version!/JoplinPortable.exe" "!joplin_exe!" || exit /B
-)
-
-call :FileHashCheck sha256 "!joplin_exe!" "!joplin_sha256!" || exit /B
-
-REM ----------------------------------------------------------------------------
 REM Keypirinha
 REM ----------------------------------------------------------------------------
 set keypirinha_sha256=d109a16e6a5cf311abf6d06bbe5b1be3b9ba323b79c32a168628189e10f102a5
 set keypirinha_exe_sha256=2d3adb36a04e9fdf94636c9ac5d4c2b754accbfaecd81f4ee7189c3c0edc8af1
 set keypirinha_version=2.26
 
-set keypirinha_zip=!downloads_dir!\keypirinha-x64-!keypirinha_version!.7z
-set keypirinha_dir=!tools_dir!\keypirinha-x64-!keypirinha_version!
+set keypirinha_label=keypirinha_win64_!keypirinha_version!
+set keypirinha_zip=!downloads_dir!\!keypirinha_label!.7z
+set keypirinha_dir=!tools_dir!\!keypirinha_label!
 set keypirinha_exe=!keypirinha_dir!\keypirinha.exe
 
 if not exist "!keypirinha_exe!" (
@@ -698,8 +710,9 @@ set mobaxterm_sha256=91f80537f12c2ad34a5eba99a285c149781c6d35a144a965ce3aea8a9bc
 set mobaxterm_exe_sha256=1053c81b44018d6e6519a9c80d7413f7bb36e9f6e43b3da619b2229aa362a522
 set mobaxterm_version=21.2
 
-set mobaxterm_zip=!downloads_dir!\mobaxterm-!mobaxterm_version!.zip
-set mobaxterm_dir=!tools_dir!\mobaxterm-!mobaxterm_version!
+set mobaxterm_label=mobaxterm_win64_!mobaxterm_version!
+set mobaxterm_zip=!downloads_dir!\!mobaxterm_label!.zip
+set mobaxterm_dir=!tools_dir!\!mobaxterm_label!
 set mobaxterm_exe=!mobaxterm_dir!\MobaXterm_Personal_21.2.exe
 
 if not exist "!mobaxterm_exe!" (
@@ -716,10 +729,8 @@ REM ----------------------------------------------------------------------------
 REM We don't do SHA256 here since we don't get a versioned URL, this can
 REM change at a whim and it'd be painful to have to reupdate the script
 REM everytime.
-
-set oo_shutup_10_dir=!tools_dir!\oo_shutup_10
+set oo_shutup_10_dir=!tools_dir!
 set oo_shutup_10_file=!oo_shutup_10_dir!\oo_shutup_10.exe
-
 if not exist "!oo_shutup_10_file!" (
     if not exist "!oo_shutup_10_dir!" mkdir "!oo_shutup_10_dir!"
     call :DownloadFile "https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe" "!oo_shutup_10_file!" || exit /B
@@ -732,8 +743,9 @@ set process_hacker_sha256=c662b756324c9727760b4e921459d31a30f99cf8d3f24b64f4fcb3
 set process_hacker_exe_sha256=22b1b8f080a41a07f23eae8ab0ad2e5f88d3c5af5d8c1cd1bb4f6856482e945c
 set process_hacker_version=3.0.4861
 
-set process_hacker_zip=!downloads_dir!\process_hacker-!process_hacker_version!.zip
-set process_hacker_dir=!tools_dir!\process_hacker-!process_hacker_version!
+set process_hacker_label=process_hacker_win64_!process_hacker_version!
+set process_hacker_zip=!downloads_dir!\!process_hacker_label!
+set process_hacker_dir=!tools_dir!\!process_hacker_label!
 set process_hacker_exe=!process_hacker_dir!\64bit\ProcessHacker.exe
 
 if not exist "!process_hacker_exe!" (
@@ -751,8 +763,9 @@ set rg_sha256=a47ace6f654c5ffa236792fc3ee3fefd9c7e88e026928b44da801acb72124aa8
 set rg_exe_sha256=ab5595a4f7a6b918cece0e7e22ebc883ead6163948571419a1dd5cd3c7f37972
 set rg_version=13.0.0
 
-set rg_zip=!downloads_dir!\rg_v!rg_version!.zip
-set rg_dir=!tools_dir!\ripgrep-!rg_version!
+set rg_label=ripgrep_win64_!rg_version!
+set rg_zip=!downloads_dir!\!rg_label!.zip
+set rg_dir=!tools_dir!\!rg_label!
 set rg_exe=!rg_dir!\rg.exe
 
 if not exist "!rg_exe!" (
@@ -775,8 +788,9 @@ set geth_md5=753cab189bd175d9fc6fea965ff7161b
 set geth_exe_sha256=7374e1c761f27a24a1d66299935b03b46ac354b6dc5f48505178d014a56f12df
 set geth_version=1.10.17-25c9b49f
 
-set geth_zip=!downloads_dir!\geth-amd64-v!geth_version!.zip
-set geth_dir=!tools_dir!\geth-windows-amd64-!geth_version!
+set geth_label=geth_win64_!geth_version!
+set geth_zip=!downloads_dir!\!geth_label!.zip
+set geth_dir=!tools_dir!\!geth_label!
 set geth_exe=!geth_dir!\geth.exe
 
 set geth_gpg_key=!installer_dir!\win_geth_windows_builder_gpg_key.asc
@@ -784,12 +798,13 @@ set geth_gpg_sig=!geth_zip!.asc
 
 if not exist "!geth_exe!" (
     call :DownloadFile "https://gethstore.blob.core.windows.net/builds/geth-windows-amd64-!geth_version!.zip" "!geth_zip!" || exit /B
-    call :DownloadFile "https://gethstore.blob.core.windows.net/builds/geth-windows-amd64-!geth_version!.zip.asc" "!geth_gpg_sig! || exit /B
+    call :DownloadFile "https://gethstore.blob.core.windows.net/builds/geth-windows-amd64-!geth_version!.zip.asc" "!geth_gpg_sig!" || exit /B
     call :FileHashCheck md5 "!geth_zip!" "!geth_md5!" || exit /B
 
     gpg --import "!geth_gpg_key!" || exit /B
     gpg --verify "!geth_gpg_sig!" "!geth_zip!" || exit /B
     call :Unzip "!geth_zip!" "!geth_dir!" || exit /B
+    call :Move "!geth_dir!\geth-windows-amd64-!geth_version!" "!geth_dir!"
 )
 
 call :FileHashCheck sha256 "!geth_exe!" "!geth_exe_sha256!" || exit /B
@@ -802,8 +817,9 @@ set remix_ide_sha256=19a56cb79459e612d8cbdd6b6729d06c7080d983537d2494a15fd25ea67
 set remix_ide_exe_sha256=960bc454e37a718b86018b596d14ed977d1a8e1a5bc57b5afd573fc5e9b84a47
 set remix_ide_version=1.3.1
 
-set remix_ide_zip=!downloads_dir!\remix-ide-amd64-v!remix_ide_version!.zip
-set remix_ide_dir=!tools_dir!\remix-ide-!remix_ide_version!
+set remix_ide_label=remix_ide_win64_!remix_ide_version!
+set remix_ide_zip=!downloads_dir!\!remix_ide_label!.zip
+set remix_ide_dir=!tools_dir!\!remix_ide_label!
 set remix_ide_exe=!remix_ide_dir!\Remix IDE.exe
 
 if not exist "!remix_ide_exe!" (
@@ -820,8 +836,9 @@ REM ----------------------------------------------------------------------------
 set solidity_exe_sha256=82db83111c6e2c892179486cb7050d85f1517bf851027607eb7f4e589e714bc5
 set solidity_version=0.8.7+commit.e28d00a7
 
-set solidity_dir=!tools_dir!\solidity-windows-amd64-!solidity_version!
-set solidity_exe=!solidity_dir!\solc.exe
+set solidity_label=solidity_win64_!solidity_version!
+set solidity_dir=!tools_dir!
+set solidity_exe=!solidity_dir!\!solidity_label!
 
 if not exist "!solidity_exe!" (
     if not exist "!solidity_dir!" mkdir "!solidity_dir!"
