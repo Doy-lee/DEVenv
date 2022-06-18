@@ -79,48 +79,61 @@ lua <<EOF
 
     -- See `:help vim.lsp.*` for documentation on any of the below functions
     local bufopts = { noremap=true, silent=true, buffer=bufnr }
-    vim.keymap.set('n',  'K',    vim.lsp.buf.hover,           bufopts)
-    vim.keymap.set('n', 'gD',    vim.lsp.buf.declaration,     bufopts)
-    vim.keymap.set('n', 'gd',    vim.lsp.buf.definition,      bufopts)
-    vim.keymap.set('n', 'gt',    vim.lsp.buf.type_definition, bufopts)
-    vim.keymap.set('n', 'gr',    vim.lsp.buf.references,      bufopts)
-    vim.keymap.set('n', 'gs',    vim.lsp.buf.signature_help,  bufopts)
-    vim.keymap.set('n', '<A-a>', vim.lsp.buf.code_action,     bufopts)
-    vim.keymap.set('n', '<A-r>', vim.lsp.buf.rename,          bufopts)
+    vim.keymap.set('n',  'K', vim.lsp.buf.hover,           bufopts)
+    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration,     bufopts)
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition,      bufopts)
+    vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, bufopts)
+    vim.keymap.set('n', 'gr', vim.lsp.buf.references,      bufopts)
+    vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help,  bufopts)
+    vim.keymap.set('n', 'ga', vim.lsp.buf.code_action,     bufopts)
+    vim.keymap.set('n', 'gR', vim.lsp.buf.rename,          bufopts)
   end
 
   -- Request additional completion capabilities from the LSP server(s)
   local lspconfig = require('lspconfig')
-  local servers   = { 'clangd', }
-  for _, lsp in ipairs(servers) do
-    lspconfig[lsp].setup { on_attach = custom_on_attach, capabilities = custom_capabilities, }
-  end
+
+  -- Clangd LSP Setup
+  -- ===========================================================================
+  lspconfig.clangd.setup {
+    on_attach           = custom_on_attach,
+    capabilities        = custom_capabilities,
+    single_file_support = false, --- Don't launch LSP if the directory does not have LSP metadata
+  }
 
   -- Autocomplete Setup
   -- ===========================================================================
   local luasnip = require 'luasnip'
   local cmp     = require 'cmp'
 
+  local has_words_before = function()
+    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+  end
+
   cmp.setup {
     snippet = {
       expand = function(args) luasnip.lsp_expand(args.body) end,
     },
+    completion = { autocomplete = false },
     mapping = cmp.mapping.preset.insert({
       ['<C-d>'] = cmp.mapping.scroll_docs(4),
       ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-      ['<C-l>'] = cmp.mapping.scroll_docs(-1),   -- Scroll the docs up   by 1 line
-      ['<C-h>'] = cmp.mapping.scroll_docs(1),    -- Scroll the docs down by 1 line
+      ['<C-k>'] = cmp.mapping.scroll_docs(-1),   -- Scroll the docs up   by 1 line
+      ['<C-j>'] = cmp.mapping.scroll_docs(1),    -- Scroll the docs down by 1 line
       ['<CR>']  = cmp.mapping.confirm { behavior = cmp.ConfirmBehavior.Replace, select = true, },
-      ['<C-j>'] = cmp.mapping(function(fallback) -- Move down the autocomplete list
+      ['<Tab>'] = cmp.mapping(function(fallback) -- Move down the autocomplete list
+        cmp.complete()
         if cmp.visible() then
           cmp.select_next_item()
         elseif luasnip.expand_or_jumpable() then
           luasnip.expand_or_jump()
+        elseif has_words_before() then
+          cmp.complete()
         else
           fallback()
         end
       end, { 'i', 's' }),
-      ['<C-k>'] = cmp.mapping(function(fallback) -- Move up the autocomplete list
+      ['<S-Tab>'] = cmp.mapping(function(fallback) -- Move up the autocomplete list
         if cmp.visible() then
           cmp.select_prev_item()
         elseif luasnip.jumpable(-1) then
@@ -131,14 +144,9 @@ lua <<EOF
       end, { 'i', 's' }),
     }),
     sources = {
-      { name = 'nvim_lsp' }, { name = 'luasnip' },
+      { name = 'nvim_lsp' },
+      { name = 'luasnip' },
     },
-  }
-
-  -- Clangd LSP Setup
-  -- ===========================================================================
-  lspconfig.clangd.setup {
-    single_file_support = false, --- Don't launch LSP if the directory does not have LSP metadata
   }
 
   require('nvim-treesitter.configs').setup {
@@ -147,7 +155,7 @@ lua <<EOF
     ignore_install   = { },            -- List of parsers to ignore installing (for "all")
 
     highlight = {
-      enable = true, -- `false` will disable the whole extension
+      enable = false, -- `false` will disable the whole extension
 
       -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
       -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
