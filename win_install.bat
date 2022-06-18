@@ -588,22 +588,23 @@ set fzf_version=0.30.0
 
 set fzf_label=fzf_win64_!fzf_version!
 set fzf_zip=!downloads_dir!\!fzf_label!.zip
-set fzf_dir=!tools_dir!\!fzf_label!
-set fzf_exe=!fzf_dir!\fzf.exe
+set fzf_dir=!tools_dir!
+set fzf_exe=!fzf_dir!\fzf_win64_!fzf_version!.exe
 
 if not exist "!fzf_exe!" (
     call :DownloadFile "https://github.com/junegunn/fzf/releases/download/!fzf_version!/fzf-!fzf_version!-windows_amd64.zip" "!fzf_zip!" || exit /B
     call :FileHashCheck sha256 "!fzf_zip!" "!fzf_sha256!" || exit /B
     call :Unzip "!fzf_zip!" "!fzf_dir!" || exit /B
+    move /Y "!fzf_dir!\fzf.exe" "!fzf_exe!" 1>NUL || exit /B
 )
 
 call :FileHashCheck sha256 "!fzf_exe!" "!fzf_exe_sha256!" || exit /B
 call :MakeBatchShortcutInBinDir "fzf" "!fzf_exe!"
 
 REM Terminal
-REM Use RG for FZF to make it ultra fast
+REM Use FD for FZF to make it ultra fast
 echo set FZF_DEFAULT_OPTS=--multi --layout=reverse>> "!tmp_terminal_script!"
-echo set FZF_DEFAULT_COMMAND=rg --files --no-ignore-vcs --hidden>> "!tmp_terminal_script!"
+echo set FZF_DEFAULT_COMMAND=fd --unrestricted>> "!tmp_terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM NVIM
@@ -793,7 +794,33 @@ if not exist "!rg_exe!" (
 )
 
 call :FileHashCheck sha256 "!rg_exe!" "!rg_exe_sha256!" || exit /B
-call :MakeBatchShortcutInBinDir "rg" "!rg_exe!"
+
+REM Terminal
+echo set PATH=!rg_dir!;%%PATH%%>> "!tmp_terminal_script!"
+
+REM ----------------------------------------------------------------------------
+REM fd
+REM ----------------------------------------------------------------------------
+set fd_sha256=F21BC26C1AB6BDBE4FE43F87A20C792D4ABE629AE97C6F42B25AC8A042F5521F
+set fd_exe_sha256=764F31AC5B477707B51DAEC32458E4D66059BA0D17F03032B7CD0C0534703354
+set fd_version=8.4.0
+
+set fd_label=fd_win64_!fd_version!
+set fd_zip=!downloads_dir!\!fd_label!.zip
+set fd_dir=!tools_dir!\!fd_label!
+set fd_exe=!fd_dir!\fd.exe
+
+if not exist "!fd_exe!" (
+    call :DownloadFile "https://github.com/sharkdp/fd/releases/download/v!fd_version!/fd-v!fd_version!-x86_64-pc-windows-msvc.zip" "!fd_zip!" || exit /B
+    call :FileHashCheck sha256 "!fd_zip!" "!fd_sha256!" || exit /B
+    call :Unzip "!fd_zip!" "!fd_dir!" || exit /B
+    call :Move "!fd_dir!\fd-v!fd_version!-x86_64-pc-windows-msvc" "!fd_dir!" || exit /B
+)
+
+call :FileHashCheck sha256 "!fd_exe!" "!fd_exe_sha256!" || exit /B
+
+REM Terminal
+echo set PATH=!fd_dir!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM Ethereum
@@ -951,14 +978,8 @@ REM ----------------------------------------------------------------------------
 :Unzip
 set zip_file=%~1
 set dest=%~2
-set msg=[Unzip] !zip_file! to !dest!
-
-if exist !dest! (
-    echo - [Cached] !msg!
-) else (
-    echo - !msg!
-    call !zip7_dir!\7z.exe x -y -spe -o!dest! !zip_file!
-)
+echo [Unzip] !zip_file! to !dest!
+call !zip7_dir!\7z.exe x -y -spe -o!dest! !zip_file!
 exit /B !ERRORLEVEL!
 
 REM ------------------------------------------------------------------------------------------------

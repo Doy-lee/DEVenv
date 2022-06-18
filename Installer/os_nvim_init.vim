@@ -5,12 +5,15 @@ call plug#begin(stdpath('config') . '/plugged')
     " vim-dispatch allows running async jobs in vim (i.e. builds in the background)
     Plug 'https://github.com/scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
     Plug 'https://github.com/tpope/vim-dispatch'
-    Plug 'https://github.com/nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
-    " Fast fuzzy searcher, the .vim repository pulls in sane defaults for
-    " setting up fzf in vim.
-    Plug 'https://github.com/junegunn/fzf'
-    Plug 'https://github.com/junegunn/fzf.vim'
+    " TODO: 2022-06-19 Treesitter is too slow on large C++ files
+    " Plug 'https://github.com/nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+    Plug 'https://github.com/bfrg/vim-cpp-modern'
+
+    " Telescope file picker, sorter and previewer
+    Plug 'https://github.com/nvim-lua/plenary.nvim'
+    Plug 'https://github.com/nvim-telescope/telescope.nvim'
+    Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
 
     " nvim-lspconfig sets up sane defaults for LSP servers (i.e. clangd)
     " nvim-cmp is a more powerful autocomplete engine
@@ -30,11 +33,39 @@ call plug#begin(stdpath('config') . '/plugged')
     " odin for syntax highlighting
     Plug 'https://github.com/Tetralux/odin.vim'
     Plug 'https://github.com/sainnhe/gruvbox-material'
+
+    " Lua cache to speed up load times
+    Plug 'https://github.com/lewis6991/impatient.nvim'
 call plug#end()
 
 " Lua Setup
 " ==============================================================================
 lua <<EOF
+  require('impatient')
+  require('telescope').load_extension('fzf')
+  require('telescope').setup {
+    defaults = {
+      layout_config = {
+        horizontal = { width = 0.95 }
+      },
+      mappings = {
+        i = {
+          ["<C-j>"] = require('telescope.actions').move_selection_next,
+          ["<C-k>"] = require('telescope.actions').move_selection_previous,
+        },
+        n = {
+          ["<C-j>"] = require('telescope.actions').move_selection_next,
+          ["<C-k>"] = require('telescope.actions').move_selection_previous,
+        },
+      },
+    },
+    pickers = {
+      find_files = {
+        find_command = { "fd", "--unrestricted", "--strip-cwd-prefix" }
+      },
+    }
+  }
+
   -- Vim Options
   -- ===========================================================================
   vim.opt.autowrite=true        -- Automatically save before cmds like :next and :prev
@@ -81,9 +112,6 @@ lua <<EOF
     local bufopts = { noremap=true, silent=true, buffer=bufnr }
     vim.keymap.set('n',  'K', vim.lsp.buf.hover,           bufopts)
     vim.keymap.set('n', 'gD', vim.lsp.buf.declaration,     bufopts)
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition,      bufopts)
-    vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, bufopts)
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references,      bufopts)
     vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help,  bufopts)
     vim.keymap.set('n', 'ga', vim.lsp.buf.code_action,     bufopts)
     vim.keymap.set('n', 'gR', vim.lsp.buf.rename,          bufopts)
@@ -149,27 +177,28 @@ lua <<EOF
     },
   }
 
-  require('nvim-treesitter.configs').setup {
-    ensure_installed = { "c", "cpp" }, -- A list of parser names, or "all"
-    sync_install     = false,          -- Install parsers synchronously (only applied to `ensure_installed`)
-    ignore_install   = { },            -- List of parsers to ignore installing (for "all")
+  -- TODO: 2022-06-19 Treesitter is too slow on large C++ files
+  -- require('nvim-treesitter.configs').setup {
+  --   ensure_installed = { "c", "cpp" }, -- A list of parser names, or "all"
+  --   sync_install     = false,          -- Install parsers synchronously (only applied to `ensure_installed`)
+  --   ignore_install   = { },            -- List of parsers to ignore installing (for "all")
 
-    highlight = {
-      enable = false, -- `false` will disable the whole extension
+  --   highlight = {
+  --     enable = false, -- `false` will disable the whole extension
 
-      -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
-      -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
-      -- the name of the parser)
-      -- list of language that will be disabled
-      disable = { },
+  --     -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
+  --     -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
+  --     -- the name of the parser)
+  --     -- list of language that will be disabled
+  --     disable = { },
 
-      -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-      -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-      -- Using this option may slow down your editor, and you may see some duplicate highlights.
-      -- Instead of true it can also be a list of languages
-      additional_vim_regex_highlighting = false,
-    },
-  }
+  --     -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+  --     -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+  --     -- Using this option may slow down your editor, and you may see some duplicate highlights.
+  --     -- Instead of true it can also be a list of languages
+  --     additional_vim_regex_highlighting = false,
+  --   },
+  -- }
 EOF
 
 " Theme
@@ -180,7 +209,22 @@ let g:gruvbox_material_disable_italic_comment=1
 let g:gruvbox_material_enable_italic=0
 let g:gruvbox_material_enable_bold=0
 let g:gruvbox_material_diagnostic_virtual_text='colored'
+let g:gruvbox_material_better_performance=1
 colorscheme gruvbox-material
+
+" Vim-cpp-modern customisation
+" Disable function highlighting (affects both C and C++ files)
+let g:cpp_function_highlight = 1
+
+" Enable highlighting of C++11 attributes
+let g:cpp_attributes_highlight = 1
+
+" Highlight struct/class member variables (affects both C and C++ files)
+let g:cpp_member_highlight = 0
+
+" Put all standard C and C++ keywords under Vim's highlight group 'Statement'
+" (affects both C and C++ files)
+let g:cpp_simple_highlight = 1
 
 " Options
 " ==============================================================================
@@ -226,6 +270,19 @@ augroup end
 
 " General Key Bindings
 " ==============================================================================
+" Telescope Bindings
+nnoremap <leader>f  <cmd>Telescope find_files<cr>
+nnoremap <leader>g  <cmd>Telescope live_grep<cr>
+nnoremap <leader>ta <cmd>Telescope tags<cr>
+nnoremap <leader>te <cmd>Telescope<cr>
+nnoremap <leader>b  <cmd>Telescope buffers<cr>
+nnoremap <leader>h  <cmd>Telescope help_tags<cr>
+
+nnoremap <leader>ls <cmd>Telescope lsp_dynamic_workspace_symbols<cr>
+nnoremap gd         <cmd>Telescope lsp_definitions<cr>
+nnoremap gt         <cmd>Telescope lsp_type_definitions<cr>
+nnoremap gr         <cmd>Telescope lsp_references<cr>
+
 " Map Ctrl+HJKL to navigate buffer window
 nmap <silent> <C-h> :wincmd h<CR>
 nmap <silent> <C-j> :wincmd j<CR>
@@ -254,14 +311,6 @@ nnoremap <A-k> :cp<CR>
 
 " FZF
 " ==============================================================================
-nnoremap <leader>f :FzfFiles<CR>
-nnoremap <leader>F :FzfFiles 
-nnoremap <leader>t :FzfTags<CR>
-nnoremap <leader>r :FzfRg<R>
-nnoremap <leader>r :FzfRg 
-nnoremap <leader>b :FzfBuffers<CR>
-nnoremap <leader>l :FzfLines<CR>
-
 " Empty value to disable preview window altogether
 let g:fzf_preview_window = []
 
