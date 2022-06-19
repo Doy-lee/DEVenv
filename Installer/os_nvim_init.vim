@@ -91,6 +91,13 @@ lua <<EOF
   vim.opt.visualbell=true       -- Flash the screen on error
   vim.opt.wrap=false            -- Don't wrap lines of text automatically
 
+  vim.diagnostic.config({
+    -- Turn off the diagnostics signs on the line number. In LSP mode, editing
+    -- a C++ buffer constantly toggles the sign column on and off as you change
+    -- modes which is very visually distracting.
+    signs = false,
+  })
+
   -- LSP Setup
   -- ===========================================================================
   -- Load the additional capabilities supported by nvim-cmp
