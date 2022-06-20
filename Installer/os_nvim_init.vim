@@ -128,6 +128,11 @@ lua <<EOF
     single_file_support = false, --- Don't launch LSP if the directory does not have LSP metadata
   }
 
+  lspconfig.cmake.setup {
+    on_attach    = custom_on_attach,
+    capabilities = custom_capabilities,
+  }
+
   -- Autocomplete Setup
   -- ===========================================================================
   local luasnip = require 'luasnip'

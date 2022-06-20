@@ -667,7 +667,7 @@ call :DownloadFile "https://raw.githubusercontent.com/junegunn/vim-plug/master/p
 
 REM Install Python NVIM module, for :py3 support
 set PYTHONHOME=!python_bin_dir!
-!python_bin_dir!\Scripts\pip.exe install pynvim
+!python_bin_dir!\Scripts\pip.exe install pynvim cmake-language-server
 
 REM ----------------------------------------------------------------------------
 REM ImHex
