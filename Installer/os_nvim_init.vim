@@ -154,6 +154,10 @@ lua <<EOF
     snippet = {
       expand = function(args) luasnip.lsp_expand(args.body) end,
     },
+    window = {
+        completion = cmp.config.window.bordered(),
+        documentation = cmp.config.window.bordered(),
+    },
     completion = { autocomplete = false },
     mapping = cmp.mapping.preset.insert({
       ['<C-d>'] = cmp.mapping.scroll_docs(4),
@@ -162,7 +166,6 @@ lua <<EOF
       ['<C-j>'] = cmp.mapping.scroll_docs(1),    -- Scroll the docs down by 1 line
       ['<CR>']  = cmp.mapping.confirm { behavior = cmp.ConfirmBehavior.Replace, select = true, },
       ['<Tab>'] = cmp.mapping(function(fallback) -- Move down the autocomplete list
-        cmp.complete()
         if cmp.visible() then
           cmp.select_next_item()
         elseif luasnip.expand_or_jumpable() then
