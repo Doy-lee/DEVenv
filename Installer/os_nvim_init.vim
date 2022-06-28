@@ -294,10 +294,10 @@ nnoremap <leader>te <cmd>Telescope<cr>
 nnoremap <leader>b  <cmd>Telescope buffers<cr>
 nnoremap <leader>h  <cmd>Telescope help_tags<cr>
 
-nnoremap <leader>ls <cmd>Telescope lsp_dynamic_workspace_symbols<cr>
-nnoremap gd         <cmd>Telescope lsp_definitions<cr>
-nnoremap gt         <cmd>Telescope lsp_type_definitions<cr>
-nnoremap gr         <cmd>Telescope lsp_references<cr>
+nnoremap gf <cmd>Telescope lsp_dynamic_workspace_symbols<cr>
+nnoremap gd <cmd>Telescope lsp_definitions<cr>
+nnoremap gt <cmd>Telescope lsp_type_definitions<cr>
+nnoremap gr <cmd>Telescope lsp_references<cr>
 
 " Map Ctrl+HJKL to navigate buffer window
 nmap <silent> <C-h> :wincmd h<CR>
