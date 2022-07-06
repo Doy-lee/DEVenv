@@ -258,6 +258,9 @@ set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe,*.obj,*.vcxproj,*.pdb,*.idb
 set undofile
 let &undodir=stdpath('config') . '/undo'
 
+" Setup backup directory
+let &backupdir=stdpath('config') . '/backup'
+
 " Enable mouse support
 if has('mouse')
     set mouse=a
