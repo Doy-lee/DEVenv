@@ -121,9 +121,9 @@ REM Download & verify the tools we want for development
 REM ----------------------------------------------------------------------------
 REM Wezterm
 REM ----------------------------------------------------------------------------
-set wezterm_sha256=1161E189A227C3CC34F128916F9C97DD33582EF24F54CF9893D8487FA753DCD0
-set wezterm_exe_sha256=845BF220A6A57F17DFCA725859EB88B1FCA50E8D3D39A41DB01A49726F6E6260
-set wezterm_version=20220624-141144-bd1b7c5d
+set wezterm_sha256=c634e98fa9715766bbb00cbc3c8a23d1d558c8cd5716ad2efca45ed4e0ef82f9
+set wezterm_exe_sha256=b9b5bae20d0679127ca0c4da276dff3b7b32310bfbfaede26a9b8ecb55e295ce
+set wezterm_version=20220408-101518-b908e2dd
 
 set wezterm_label=wezterm_win64_!wezterm_version!
 set wezterm_zip=!downloads_dir!\!wezterm_label!.zip
