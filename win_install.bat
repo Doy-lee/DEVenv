@@ -647,9 +647,9 @@ call win_helpers.bat :MakeBatchShortcut "nvim-qt" "!nvim_dir!\bin\nvim-qt.exe" "
 REM ----------------------------------------------------------------------------
 REM Neovide
 REM ----------------------------------------------------------------------------
-set neovide_sha256=EF4EBCF41ACB38B418859DD7AEDBCB7B2741EEC9BE0B8D7E1EC5F3001A07E5D8
-set neovide_exe_sha256=BA2CDCE2DE1D4A1DAF6DE6CE1AE132B606CC51A87AA6C9483824829117248AE2
-set neovide_version=0.8.0
+set neovide_sha256=D1DE20E0FCBF68CB4D85CD6F15691DFB77848DAFB97519F8E67E3036A2A7927D
+set neovide_exe_sha256=C0F6ED7ED8BAC4EE910267FA785DA698A581004EA45838BE401E3FBA18DD3234
+set neovide_version=0.9.0
 
 set neovide_label=neovide_win64_!neovide_version!
 set neovide_zip=!downloads_dir!\!neovide_label!.zip
@@ -660,7 +660,6 @@ if not exist "!neovide_exe!" (
     call win_helpers.bat :DownloadFile "https://github.com/neovide/neovide/releases/download/!neovide_version!/neovide-windows.zip" "!neovide_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!neovide_zip!" "!neovide_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!neovide_zip!" "!neovide_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!neovide_dir!\neovide-windows" "!neovide_dir!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!neovide_exe!" "!neovide_exe_sha256!" || exit /B %ERRORLEVEL%

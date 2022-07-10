@@ -80,14 +80,14 @@ for /F "tokens=2 delims= " %%c in ('powershell -NoLogo -NoProfile -NonInteractiv
 
 REM Verify Hash
 if /I "!expected!" neq "!actual!" (
-    echo - [FileHashCheck] !file!
-    echo !algorithm! hash does not match, failing.
-    echo Expected: !expected!
-    echo Actual:   !actual!
+    echo - [FileHashCheck] !algorithm! failed [file=!file!,
+    echo     expect=!expected!,
+    echo     actual=!actual!
+    echo   ]
     exit /B 1
 )
 
-echo - [Verify] !algorithm! Hash OK: !file! !expected!
+echo - [FileHashCheck] !algorithm! OK [file=!file! hash=!expected!]
 exit /B 0
 
 :Move
@@ -115,7 +115,7 @@ set executable=%~2
 set dest_dir=%~3
 
 if not exist "!executable!" (
-    echo - [MakeBatchShortcut] Executable to make shortcut to does not exist [executable=%executable%]
+    echo - [MakeBatchShortcut] Executable for shortcut does not exist [executable=%executable%]
     exit /B %ERRORLEVEL%
 )
 
@@ -124,7 +124,7 @@ if not exist "!dest_dir!" (
     exit /B %ERRORLEVEL%
 )
 
-echo - [MakeBatchShortcut] Shortcut [name=!name!, exe=!executable!, dest=!dest_dir!]
+echo - [MakeBatchShortcut] Create [name=!name!, exe=!executable!, dest=!dest_dir!]
 echo @echo off> "!dest_dir!\!name!.bat"
 echo !executable! %%*>> "!dest_dir!\!name!.bat"
 exit /B 0
