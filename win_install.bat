@@ -14,9 +14,7 @@ if not exist !home_dir! mkdir !home_dir!
 if not exist !tools_dir! mkdir !tools_dir!
 if not exist !downloads_dir! mkdir !downloads_dir!
 
-set vim_dir=!home_dir!\.vim
 set bin_dir=!tools_dir!\Binaries
-if not exist !vim_dir! mkdir !vim_dir!
 if not exist !bin_dir! mkdir !bin_dir!
 
 set tmp_terminal_script=!tools_dir!\win_terminal.bat.tmp
@@ -665,7 +663,6 @@ if not exist "!neovide_exe!" (
 call win_helpers.bat :FileHashCheck sha256 "!neovide_exe!" "!neovide_exe_sha256!" || exit /B %ERRORLEVEL%
 call win_helpers.bat :MakeBatchShortcut "neovide" "!neovide_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
 
-REM ----------------------------------------------------------------------------
 REM Vim Configuration
 REM ----------------------------------------------------------------------------
 REM Nvim Config

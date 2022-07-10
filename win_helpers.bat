@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-REM Win Helpers - Version 2
+REM Win Helpers - Version 3
 call %*
 goto exit
 
@@ -20,7 +20,7 @@ if exist "!dest_file!" (
 if exist "!dest_file!" (
     exit /B 0
 ) else (
-    echo [Download File] Failed to download file from !url!
+    echo [DownloadFile] Download failed [url=!url!]
     exit /B 1
 )
 
