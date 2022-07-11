@@ -533,7 +533,6 @@ if not exist "!clink_exe!" (
     call win_helpers.bat :DownloadFile "https://github.com/chrisant996/clink/releases/download/v!clink_version!/clink.!clink_version!.!clink_git_hash!.zip" "!clink_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!clink_zip!" "!clink_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!clink_zip!" "!clink_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!clink_dir!\clink_!clink_version!" "!clink_dir!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :OverwriteCopy "!clink_dir!\_default_inputrc" "!clink_dir!\default_inputrc" || exit /B %ERRORLEVEL%
     call win_helpers.bat :OverwriteCopy "!clink_dir!\_default_settings" "!clink_dir!\default_settings" || exit /B %ERRORLEVEL%
 )
