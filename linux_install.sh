@@ -130,24 +130,21 @@ for llvm_version in ${llvm_version_list[@]}; do
     llvm_label=llvm_linux64_${llvm_version}
     llvm_dir=${tools_dir}/${llvm_label}
     llvm_exe=${llvm_dir}/bin/clang
-    
     if [[ ! -f "${llvm_exe}" ]]; then
         DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-${llvm_version}/${llvm_download_label}.tar.xz" "${llvm_download_file}" || exit
         FileSHA256Check "${llvm_download_file}" "${llvm_sha256}" || exit
         mkdir --parents "${llvm_dir}" && tar xf "${llvm_download_file}" --skip-old-files --directory="${llvm_dir}" || exit
 
-	if [[ "${llvm_version}" == "12.0.1" ]]; then
-	    # NOTE: There was a distribution bug in v12.0.1 where the folder was misnamed
-	    mv ${llvm_dir}/clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu-/* ${llvm_dir} || exit
+        if [[ "${llvm_version}" == "12.0.1" ]]; then
+            # NOTE: There was a distribution bug in v12.0.1 where the folder was misnamed
+            mv ${llvm_dir}/clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu-/* ${llvm_dir} || exit
             rm --recursive ${llvm_dir}/clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu || exit
-	else
-	    mv ${llvm_dir}/${llvm_download_label}/* ${llvm_dir} || exit
+        else
+            mv ${llvm_dir}/${llvm_download_label}/* ${llvm_dir} || exit
             rm --recursive ${llvm_dir}/${llvm_download_label} || exit
-	fi
+        fi
     fi
-    
     FileSHA256Check "${llvm_exe}" "${llvm_exe_sha256}" || exit
-    
     cd "${llvm_dir}/bin" && find . -type f,l -exec ln --force --symbolic --relative "{}" "${bin_dir}/{}-${llvm_version}" ';' && cd "${root_dir}"
 done
 
@@ -257,6 +254,21 @@ fi
 
 FileSHA256Check "${ripgrep_exe}" "${ripgrep_exe_sha256}" || exit
 ln --force --symbolic --relative "${ripgrep_exe}" "${bin_dir}"
+
+# wezterm
+# ------------------------------------------------------------------------------
+wezterm_sha256=4de3cd65b7d7ae0c72a691597bd3def57c65f07fe4a7c98b447b8a9dc4d0adf0
+wezterm_version=20220624-141144-bd1b7c5d
+
+wezterm_label=wezterm_linux64_${wezterm_version}
+wezterm_download_label=WezTerm-${wezterm_version}-Ubuntu18.04
+wezterm_exe=${tools_dir}/${wezterm_label}.AppImage
+
+DownloadFile "https://github.com/wez/wezterm/releases/download/${wezterm_version}/${wezterm_download_label}.AppImage" "${wezterm_exe}" || exit
+FileSHA256Check "${wezterm_exe}" "${wezterm_sha256}" || exit
+
+chmod +x "${wezterm_exe}"
+cp --force ${installer_dir}/os_wezterm.lua ~/.wezterm.lua
 
 # Ctags
 # ------------------------------------------------------------------------------
