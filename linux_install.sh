@@ -119,11 +119,11 @@ for llvm_version in ${llvm_version_list[@]}; do
     elif [[ "${llvm_version}" == "12.0.1" ]]; then
         llvm_sha256=6b3cc55d3ef413be79785c4dc02828ab3bd6b887872b143e3091692fc6acefe7
         llvm_exe_sha256=329bba976c0cef38863129233a4b0939688eae971c7a606d41dd0e5a53d53455
-	llvm_download_label=clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu-16.04
+        llvm_download_label=clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu-16.04
     elif [[ "${llvm_version}" == "11.1.0" ]]; then
         llvm_sha256=c691a558967fb7709fb81e0ed80d1f775f4502810236aa968b4406526b43bee1
         llvm_exe_sha256=656bfde194276cee81dc8a7a08858313c5b5bdcfa18ac6cd6116297af2f65148
-	llvm_download_label=clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu-16.04
+        llvm_download_label=clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu-16.04
     fi
 
     llvm_download_file=${downloads_dir}/${llvm_download_label}.tar.xz
@@ -138,7 +138,7 @@ for llvm_version in ${llvm_version_list[@]}; do
         if [[ "${llvm_version}" == "12.0.1" ]]; then
             # NOTE: There was a distribution bug in v12.0.1 where the folder was misnamed
             mv ${llvm_dir}/clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu-/* ${llvm_dir} || exit
-            rm --recursive ${llvm_dir}/clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu || exit
+            rm --recursive ${llvm_dir}/clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu- || exit
         else
             mv ${llvm_dir}/${llvm_download_label}/* ${llvm_dir} || exit
             rm --recursive ${llvm_dir}/${llvm_download_label} || exit
@@ -196,7 +196,7 @@ if [[ ! -f "${neovide_exe}" ]]; then
     DownloadFile "https://github.com/neovide/neovide/releases/download/${neovide_version}/neovide.tar.gz" ${neovide_download_file} || exit
     FileSHA256Check ${neovide_download_file} ${neovide_sha256} || exit
 
-    mkdir --parents "${cmake_dir}" && tar xf ${neovide_download_file} --skip-old-files --directory=${neovide_dir}/neovide-tmp || exit
+    mkdir --parents ${neovide_dir}/neovide-tmp && tar xf ${neovide_download_file} --skip-old-files --directory=${neovide_dir}/neovide-tmp || exit
     mv ${neovide_dir}/neovide-tmp/target/release/neovide "${neovide_exe}" || exit
     rm -rf ${neovide_dir}/neovide-tmp
 fi
