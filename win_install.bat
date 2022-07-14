@@ -458,7 +458,7 @@ REM MSVC
 REM ----------------------------------------------------------------------------
 REM This depends on python, so it must be installed after it.
 set msvc_version=14.32
-set msvc_sdk_version=20348
+set msvc_sdk_version=22621
 set msvc_dir=!tools_dir!\msvc_win64_!msvc_version!_win10_sdk_!msvc_sdk_version!
 if not exist "!msvc_dir!" (
     call "!python_exe!" !installer_dir!\win_portable-msvc.py --accept-license --msvc-version !msvc_version! --sdk-version !msvc_sdk_version! || exit /B %ERRORLEVEL%
