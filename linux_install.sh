@@ -119,35 +119,32 @@ for llvm_version in ${llvm_version_list[@]}; do
     elif [[ "${llvm_version}" == "12.0.1" ]]; then
         llvm_sha256=6b3cc55d3ef413be79785c4dc02828ab3bd6b887872b143e3091692fc6acefe7
         llvm_exe_sha256=329bba976c0cef38863129233a4b0939688eae971c7a606d41dd0e5a53d53455
-	llvm_download_label=clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu-16.04
+        llvm_download_label=clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu-16.04
     elif [[ "${llvm_version}" == "11.1.0" ]]; then
         llvm_sha256=c691a558967fb7709fb81e0ed80d1f775f4502810236aa968b4406526b43bee1
         llvm_exe_sha256=656bfde194276cee81dc8a7a08858313c5b5bdcfa18ac6cd6116297af2f65148
-	llvm_download_label=clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu-16.04
+        llvm_download_label=clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu-16.04
     fi
 
     llvm_download_file=${downloads_dir}/${llvm_download_label}.tar.xz
     llvm_label=llvm_linux64_${llvm_version}
     llvm_dir=${tools_dir}/${llvm_label}
     llvm_exe=${llvm_dir}/bin/clang
-    
     if [[ ! -f "${llvm_exe}" ]]; then
         DownloadFile "https://github.com/llvm/llvm-project/releases/download/llvmorg-${llvm_version}/${llvm_download_label}.tar.xz" "${llvm_download_file}" || exit
         FileSHA256Check "${llvm_download_file}" "${llvm_sha256}" || exit
         mkdir --parents "${llvm_dir}" && tar xf "${llvm_download_file}" --skip-old-files --directory="${llvm_dir}" || exit
 
-	if [[ "${llvm_version}" == "12.0.1" ]]; then
-	    # NOTE: There was a distribution bug in v12.0.1 where the folder was misnamed
-	    mv ${llvm_dir}/clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu-/* ${llvm_dir} || exit
-            rm --recursive ${llvm_dir}/clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu || exit
-	else
-	    mv ${llvm_dir}/${llvm_download_label}/* ${llvm_dir} || exit
+        if [[ "${llvm_version}" == "12.0.1" ]]; then
+            # NOTE: There was a distribution bug in v12.0.1 where the folder was misnamed
+            mv ${llvm_dir}/clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu-/* ${llvm_dir} || exit
+            rm --recursive ${llvm_dir}/clang+llvm-${llvm_version}-x86_64-linux-gnu-ubuntu- || exit
+        else
+            mv ${llvm_dir}/${llvm_download_label}/* ${llvm_dir} || exit
             rm --recursive ${llvm_dir}/${llvm_download_label} || exit
-	fi
+        fi
     fi
-    
     FileSHA256Check "${llvm_exe}" "${llvm_exe_sha256}" || exit
-    
     cd "${llvm_dir}/bin" && find . -type f,l -exec ln --force --symbolic --relative "{}" "${bin_dir}/{}-${llvm_version}" ';' && cd "${root_dir}"
 done
 
@@ -199,7 +196,7 @@ if [[ ! -f "${neovide_exe}" ]]; then
     DownloadFile "https://github.com/neovide/neovide/releases/download/${neovide_version}/neovide.tar.gz" ${neovide_download_file} || exit
     FileSHA256Check ${neovide_download_file} ${neovide_sha256} || exit
 
-    mkdir --parents "${cmake_dir}" && tar xf ${neovide_download_file} --skip-old-files --directory=${neovide_dir}/neovide-tmp || exit
+    mkdir --parents ${neovide_dir}/neovide-tmp && tar xf ${neovide_download_file} --skip-old-files --directory=${neovide_dir}/neovide-tmp || exit
     mv ${neovide_dir}/neovide-tmp/target/release/neovide "${neovide_exe}" || exit
     rm -rf ${neovide_dir}/neovide-tmp
 fi
@@ -257,6 +254,21 @@ fi
 
 FileSHA256Check "${ripgrep_exe}" "${ripgrep_exe_sha256}" || exit
 ln --force --symbolic --relative "${ripgrep_exe}" "${bin_dir}"
+
+# wezterm
+# ------------------------------------------------------------------------------
+wezterm_sha256=4de3cd65b7d7ae0c72a691597bd3def57c65f07fe4a7c98b447b8a9dc4d0adf0
+wezterm_version=20220624-141144-bd1b7c5d
+
+wezterm_label=wezterm_linux64_${wezterm_version}
+wezterm_download_label=WezTerm-${wezterm_version}-Ubuntu18.04
+wezterm_exe=${tools_dir}/${wezterm_label}.AppImage
+
+DownloadFile "https://github.com/wez/wezterm/releases/download/${wezterm_version}/${wezterm_download_label}.AppImage" "${wezterm_exe}" || exit
+FileSHA256Check "${wezterm_exe}" "${wezterm_sha256}" || exit
+
+chmod +x "${wezterm_exe}"
+cp --force ${installer_dir}/os_wezterm.lua ~/.wezterm.lua
 
 # Ctags
 # ------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-REM Win Helpers - Version 3
+REM Win Helpers - Version 4
 call %*
 goto exit
 
@@ -40,6 +40,7 @@ exit /B 0
 
 :Unzip
 REM call win_helpers.bat :Unzip <path/to/7z.exe> <zip_file> <dest>
+REM Overwrite mode: "-aos" Skip extracting of existing files
 REM ------------------------------------------------------------------------------------------------
 set zip7_exe=%~1
 set zip_file=%~2
@@ -55,13 +56,9 @@ if not exist "!zip_file!" (
     exit /B 1
 )
 
-if exist !dest! (
-    echo - [Unzip/Cached] !zip_file! to !dest!
-) else (
-    echo - [Unzip] !zip_file! to !dest!
-    call !zip7_dir!\7z.exe x -y -spe -o!dest! !zip_file!
-)
-exit /B 0
+echo - [Unzip] !zip_file! to !dest!
+call !zip7_dir!\7z.exe x -y -aos -spe -o!dest! !zip_file!
+exit /B %ERRORLEVEL%
 
 :FileHashCheck
 REM call win_helpers.bat :FileHashCheck [sha256|md5|...] <file> <hash>
@@ -90,19 +87,19 @@ if /I "!expected!" neq "!actual!" (
 echo - [FileHashCheck] !algorithm! OK [file=!file! hash=!expected!]
 exit /B 0
 
-:Move
-REM call win_helpers.bat :Move <src> <dest>
+:MoveDir
+REM call win_helpers.bat :MoveDir <src> <dest>
 REM ------------------------------------------------------------------------------------------------
 set src=%~1
 set dest=%~2
 
 if not exist "!src!" (
-    echo - [Move] File/path does not exist [file=%src%]
+    echo - [MoveDir] Directory does not exist [dir=%src%]
     exit /B 1
 )
 
-echo - [Move] Move "!src!" to "!dest!"
-robocopy "!src!" "!dest!" /E /MOVE /NP /NJS /NJS /NS /NC /NFL /NDL
+echo - [MoveDir] "!src!" to "!dest!"
+robocopy "!src!" "!dest!" /E /MOVE /MT /NP /NJS /NS /NC /NFL /NDL
 exit /B 0
 
 :MakeBatchShortcut

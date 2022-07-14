@@ -132,7 +132,7 @@ if not exist "!wezterm_exe!" (
     call win_helpers.bat :DownloadFile https://github.com/wez/wezterm/releases/download/!wezterm_version!/WezTerm-windows-!wezterm_version!.zip "!wezterm_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!wezterm_zip!" "!wezterm_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!wezterm_zip!" "!wezterm_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!wezterm_dir!\wezterm-windows-!wezterm_version!" "!wezterm_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!wezterm_dir!\wezterm-windows-!wezterm_version!" "!wezterm_dir!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!wezterm_exe!" "!wezterm_exe_sha256!" || exit /B %ERRORLEVEL%
@@ -178,7 +178,7 @@ if not exist "!cmake_exe!" (
     call win_helpers.bat :DownloadFile "https://github.com/Kitware/CMake/releases/download/v!cmake_version!/cmake-!cmake_version!-windows-x86_64.zip" "!cmake_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!cmake_zip!" "!cmake_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!cmake_zip!" "!cmake_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!cmake_dir!/cmake-!cmake_version!-windows-x86_64" "!cmake_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!cmake_dir!/cmake-!cmake_version!-windows-x86_64" "!cmake_dir!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!cmake_exe!" "!cmake_exe_sha256!" || exit /B %ERRORLEVEL%
@@ -200,7 +200,7 @@ if not exist "!ctags_exe!" (
     call win_helpers.bat :DownloadFile "https://github.com/universal-ctags/ctags-win32/releases/download/!ctags_version!/ctags-!ctags_version!-x64.zip" "!ctags_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!ctags_zip!" "!ctags_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!ctags_zip!" "!ctags_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!ctags_dir!/ctags-!ctags_version!-windows-x86_64" "!ctags_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!ctags_dir!/ctags-!ctags_version!-windows-x86_64" "!ctags_dir!" || exit /B %ERRORLEVEL%
 )
 call win_helpers.bat :FileHashCheck sha256 "!ctags_exe!" "!ctags_exe_sha256!" || exit /B %ERRORLEVEL%
 call win_helpers.bat :MakeBatchShortcut "ctags" "!ctags_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
@@ -303,7 +303,7 @@ if not exist "!mingw_exe!" (
     call win_helpers.bat :DownloadFile \"https://sourceforge.net/projects/mingw-w64/files/Toolchains targetting Win64/Personal Builds/mingw-builds/!mingw_version!/threads-posix/seh/x86_64-!mingw_version!-release-posix-seh-rt_v6-rev0.7z\" !mingw_zip! || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 !mingw_zip! !mingw_sha256! || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" !mingw_zip! !mingw_dir! || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move !mingw_dir!\mingw64 !mingw_dir! || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir !mingw_dir!\mingw64 !mingw_dir! || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!mingw_exe!" "!mingw_exe_sha256!" || exit /B %ERRORLEVEL%
@@ -348,7 +348,7 @@ if not exist "!nodejs_exe!" (
     call win_helpers.bat :DownloadFile "https://nodejs.org/dist/v!nodejs_version!/node-v!nodejs_version!-win-x64.7z" "!nodejs_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!nodejs_zip!" "!nodejs_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!nodejs_zip!" "!nodejs_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!nodejs_dir!\node-v!nodejs_version!-win-x64" "!nodejs_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!nodejs_dir!\node-v!nodejs_version!-win-x64" "!nodejs_dir!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!nodejs_exe!" "!nodejs_exe_sha256!" || exit /B %ERRORLEVEL%
@@ -359,34 +359,36 @@ echo set PATH=!nodejs_dir!;%%PATH%%>> "!tmp_terminal_script!"
 REM ----------------------------------------------------------------------------
 REM Python
 REM ----------------------------------------------------------------------------
-set python_sha256=93cc3db75dffb4d56b9f64af43294f130f2c222a66de7a1325d0ce8f1ed62e26
-set python_exe_sha256=9042daa88b2d3879a51bfabc2d90d4a56da05ebf184b6492a22a46fdc1c936a4
-set python_version=3.9.0.2dot
-set python_version_nodot=3902
-set python_version_dot=3.9.0
+REM We use the shared installation of python since pynvim/greenlet does not work
+REM with a static python distribution.
+set python_sha256=39EE2B12AAB9E07E2B3CE698331160C55C75CD4AFFEE028F6AE78020711D503C
+set python_exe_sha256=8677FBA3EFC27F51EA84C528B24E5824B580CE59CD5714C47073FF2459637687
 
-set python_label=Winpython64_win64_!python_version_nodot!
-set python_zip=!downloads_dir!\!python_label!.zip
+set python_date=20220630
+set python_version=3.9.13
+set python_version_and_date=!python_version!+!python_date!
+
+set python_download_ext=tar.gz
+set python_download_label=cpython-!python_version_and_date!-x86_64-pc-windows-msvc-shared-install_only
+set python_download_file=!downloads_dir!\!python_download_label!.!python_download_ext!
+
+set python_label=cpython_win64_!python_version_and_date!
 set python_dir=!tools_dir!\!python_label!
-set python_bin_dir=!python_dir!\python-!python_version_dot!.amd64\
-set python_exe=!python_bin_dir!\python.exe
+set python_exe=!python_dir!\python.exe
 
 if not exist "!python_exe!" (
-    call win_helpers.bat :DownloadFile "https://github.com/winpython/winpython/releases/download/3.0.20201028/Winpython64-!python_version!.exe" "!python_zip!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :FileHashCheck sha256 "!python_zip!" "!python_sha256!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Unzip "!zip7_exe!" "!python_zip!" "!python_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!python_dir!\WPy64-!python_version_nodot!" "!python_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :DownloadFile "https://github.com/indygreg/python-build-standalone/releases/download/!python_date!/!python_download_label!.!python_download_ext!" "!python_download_file!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :FileHashCheck sha256 "!python_download_file!" "!python_sha256!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :Unzip "!zip7_exe!" "!python_download_file!" "!downloads_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :Unzip "!zip7_exe!" "!downloads_dir!\!python_download_label!.tar" "!python_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!python_dir!\python" "!python_dir!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!python_exe!" "!python_exe_sha256!" || exit /B %ERRORLEVEL%
 
-set python_bin_dir=!python_dir!\python-!python_version_dot!.amd64
-set python_scripts_bin_dir=!python_bin_dir!\Scripts
-
 REM Terminal
-echo set PATH=!python_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
-echo set PATH=!python_scripts_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
-echo set PYTHONHOME=!python_bin_dir!>> "!tmp_terminal_script!"
+echo set PYTHONHOME=!python_dir!>> "!tmp_terminal_script!"
+echo set PATH=!python_dir!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM ----------------------------------------------------------------------------
 REM RenderDoc
@@ -404,7 +406,7 @@ if not exist "!renderdoc_exe!" (
     call win_helpers.bat :DownloadFile "https://renderdoc.org/stable/!renderdoc_version!/RenderDoc_!renderdoc_version!_64.zip" "!renderdoc_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!renderdoc_zip!" "!renderdoc_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!renderdoc_zip!" "!renderdoc_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!renderdoc_dir!\RenderDoc_!renderdoc_version!_64" "!renderdoc_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!renderdoc_dir!\RenderDoc_!renderdoc_version!_64" "!renderdoc_dir!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!renderdoc_exe!" "!renderdoc_exe_sha256!" || exit /B %ERRORLEVEL%
@@ -425,7 +427,7 @@ if not exist "!zeal_exe!" (
     call win_helpers.bat :DownloadFile "https://github.com/zealdocs/zeal/releases/download/v!zeal_version!/zeal-portable-!zeal_version!-windows-x64.7z" "!zeal_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!zeal_zip!" "!zeal_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!zeal_zip!" "!zeal_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!zeal_dir!\zeal-portable-!zeal_version!-windows-x64" "!zeal_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!zeal_dir!\zeal-portable-!zeal_version!-windows-x64" "!zeal_dir!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!zeal_exe!" "!zeal_exe_sha256!" || exit /B %ERRORLEVEL%
@@ -437,16 +439,19 @@ set zig_sha256=443da53387d6ae8ba6bac4b3b90e9fef4ecbe545e1c5fa3a89485c36f5c0e3a2
 set zig_exe_sha256=63c2f819cfdb1a35cb954791fc0aa48910a42065a5e1c6ff89ee16775c75a112
 set zig_version=0.9.1
 
+set zig_download_ext=zip
+set zig_download_label=zig-windows-x86_64-!zig_version!
+set zig_download_file=!downloads_dir!\!zig_download_label!.!zig_download_ext!
+
 set zig_label=zig_win64_!zig_version!
-set zig_zip=!downloads_dir!\!zig_label!.zip
 set zig_dir=!tools_dir!\!zig_label!
 set zig_exe=!zig_dir!\zig.exe
 
 if not exist "!zig_exe!" (
-    call win_helpers.bat :DownloadFile "https://ziglang.org/download/!zig_version!/zig-windows-x86_64-!zig_version!.zip" "!zig_zip!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :FileHashCheck sha256 "!zig_zip!" "!zig_sha256!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Unzip "!zip7_exe!" "!zig_zip!" "!zig_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!zig_dir!\zig-windows-x86_64-!zig_version!" "!zig_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :DownloadFile "https://ziglang.org/download/!zig_version!/!zig_download_label!.!zig_download_ext!" "!zig_download_file!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :FileHashCheck sha256 "!zig_download_file!" "!zig_sha256!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :Unzip "!zip7_exe!" "!zig_download_file!" "!zig_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!zig_dir!\zig-windows-x86_64-!zig_version!" "!zig_dir!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!zig_exe!" "!zig_exe_sha256!" || exit /B %ERRORLEVEL%
@@ -462,7 +467,7 @@ set msvc_sdk_version=22621
 set msvc_dir=!tools_dir!\msvc_win64_!msvc_version!_win10_sdk_!msvc_sdk_version!
 if not exist "!msvc_dir!" (
     call "!python_exe!" !installer_dir!\win_portable-msvc.py --accept-license --msvc-version !msvc_version! --sdk-version !msvc_sdk_version! || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "msvc" "!msvc_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "msvc" "!msvc_dir!" || exit /B %ERRORLEVEL%
 )
 
 REM Put the compiler into the path temporarily for compiling some programs on
@@ -634,7 +639,7 @@ if not exist "!nvim_exe!" (
     call win_helpers.bat :DownloadFile "https://github.com/neovim/neovim/releases/download/v!nvim_version!/nvim-win64.zip" "!nvim_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!nvim_zip!" "!nvim_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!nvim_zip!" "!nvim_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!nvim_dir!\nvim-win64" "!nvim_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!nvim_dir!\nvim-win64" "!nvim_dir!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!nvim_exe!" "!nvim_exe_sha256!" || exit /B %ERRORLEVEL%
@@ -650,13 +655,14 @@ set neovide_version=0.9.0
 
 set neovide_label=neovide_win64_!neovide_version!
 set neovide_zip=!downloads_dir!\!neovide_label!.zip
-set neovide_dir=!tools_dir!\!neovide_label!
-set neovide_exe=!neovide_dir!\neovide.exe
+set neovide_dir=!tools_dir!\
+set neovide_exe=!neovide_dir!\!neovide_label!.exe
 
 if not exist "!neovide_exe!" (
     call win_helpers.bat :DownloadFile "https://github.com/neovide/neovide/releases/download/!neovide_version!/neovide-windows.zip" "!neovide_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!neovide_zip!" "!neovide_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!neovide_zip!" "!neovide_dir!" || exit /B %ERRORLEVEL%
+    move /Y "!neovide_dir!\neovide.exe" "!neovide_exe!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!neovide_exe!" "!neovide_exe_sha256!" || exit /B %ERRORLEVEL%
@@ -676,8 +682,8 @@ if not exist "!vim_plug_dir!" mkdir "!vim_plug_dir!"
 call win_helpers.bat :DownloadFile "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim" "!vim_plug!" || exit /B %ERRORLEVEL%
 
 REM Install Python NVIM module, for :py3 support
-set PYTHONHOME=!python_bin_dir!
-!python_bin_dir!\Scripts\pip.exe install pynvim cmake-language-server
+set PYTHONHOME=!python_dir!
+!python_dir!\python.exe -m pip install pynvim cmake-language-server
 
 REM ----------------------------------------------------------------------------
 REM ImHex
@@ -715,7 +721,7 @@ if not exist "!keypirinha_exe!" (
     call win_helpers.bat :DownloadFile "https://github.com/Keypirinha/Keypirinha/releases/download/v!keypirinha_version!/keypirinha-!keypirinha_version!-x64-portable.7z" "!keypirinha_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!keypirinha_zip!" "!keypirinha_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!keypirinha_zip!" "!keypirinha_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!keypirinha_dir!\keypirinha" "!keypirinha_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!keypirinha_dir!\keypirinha" "!keypirinha_dir!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!keypirinha_exe!" "!keypirinha_exe_sha256!" || exit /B %ERRORLEVEL%
@@ -800,7 +806,7 @@ if not exist "!rg_exe!" (
     call win_helpers.bat :DownloadFile "https://github.com/BurntSushi/ripgrep/releases/download/!rg_version!/ripgrep-!rg_version!-x86_64-pc-windows-msvc.zip" "!rg_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!rg_zip!" "!rg_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!rg_zip!" "!rg_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!rg_dir!\ripgrep-!rg_version!-x86_64-pc-windows-msvc" "!rg_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!rg_dir!\ripgrep-!rg_version!-x86_64-pc-windows-msvc" "!rg_dir!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!rg_exe!" "!rg_exe_sha256!" || exit /B %ERRORLEVEL%
@@ -824,7 +830,7 @@ if not exist "!fd_exe!" (
     call win_helpers.bat :DownloadFile "https://github.com/sharkdp/fd/releases/download/v!fd_version!/fd-v!fd_version!-x86_64-pc-windows-msvc.zip" "!fd_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!fd_zip!" "!fd_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!fd_zip!" "!fd_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!fd_dir!\fd-v!fd_version!-x86_64-pc-windows-msvc" "!fd_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!fd_dir!\fd-v!fd_version!-x86_64-pc-windows-msvc" "!fd_dir!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!fd_exe!" "!fd_exe_sha256!" || exit /B %ERRORLEVEL%
@@ -858,7 +864,7 @@ if not exist "!geth_exe!" (
     gpg --import "!geth_gpg_key!" || exit /B %ERRORLEVEL%
     gpg --verify "!geth_gpg_sig!" "!geth_zip!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!geth_zip!" "!geth_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Move "!geth_dir!\geth-windows-amd64-!geth_version!" "!geth_dir!"
+    call win_helpers.bat :MoveDir "!geth_dir!\geth-windows-amd64-!geth_version!" "!geth_dir!"
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!geth_exe!" "!geth_exe_sha256!" || exit /B %ERRORLEVEL%
