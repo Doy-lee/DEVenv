@@ -101,6 +101,28 @@ fi
 FileSHA256Check "${fd_exe}" "${fd_exe_sha256}" || exit
 ln --force --symbolic --relative "${fd_exe}" "${bin_dir}"
 
+# GCC
+# ------------------------------------------------------------------------------
+gcc_dir=${tools_dir}/gcc-mostlyportable
+gcc_version_list=(12.1.0 11.3.0 10.4.0 9.5.0 8.5.0 7.5.0 6.5.0)
+
+mkdir --parents "${gcc_dir}"
+cp "${installer_dir}/unix_gcc_build.sh"   "${gcc_dir}/build.sh"
+cp "${installer_dir}/unix_gcc_dockerfile" "${gcc_dir}/Dockerfile"
+
+cd "${gcc_dir}" || exit
+    for gcc_version in ${gcc_version_list[@]}; do
+        gcc_bin_dir=${gcc_dir}
+        if [[ ! -f "${gcc_bin_dir}/g++" ]]; then
+            ./build.sh ${gcc_version} || exit
+            ln -s ${gcc_bin_dir}/g++ ${bin_dir}/g++-${gcc_version} || exit
+            ln -s ${gcc_bin_dir}/gcc ${bin_dir}/gcc-${gcc_version} || exit
+        fi
+    done
+    ln -s ${gcc_bin_dir}/g++ ${bin_dir}/g++ || exit
+    ln -s ${gcc_bin_dir}/gcc ${bin_dir}/gcc || exit
+cd "${root_dir}" || exit
+
 # LLVM/Clang
 # ------------------------------------------------------------------------------
 llvm_version_list=(11.1.0 12.0.1 13.0.1 14.0.0)
