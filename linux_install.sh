@@ -53,6 +53,11 @@ mkdir --parents ${bin_dir}
 
 # Tools
 # ------------------------------------------------------------------------------
+if ! command -v docker &> /dev/null
+then
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sudo sh get-docker.sh
+fi
 
 # CMake
 # ----------------------------------------------------------------------------
@@ -112,15 +117,15 @@ cp "${installer_dir}/unix_gcc_dockerfile" "${gcc_dir}/Dockerfile"
 
 cd "${gcc_dir}" || exit
     for gcc_version in ${gcc_version_list[@]}; do
-        gcc_bin_dir=${gcc_dir}
+        gcc_bin_dir=${gcc_dir}/gcc-mostlyportable-${gcc_version}/bin
         if [[ ! -f "${gcc_bin_dir}/g++" ]]; then
             ./build.sh ${gcc_version} || exit
-            ln -s ${gcc_bin_dir}/g++ ${bin_dir}/g++-${gcc_version} || exit
-            ln -s ${gcc_bin_dir}/gcc ${bin_dir}/gcc-${gcc_version} || exit
         fi
+        ln --symbolic --force --relative ${gcc_bin_dir}/g++ ${bin_dir}/g++-${gcc_version} || exit
+        ln --symbolic --force --relative ${gcc_bin_dir}/gcc ${bin_dir}/gcc-${gcc_version} || exit
     done
-    ln -s ${gcc_bin_dir}/g++ ${bin_dir}/g++ || exit
-    ln -s ${gcc_bin_dir}/gcc ${bin_dir}/gcc || exit
+    ln --symbolic --force --relative "${gcc_bin_dir}/g++" "${bin_dir}/g++" || exit
+    ln --symbolic --force --relative "${gcc_bin_dir}/gcc" "${bin_dir}/gcc" || exit
 cd "${root_dir}" || exit
 
 # LLVM/Clang

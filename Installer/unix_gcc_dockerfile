@@ -27,6 +27,7 @@ WORKDIR /usr/local/docker
 ARG MOSTLY_PORTABLE_GCC_GIT_BRANCH=master
 RUN set -ex \
     && git clone https://github.com/Frogging-Family/mostlyportable-gcc \
+    && cd mostlyportable-gcc \
     && git checkout $MOSTLY_PORTABLE_GIT_BRANCH
 
 ARG GCC_VERSION=11.3.0

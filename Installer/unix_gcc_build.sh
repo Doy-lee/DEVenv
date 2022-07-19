@@ -10,11 +10,11 @@ do
     docker create --name ${container_name} ${image_name} || exit
 
     mkdir --parent build || exit
-    docker cp ${container_name}:/usr/local/docker/gcc-mostlyportable-${gcc_version} . || exit
+    docker cp ${container_name}:/usr/local/docker/mostlyportable-gcc/gcc-mostlyportable-${gcc_version} . || exit
 
     docker container rm ${container_name} || exit
 done
 
 if [[ $EUID == 0 ]]; then
-    chown --recursive ${USER} build
+    chown --recursive ${USER} gcc-mostlyportable-*
 fi
