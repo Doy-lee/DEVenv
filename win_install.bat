@@ -164,24 +164,48 @@ REM ----------------------------------------------------------------------------
 REM ----------------------------------------------------------------------------
 REM CMake
 REM ----------------------------------------------------------------------------
-set cmake_sha256=9b509cc4eb7191dc128cfa3f2170036f9cbc7d9d5f93ff7fafc5b2d77b3b40dc
-set cmake_exe_sha256=326ae6ce4bd46c27f6ce46c95b48efc19848fd9fc24d71d2e8a226dadfef810c
-set cmake_version=3.23.1
+set cmake_version_list=3.23.1 !cmake_version_list!
+set cmake_version_list=3.22.2 !cmake_version_list!
+set cmake_version_list=3.10.3 !cmake_version_list!
+set cmake_version_list=!cmake_version_list!
 
-set cmake_label=cmake_win64_!cmake_version!
-set cmake_zip=!downloads_dir!\!cmake_label!.zip
-set cmake_dir=!tools_dir!\!cmake_label!
-set cmake_bin_dir=!cmake_dir!\bin
-set cmake_exe=!cmake_dir!\bin\cmake.exe
+for %%a in (%cmake_version_list%) do (
+    set cmake_version=%%a
+    set cmake_download_label=cmake-!cmake_version!-windows-x86_64
 
-if not exist "!cmake_exe!" (
-    call win_helpers.bat :DownloadFile "https://github.com/Kitware/CMake/releases/download/v!cmake_version!/cmake-!cmake_version!-windows-x86_64.zip" "!cmake_zip!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :FileHashCheck sha256 "!cmake_zip!" "!cmake_sha256!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Unzip "!zip7_exe!" "!cmake_zip!" "!cmake_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :MoveDir "!cmake_dir!/cmake-!cmake_version!-windows-x86_64" "!cmake_dir!" || exit /B %ERRORLEVEL%
+    if "!cmake_version!"=="3.23.1" (
+        set cmake_sha256=9b509cc4eb7191dc128cfa3f2170036f9cbc7d9d5f93ff7fafc5b2d77b3b40dc
+        set cmake_exe_sha256=326ae6ce4bd46c27f6ce46c95b48efc19848fd9fc24d71d2e8a226dadfef810c
+    ) else if "!cmake_version!"=="3.22.2" (
+        set cmake_sha256=192D62EAECB0600E743F01058DFBD5B6BED91504FE8F56416FEBF54C38CE096E
+        set cmake_exe_sha256=CF1AF65D22BD01BF1CF2DB7ECEFEB730AB147549755FAA4357E5427E3175F638
+    ) else if "!cmake_version!"=="3.10.3" (
+        set cmake_sha256=3BD57D1CFCF720A4CC72DB77BDA4C76A7B700FB0341821AD868963AD28856CD0
+        set cmake_exe_sha256=F2E3B486D87D2A6BC19B3A62C740028F3F8945875196AC7D3D0E69649E98730A
+        set cmake_download_label=cmake-!cmake_version!-win64-x64
+    )
+
+    set cmake_download_ext=zip
+    set cmake_download_file=!downloads_dir!\!cmake_download_label!.!cmake_download_ext!
+    set cmake_download_url="https://github.com/Kitware/CMake/releases/download/v!cmake_version!/!cmake_download_label!.!cmake_download_ext!"
+
+    set cmake_label=cmake_win64_!cmake_version!
+    set cmake_dir=!tools_dir!\!cmake_label!
+    set cmake_bin_dir=!cmake_dir!\bin
+    set cmake_exe=!cmake_bin_dir!\cmake.exe
+
+    if not exist "!cmake_exe!" (
+        call win_helpers.bat :DownloadFile "!cmake_download_url!" "!cmake_download_file!" || exit /B %ERRORLEVEL%
+        call win_helpers.bat :FileHashCheck sha256 "!cmake_download_file!" "!cmake_sha256!" || exit /B %ERRORLEVEL%
+        call win_helpers.bat :Unzip "!zip7_exe!" "!cmake_download_file!" "!cmake_dir!" || exit /B %ERRORLEVEL%
+        call win_helpers.bat :MoveDir "!cmake_dir!/!cmake_download_label!" "!cmake_dir!" || exit /B %ERRORLEVEL%
+    )
+
+    call win_helpers.bat :FileHashCheck sha256 "!cmake_exe!" "!cmake_exe_sha256!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MakeBatchShortcut "cmake-!cmake_version!" "!cmake_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
 )
 
-call win_helpers.bat :FileHashCheck sha256 "!cmake_exe!" "!cmake_exe_sha256!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeBatchShortcut "cmake" "!cmake_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
 echo set PATH=!cmake_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM ----------------------------------------------------------------------------
