@@ -109,7 +109,14 @@ ln --force --symbolic --relative "${fd_exe}" "${bin_dir}"
 # GCC
 # ------------------------------------------------------------------------------
 gcc_dir=${tools_dir}/gcc-mostlyportable
-gcc_version_list=(12.1.0 11.3.0 10.4.0 9.5.0 8.5.0 7.5.0 6.5.0)
+gcc_version_list=()
+gcc_version_list+=(6.5.0)
+gcc_version_list+=(7.5.0)
+gcc_version_list+=(8.5.0)
+gcc_version_list+=(9.5.0)
+gcc_version_list+=(10.4.0)
+gcc_version_list+=(11.3.0)
+gcc_version_list+=(12.1.0)
 
 mkdir --parents "${gcc_dir}"
 cp "${installer_dir}/unix_gcc_build.sh"   "${gcc_dir}/build.sh"
@@ -130,7 +137,11 @@ cd "${root_dir}" || exit
 
 # LLVM/Clang
 # ------------------------------------------------------------------------------
-llvm_version_list=(11.1.0 12.0.1 13.0.1 14.0.0)
+llvm_version_list=()
+llvm_version_list+=(11.1.0)
+llvm_version_list+=(12.0.1)
+llvm_version_list+=(13.0.1)
+llvm_version_list+=(14.0.0)
 
 for llvm_version in ${llvm_version_list[@]}; do
     llvm_sha256=none
@@ -176,6 +187,24 @@ for llvm_version in ${llvm_version_list[@]}; do
 done
 
 cd "${llvm_dir}/bin" && find . -type f,l -exec ln --force --symbolic --relative "{}" "${bin_dir}/" ';' && cd "${root_dir}"
+
+# gf
+# ------------------------------------------------------------------------------
+gf_dir=${tools_dir}/gf
+
+if [[ ! -d "${gf_dir}" ]]; then
+    git clone https://github.com/nakst/gf "${tools_dir}/gf" || exit
+fi
+
+cd "${tools_dir}/gf" || exit
+git checkout master
+
+# Use our custom G++ because I typically run Ubuntu 18.04 which uses G++7
+# which is too old to compile GF.
+PATH=${gcc_bin_dir}:${PATH} ./build.sh || exit
+ln --force --symbolic --relative "gf2" "${bin_dir}"
+
+cd "${root_dir}"
 
 # Vim Configuration
 # ------------------------------------------------------------------------------
