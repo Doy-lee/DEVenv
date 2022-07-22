@@ -392,19 +392,18 @@ set python_date=20220630
 set python_version=3.9.13
 set python_version_and_date=!python_version!+!python_date!
 
-set python_download_ext=tar.gz
-set python_download_label=cpython-!python_version_and_date!-x86_64-pc-windows-msvc-shared-install_only
-set python_download_file=!downloads_dir!\!python_download_label!.!python_download_ext!
+set python_download_name=cpython-!python_version_and_date!-x86_64-pc-windows-msvc-shared-install_only
+set python_download_file=!python_download_name!.tar.gz
+set python_download_path=!downloads_dir!\!python_download_file!
 
-set python_label=cpython_win64_!python_version_and_date!
-set python_dir=!tools_dir!\!python_label!
+set python_dir=!tools_dir!\cpython_win64_!python_version_and_date!
 set python_exe=!python_dir!\python.exe
 
 if not exist "!python_exe!" (
-    call win_helpers.bat :DownloadFile "https://github.com/indygreg/python-build-standalone/releases/download/!python_date!/!python_download_label!.!python_download_ext!" "!python_download_file!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :FileHashCheck sha256 "!python_download_file!" "!python_sha256!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Unzip "!zip7_exe!" "!python_download_file!" "!downloads_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Unzip "!zip7_exe!" "!downloads_dir!\!python_download_label!.tar" "!python_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :DownloadFile "https://github.com/indygreg/python-build-standalone/releases/download/!python_date!/!python_download_file!" "!python_download_path!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :FileHashCheck sha256 "!python_download_path!" "!python_sha256!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :Unzip "!zip7_exe!" "!python_download_path!" "!downloads_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :Unzip "!zip7_exe!" "!downloads_dir!\!python_download_name!.tar" "!python_dir!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :MoveDir "!python_dir!\python" "!python_dir!" || exit /B %ERRORLEVEL%
 )
 
@@ -504,23 +503,38 @@ echo call "!msvc_dir!\setup.bat">> "!tmp_terminal_script!"
 REM ----------------------------------------------------------------------------
 REM Symget
 REM ----------------------------------------------------------------------------
-REM set symget_dir=!tools_dir!\symget
-REM if not exist "!symget_dir!" (
-REM     call !git_exe! clone https://github.com/mmozeiko/symget.git !symget_dir! || exit /B %ERRORLEVEL%
-REM )
-REM
-REM call !git_exe! -C !symget_dir! pull origin main || exit /B %ERRORLEVEL%
-REM call !git_exe! -C !symget_dir! checkout 79b026f || exit /B %ERRORLEVEL%
+set symget_git_hash=79b026f
+set symget_dir=!tools_dir!\symget
+set symget_exe=!symget_dir!\symget.exe
+if not exist "!symget_dir!" (
+    call !git_exe! clone https://github.com/mmozeiko/symget.git !symget_dir! || exit /B %ERRORLEVEL%
+)
+
+REM Extract current git hash of the repository. Remove the last character as
+REM rev-parse has a trailing whitespace.
+for /F "tokens=1 USEBACKQ" %%F IN (`"!git_exe!" -C !symget_dir! rev-parse --short HEAD`) do ( SET symget_curr_git_hash=%%F )
+set symget_curr_git_hash=!symget_curr_git_hash:~0,-1!
+
+if !symget_curr_git_hash! neq !symget_git_hash! (
+    call !git_exe! -C !symget_dir! checkout !symget_git_hash! || exit /B %ERRORLEVEL%
+    if exist !symget_exe! del /F !symget_exe!
+)
+
+if not exist "!symget_exe!" (
+    pushd !symget_dir!
+    call build.cmd
+    popd
+)
 
 REM ----------------------------------------------------------------------------
 REM Odin
 REM ----------------------------------------------------------------------------
-set odin_git_hash=a4cb6f96
+set odin_git_hash=227ee0f
 set odin_dir=!tools_dir!\odin_win64
 set odin_exe=!odin_dir!\odin.exe
 
 if not exist "!odin_dir!" (
-    call !git_exe! clone https://github.com/odin-lang/odin.git !odin_dir! || exit /B %ERRORLEVEL%
+    call !git_exe! clone "https://github.com/odin-lang/odin.git" !odin_dir! || exit /B %ERRORLEVEL%
 )
 
 REM Extract current git hash of the repository. Remove the last character as
@@ -529,8 +543,8 @@ for /F "tokens=1 USEBACKQ" %%F IN (`"!git_exe!" -C !odin_dir! rev-parse --short 
 set odin_curr_git_hash=!odin_curr_git_hash:~0,-1!
 
 if !odin_curr_git_hash! neq !odin_git_hash! (
-    call !git_exe! -C !odin_dir! pull origin master || exit /B %ERRORLEVEL%
     call !git_exe! -C !odin_dir! checkout !odin_git_hash! || exit /B %ERRORLEVEL%
+    if exist !odin_exe! del /F !odin_exe!
 )
 
 if not exist "!odin_exe!" (
@@ -547,21 +561,24 @@ REM ----------------------------------------------------------------------------
 REM ----------------------------------------------------------------------------
 REM clink - Bash style tab completion in terminal
 REM ----------------------------------------------------------------------------
-set clink_sha256=00A516A9D072E46ADF381156703E54CDF086A1F078D006971E6D96DFA0186881
-set clink_exe_sha256=7448FD3BE1CB698A154AAA9F2EB27146B81EE266F27BFE993B342C22C25E520A
-set clink_version=1.3.35
-set clink_git_hash=5e327d
+set clink_sha256=6FD44B1D085ABC8319108986C0E19B119D54BC84A753397D567A5F62950F0ACC
+set clink_exe_sha256=138F680A25C993ACE201B844DEAC7F42D8D3EC9F02042D3DE7E9B6426C8A6D42
+set clink_version=1.3.37
+set clink_git_hash=b85068
 
-set clink_label=clink_win64_!clink_version!
-set clink_zip=!downloads_dir!\!clink_label!.zip
-set clink_dir=!tools_dir!\!clink_label!
+set clink_download_name=clink.!clink_version!.!clink_git_hash!
+set clink_download_file=!clink_download_name!.zip
+set clink_download_path=!downloads_dir!\!clink_download_file!
+set clink_download_url="https://github.com/chrisant996/clink/releases/download/v!clink_version!/!clink_download_file!"
+
+set clink_dir=!tools_dir!\clink_win64_!clink_version!
 set clink_exe=!clink_dir!\clink_x64.exe
 set clink_bat=!clink_dir!\clink.bat
 
 if not exist "!clink_exe!" (
-    call win_helpers.bat :DownloadFile "https://github.com/chrisant996/clink/releases/download/v!clink_version!/clink.!clink_version!.!clink_git_hash!.zip" "!clink_zip!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :FileHashCheck sha256 "!clink_zip!" "!clink_sha256!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Unzip "!zip7_exe!" "!clink_zip!" "!clink_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :DownloadFile "!clink_download_url!" "!clink_download_path!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :FileHashCheck sha256 "!clink_download_path!" "!clink_sha256!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :Unzip "!zip7_exe!" "!clink_download_path!" "!clink_dir!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :OverwriteCopy "!clink_dir!\_default_inputrc" "!clink_dir!\default_inputrc" || exit /B %ERRORLEVEL%
     call win_helpers.bat :OverwriteCopy "!clink_dir!\_default_settings" "!clink_dir!\default_settings" || exit /B %ERRORLEVEL%
 )
