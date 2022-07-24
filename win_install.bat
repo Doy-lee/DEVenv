@@ -915,6 +915,28 @@ call win_helpers.bat :FileHashCheck sha256 "!fd_exe!" "!fd_exe_sha256!" || exit 
 REM Terminal
 echo set PATH=!fd_dir!;%%PATH%%>> "!tmp_terminal_script!"
 
+REM wiztree
+REM ----------------------------------------------------------------------------
+set wiztree_sha256=066E270DE1E398CC8447428047628C241832D53839AAE9815443B486AFFD66C9
+set wiztree_exe_sha256=688a21f225af918c47b883a0d905922411a63cbe55785aa4fbc16af244c1fcdf
+set wiztree_version=4_08
+
+set wiztree_download_name=wiztree_!wiztree_version!_portable
+set wiztree_download_file=!wiztree_download_name!.zip
+set wiztree_download_path=!downloads_dir!\!wiztree_download_file!
+set wiztree_download_url="https://www.diskanalyzer.com/files/!wiztree_download_file!"
+
+set wiztree_dir=!tools_dir!\wiztree_win64_!wiztree_version!
+set wiztree_exe=!wiztree_dir!\wiztree64.exe
+
+if not exist "!wiztree_exe!" (
+    call win_helpers.bat :DownloadFile "!wiztree_download_url!" "!wiztree_download_path!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :FileHashCheck sha256 "!wiztree_download_path!" "!wiztree_sha256!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :Unzip "!zip7_exe!" "!wiztree_download_path!" "!wiztree_dir!" || exit /B %ERRORLEVEL%
+)
+
+call win_helpers.bat :FileHashCheck sha256 "!wiztree_exe!" "!wiztree_exe_sha256!" || exit /B %ERRORLEVEL%
+
 REM Ethereum
 REM ----------------------------------------------------------------------------
 REM geth
