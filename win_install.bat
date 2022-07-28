@@ -526,7 +526,7 @@ set symget_git_hash=79b026f
 set symget_dir=!tools_dir!\symget
 set symget_exe=!symget_dir!\symget.exe
 if not exist "!symget_dir!" (
-    call !git_exe! clone https://github.com/mmozeiko/symget.git !symget_dir! || exit /B %ERRORLEVEL%
+    call "!git_exe!" clone "https://github.com/mmozeiko/symget.git" "!symget_dir!" || exit /B %ERRORLEVEL%
 )
 
 REM Extract current git hash of the repository. Remove the last character as
@@ -535,8 +535,9 @@ for /F "tokens=1 USEBACKQ" %%F IN (`"!git_exe!" -C !symget_dir! rev-parse --shor
 set symget_curr_git_hash=!symget_curr_git_hash:~0,-1!
 
 if !symget_curr_git_hash! neq !symget_git_hash! (
-    call !git_exe! -C !symget_dir! checkout !symget_git_hash! || exit /B %ERRORLEVEL%
-    if exist !symget_exe! del /F !symget_exe!
+    call "!git_exe!" -C "!symget_dir!" fetch || exit /B %ERRORLEVEL%
+    call "!git_exe!" -C "!symget_dir!" checkout "!symget_git_hash!" || exit /B %ERRORLEVEL%
+    if exist "!symget_exe!" del /F "!symget_exe!"
 )
 
 if not exist "!symget_exe!" (
@@ -552,21 +553,24 @@ set odin_dir=!tools_dir!\odin_win64
 set odin_exe=!odin_dir!\odin.exe
 
 if not exist "!odin_dir!" (
-    call !git_exe! clone "https://github.com/odin-lang/odin.git" !odin_dir! || exit /B %ERRORLEVEL%
+    call "!git_exe!" clone "https://github.com/odin-lang/odin.git" "!odin_dir!" || exit /B %ERRORLEVEL%
 )
 
 REM Extract current git hash of the repository. Remove the last character as
 REM rev-parse has a trailing whitespace.
 for /F "tokens=1 USEBACKQ" %%F IN (`"!git_exe!" -C !odin_dir! rev-parse --short HEAD`) do ( SET odin_curr_git_hash=%%F )
 set odin_curr_git_hash=!odin_curr_git_hash:~0,-1!
+echo @@@@@ !odin_git_hash!
+echo XXXXX !odin_curr_git_hash!
 
-if !odin_curr_git_hash! neq !odin_git_hash! (
-    call !git_exe! -C !odin_dir! checkout !odin_git_hash! || exit /B %ERRORLEVEL%
-    if exist !odin_exe! del /F !odin_exe!
+if "!odin_curr_git_hash!" neq "!odin_git_hash!" (
+    call "!git_exe!" -C "!odin_dir!" fetch || exit /B %ERRORLEVEL%
+    call "!git_exe!" -C "!odin_dir!" checkout "!odin_git_hash!" || exit /B %ERRORLEVEL%
+    if exist "!odin_exe!" del /F "!odin_exe!"
 )
 
 if not exist "!odin_exe!" (
-    pushd !odin_dir!
+    pushd "!odin_dir!"
     call build.bat
     popd
 )
