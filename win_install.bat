@@ -535,7 +535,7 @@ for /F "tokens=1 USEBACKQ" %%F IN (`"!git_exe!" -C !symget_dir! rev-parse --shor
 set symget_curr_git_hash=!symget_curr_git_hash:~0,-1!
 
 if !symget_curr_git_hash! neq !symget_git_hash! (
-    call "!git_exe!" -C "!symget_dir!" fetch || exit /B %ERRORLEVEL%
+    call "!git_exe!" -C "!symget_dir!" pull origin master || exit /B %ERRORLEVEL%
     call "!git_exe!" -C "!symget_dir!" checkout "!symget_git_hash!" || exit /B %ERRORLEVEL%
     if exist "!symget_exe!" del /F "!symget_exe!"
 )
@@ -548,7 +548,7 @@ if not exist "!symget_exe!" (
 
 REM Odin
 REM ----------------------------------------------------------------------------
-set odin_git_hash=227ee0f
+set odin_git_hash=a0135080b3d5004da6fd3ccc2ef34a7faea54245
 set odin_dir=!tools_dir!\odin_win64
 set odin_exe=!odin_dir!\odin.exe
 
@@ -560,11 +560,9 @@ REM Extract current git hash of the repository. Remove the last character as
 REM rev-parse has a trailing whitespace.
 for /F "tokens=1 USEBACKQ" %%F IN (`"!git_exe!" -C !odin_dir! rev-parse --short HEAD`) do ( SET odin_curr_git_hash=%%F )
 set odin_curr_git_hash=!odin_curr_git_hash:~0,-1!
-echo @@@@@ !odin_git_hash!
-echo XXXXX !odin_curr_git_hash!
 
 if "!odin_curr_git_hash!" neq "!odin_git_hash!" (
-    call "!git_exe!" -C "!odin_dir!" fetch || exit /B %ERRORLEVEL%
+    call "!git_exe!" -C "!odin_dir!" pull origin master || exit /B %ERRORLEVEL%
     call "!git_exe!" -C "!odin_dir!" checkout "!odin_git_hash!" || exit /B %ERRORLEVEL%
     if exist "!odin_exe!" del /F "!odin_exe!"
 )
