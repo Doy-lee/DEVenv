@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-REM Win Helpers - Version 4
+REM Win Helpers - Version 5
 call %*
 goto exit
 
@@ -73,7 +73,7 @@ if not exist "!file!" (
 )
 
 REM Calculate hash
-for /F "tokens=2 delims= " %%c in ('powershell -NoLogo -NoProfile -NonInteractive Get-FileHash -algorithm !algorithm! \"!file!\" ') do ( set "actual=%%c" )
+for /F %%c in ('powershell -NoLogo -NoProfile -NonInteractive "Get-FileHash -algorithm !algorithm! \"!file!\" | Select-Object -ExpandProperty Hash "') do ( set "actual=%%c" )
 
 REM Verify Hash
 if /I "!expected!" neq "!actual!" (
