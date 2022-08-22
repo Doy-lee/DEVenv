@@ -236,6 +236,28 @@ if not exist "!ctags_exe!" (
 call win_helpers.bat :FileHashCheck sha256 "!ctags_exe!" "!ctags_exe_sha256!" || exit /B %ERRORLEVEL%
 call win_helpers.bat :MakeBatchShortcut "ctags" "!ctags_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
 
+REM doxygen
+REM ----------------------------------------------------------------------------
+set doxygen_md5=266a2b66914d0d1d96cc97e9f740b74c
+set doxygen_exe_sha256=3CB4D89F2B3DB7EEC2B6797DC6B49CDFE9ADDA954575898895260F66F312D730
+set doxygen_version=1.9.4
+
+set doxygen_download_name=doxygen-!doxygen_version!.windows.x64.bin
+set doxygen_download_file=!doxygen_download_name!.zip
+set doxygen_download_path=!downloads_dir!\!doxygen_download_file!
+set doxygen_download_url="https://www.doxygen.nl/files/!doxygen_download_file!"
+
+set doxygen_dir=!tools_dir!\doxygen_win64_!doxygen_version!
+set doxygen_exe=!doxygen_dir!\doxygen.exe
+
+if not exist "!doxygen_exe!" (
+    call win_helpers.bat :DownloadFile "!doxygen_download_url!" "!doxygen_download_path!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :FileHashCheck md5 "!doxygen_download_path!" "!doxygen_md5!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :Unzip "!zip7_exe!" "!doxygen_download_path!" "!doxygen_dir!" || exit /B %ERRORLEVEL%
+)
+call win_helpers.bat :FileHashCheck sha256 "!doxygen_exe!" "!doxygen_exe_sha256!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeBatchShortcut "doxygen" "!doxygen_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
+
 REM Git
 REM ----------------------------------------------------------------------------
 set git_sha256=bc030848e282d49e562ae2392a72501cf539322ad06ffe4cea8cf766f148dfe8
