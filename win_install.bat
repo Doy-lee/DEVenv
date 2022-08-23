@@ -19,12 +19,12 @@ if not exist !bin_dir! mkdir !bin_dir!
 set tmp_terminal_script=!tools_dir!\win_terminal.bat.tmp
 set terminal_script=!tools_dir!\win_terminal.bat
 echo @echo off> "!tmp_terminal_script!"
-echo set HOME=!home_dir!>> "!tmp_terminal_script!"
-echo set HOMEPATH=!home_dir!>> "!tmp_terminal_script!"
-echo set USERPROFILE=!home_dir!>> "!tmp_terminal_script!"
-echo set APPDATA=!home_dir!\AppData>> "!tmp_terminal_script!"
-echo set LOCALAPPDATA=!home_dir!\AppData\Local>> "!tmp_terminal_script!"
-echo set PATH=!bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
+echo set HOME=%%~dp0..\Home>> "!tmp_terminal_script!"
+echo set HOMEPATH=%%~dp0..\Home>> "!tmp_terminal_script!"
+echo set USERPROFILE=%%~dp0..\Home>> "!tmp_terminal_script!"
+echo set APPDATA=%%~dp0..\Home\AppData>> "!tmp_terminal_script!"
+echo set LOCALAPPDATA=%%~dp0..\Home\AppData\Local>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0Binaries;%%PATH%%>> "!tmp_terminal_script!"
 
 REM Setup tools for setting up the development environment
 REM ----------------------------------------------------------------------------
@@ -74,7 +74,8 @@ set zip7_download_file=!zip7_download_name!.exe
 set zip7_download_path=!downloads_dir!\!zip7_download_file!
 set zip7_download_url="https://www.7-zip.org/a/!zip7_download_file!"
 
-set zip7_dir=!tools_dir!\7zip_win64_!zip7_version!
+set zip7_dir_name=7zip_win64_!zip7_version!
+set zip7_dir=!tools_dir!\!zip7_dir_name!
 set zip7_exe=!zip7_dir!\7z.exe
 
 if not exist "!zip7_exe!" (
@@ -86,7 +87,7 @@ if not exist "!zip7_exe!" (
 call win_helpers.bat :FileHashCheck sha256 "!zip7_exe!" "!zip7_exe_sha256!" || exit /B %ERRORLEVEL%
 
 REM Terminal
-echo set PATH=!zip7_dir!;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0!zip7_dir_name!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM GPG Signature Verification
 REM ----------------------------------------------------------------------------
@@ -100,7 +101,8 @@ set gpg_download_file=!gpg_download_name!.exe
 set gpg_download_path=!downloads_dir!\!gpg_download_file!
 set gpg_download_url="https://gnupg.org/ftp/gcrypt/binary/!gpg_download_file!"
 
-set gpg_w32_dir=!tools_dir!\gpg_win32_!gpg_w32_version!
+set gpg_w32_dir_name=gpg_win32_!gpg_w32_version!
+set gpg_w32_dir=!tools_dir!\!gpg_w32_dir_name!
 set gpg_w32_bin_dir=!gpg_w32_dir!\bin
 set gpg_w32_exe=!gpg_w32_bin_dir!\gpg.exe
 
@@ -114,7 +116,7 @@ call win_helpers.bat :FileHashCheck sha256 "!gpg_w32_exe!" "!gpg_w32_exe_sha256!
 set PATH="!gpg_w32_bin_dir!";!PATH!
 
 REM Terminal
-echo set PATH=!gpg_w32_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0!gpg_w32_dir_name!\bin;%%PATH%%>> "!tmp_terminal_script!"
 
 REM Application Setup
 REM ----------------------------------------------------------------------------
@@ -131,7 +133,8 @@ set wezterm_download_file=!wezterm_download_name!.zip
 set wezterm_download_path=!downloads_dir!\!wezterm_download_file!
 set wezterm_download_url="https://github.com/wez/wezterm/releases/download/!wezterm_version!/!wezterm_download_file!"
 
-set wezterm_dir=!tools_dir!\wezterm_win64_!wezterm_version!
+set wezterm_dir_name=wezterm_win64_!wezterm_version!
+set wezterm_dir=!tools_dir!\!wezterm_dir_name!
 set wezterm_exe=!wezterm_dir!\wezterm-gui.exe
 
 if not exist "!wezterm_exe!" (
@@ -195,7 +198,8 @@ for %%a in (%cmake_version_list%) do (
     set cmake_download_path=!downloads_dir!\!cmake_download_file!
     set cmake_download_url="https://github.com/Kitware/CMake/releases/download/v!cmake_version!/!cmake_download_file!"
 
-    set cmake_dir=!tools_dir!\cmake_win64_!cmake_version!
+    set cmake_dir_name=cmake_win64_!cmake_version!
+    set cmake_dir=!tools_dir!\!cmake_dir_name!
     set cmake_bin_dir=!cmake_dir!\bin
     set cmake_exe=!cmake_bin_dir!\cmake.exe
 
@@ -207,11 +211,9 @@ for %%a in (%cmake_version_list%) do (
     )
 
     call win_helpers.bat :FileHashCheck sha256 "!cmake_exe!" "!cmake_exe_sha256!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :MakeBatchShortcut "cmake-!cmake_version!" "!cmake_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MakeRelativeBatchShortcut "cmake-!cmake_version!" "..\!cmake_dir_name!\bin\cmake.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
 )
-
-call win_helpers.bat :MakeBatchShortcut "cmake" "!cmake_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
-echo set PATH=!cmake_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0!cmake_dir_name!\bin;%%PATH%%>> "!tmp_terminal_script!"
 
 REM ctags
 REM ----------------------------------------------------------------------------
@@ -224,7 +226,8 @@ set ctags_download_file=!ctags_download_name!.zip
 set ctags_download_path=!downloads_dir!\!ctags_download_file!
 set ctags_download_url="https://github.com/universal-ctags/ctags-win32/releases/download/!ctags_version!/!ctags_download_file!"
 
-set ctags_dir=!tools_dir!\ctags_win64_!ctags_version!
+set ctags_dir_name=ctags_win64_!ctags_version!
+set ctags_dir=!tools_dir!\!ctags_dir_name!
 set ctags_exe=!ctags_dir!\ctags.exe
 
 if not exist "!ctags_exe!" (
@@ -234,7 +237,7 @@ if not exist "!ctags_exe!" (
     call win_helpers.bat :MoveDir "!ctags_dir!/ctags-!ctags_version!-windows-x86_64" "!ctags_dir!" || exit /B %ERRORLEVEL%
 )
 call win_helpers.bat :FileHashCheck sha256 "!ctags_exe!" "!ctags_exe_sha256!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeBatchShortcut "ctags" "!ctags_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "ctags" "..\!ctags_dir_name!\ctags.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
 
 REM doxygen
 REM ----------------------------------------------------------------------------
@@ -247,7 +250,8 @@ set doxygen_download_file=!doxygen_download_name!.zip
 set doxygen_download_path=!downloads_dir!\!doxygen_download_file!
 set doxygen_download_url="https://www.doxygen.nl/files/!doxygen_download_file!"
 
-set doxygen_dir=!tools_dir!\doxygen_win64_!doxygen_version!
+set doxygen_dir_name=doxygen_win64_!doxygen_version!
+set doxygen_dir=!tools_dir!\!doxygen_dir_name!
 set doxygen_exe=!doxygen_dir!\doxygen.exe
 
 if not exist "!doxygen_exe!" (
@@ -256,7 +260,7 @@ if not exist "!doxygen_exe!" (
     call win_helpers.bat :Unzip "!zip7_exe!" "!doxygen_download_path!" "!doxygen_dir!" || exit /B %ERRORLEVEL%
 )
 call win_helpers.bat :FileHashCheck sha256 "!doxygen_exe!" "!doxygen_exe_sha256!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeBatchShortcut "doxygen" "!doxygen_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "doxygen" "..\!doxygen_dir_name!\doxygen.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
 
 REM Git
 REM ----------------------------------------------------------------------------
@@ -271,7 +275,8 @@ set git_download_url="https://github.com/git-for-windows/git/releases/download/v
 
 REM Do *NOT* use an environment variable named git_dir as this will conflict
 REM with git reading it as the directory to base off all git operations.
-set git_install_dir=!tools_dir!\PortableGit_win64_!git_version!
+set git_install_dir_name=PortableGit_win64_!git_version!
+set git_install_dir=!tools_dir!\!git_install_dir_name!
 set git_exe=!git_install_dir!\cmd\git.exe
 
 if not exist "!git_exe!" (
@@ -283,9 +288,106 @@ if not exist "!git_exe!" (
 call win_helpers.bat :FileHashCheck sha256 "!git_exe!" "!git_exe_sha256!" || exit /B %ERRORLEVEL%
 
 REM Terminal
-echo set PATH=!git_install_dir!\cmd;%%PATH%%>> "!tmp_terminal_script!"
-echo set PATH=!git_install_dir!\mingw64\bin;%%PATH%%>> "!tmp_terminal_script!"
-echo set PATH=!git_install_dir!\usr\bin;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0!git_install_dir_name!\cmd;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0!git_install_dir_name!\mingw64\bin;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0!git_install_dir_name!\usr\bin;%%PATH%%>> "!tmp_terminal_script!"
+
+REM GCC/MinGW for 32/64bit ARM
+REM ----------------------------------------------------------------------------
+set gcc_mingw_arm_version_list=12.2.0 !gcc_mingw_arm_version_list!
+set gcc_mingw_arm_version_list=11.3.0 !gcc_mingw_arm_version_list!
+set gcc_mingw_arm_version_list=10.3.0 !gcc_mingw_arm_version_list!
+
+set gcc_mingw_arm_arch_list=aarch64-none-elf !gcc_mingw_arm_arch_list!
+set gcc_mingw_arm_arch_list=arm-none-eabi !gcc_mingw_arm_arch_list!
+
+for %%a in (%gcc_mingw_arm_version_list%) do (
+    for %%b in (%gcc_mingw_arm_arch_list%) do (
+        set gcc_mingw_arm_version=%%a
+        set gcc_mingw_arm_arch=%%b
+        set gcc_mingw_arm_exe_sha256=none
+
+        if "!gcc_mingw_arm_arch!"=="aarch64-none-elf" (
+            if "!gcc_mingw_arm_version!"=="12.2.0" set gcc_mingw_arm_exe_sha256=A26BAFFA86BC3401790D682F13F9B321EA56153EAE7DD4F332BDE40A6B76FCB3
+            if "!gcc_mingw_arm_version!"=="11.3.0" set gcc_mingw_arm_exe_sha256=47EAEF0E603C9FCAE18F2EFADA305888503E878053119EDE3A9E0B8B8BEAC2EE
+            if "!gcc_mingw_arm_version!"=="10.3.0" set gcc_mingw_arm_exe_sha256=F2B2D3C6DAB0F84A151835540F25E6D6F9442D00BF546BC4C709FAD4B6FDDA06
+        ) else (
+            if "!gcc_mingw_arm_version!"=="12.2.0" set gcc_mingw_arm_exe_sha256=FA48985C43CF82B426C461381E4C50D0AC3E9425F7E97BF116E1BAB4B3A2A388
+            if "!gcc_mingw_arm_version!"=="11.3.0" set gcc_mingw_arm_exe_sha256=A36F2EA6846BADF7C91631F118E88967F25D6E479A9BEEA158445CE75403A655
+            if "!gcc_mingw_arm_version!"=="10.3.0" set gcc_mingw_arm_exe_sha256=C3DC49B561D177B3586992DFEA86067EB8799E1586A7F26CEA5B0EA97926632E
+        )
+
+        set gcc_mingw_arm_download_name=gcc-v!gcc_mingw_arm_version!-!gcc_mingw_arm_arch!
+        set gcc_mingw_arm_download_file=!gcc_mingw_arm_download_name!.7z
+        set gcc_mingw_arm_download_path=!downloads_dir!\!gcc_mingw_arm_download_file!
+        set gcc_mingw_arm_download_url="https://github.com/mmozeiko/build-gcc-arm/releases/download/gcc-v!gcc_mingw_arm_version!/!gcc_mingw_arm_download_file!"
+
+        set gcc_mingw_arm_dir_name=gcc_mingw_arm_win64_!gcc_mingw_arm_version!_!gcc_mingw_arm_arch!
+        set gcc_mingw_arm_dir=!tools_dir!\!gcc_mingw_arm_dir_name!
+        set gcc_mingw_arm_bin_dir=!gcc_mingw_arm_dir!\bin
+        set gcc_mingw_arm_exe=!gcc_mingw_arm_bin_dir!\!gcc_mingw_arm_arch!-g++.exe
+
+        if not exist "!gcc_mingw_arm_exe!" (
+            call win_helpers.bat :DownloadFile "!gcc_mingw_arm_download_url!" "!gcc_mingw_arm_download_path!" || exit /B %ERRORLEVEL%
+            call win_helpers.bat :Unzip "!zip7_exe!" "!gcc_mingw_arm_download_path!" "!gcc_mingw_arm_dir!" || exit /B %ERRORLEVEL%
+            call win_helpers.bat :MoveDir "!gcc_mingw_arm_dir!\gcc-v!gcc_mingw_arm_version!-!gcc_mingw_arm_arch!" !gcc_mingw_arm_dir! || exit /B %ERRORLEVEL%
+        )
+
+        call win_helpers.bat :FileHashCheck sha256 "!gcc_mingw_arm_exe!" "!gcc_mingw_arm_exe_sha256!" || exit /B %ERRORLEVEL%
+        call win_helpers.bat :MakeRelativeBatchShortcut "!gcc_mingw_arm_arch!-gcc-!gcc_mingw_arm_version!" "..\!gcc_mingw_arm_dir_name!\bin\!gcc_mingw_arm_arch!-gcc.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
+        call win_helpers.bat :MakeRelativeBatchShortcut "!gcc_mingw_arm_arch!-g++-!gcc_mingw_arm_version!" "..\!gcc_mingw_arm_dir_name!\bin\!gcc_mingw_arm_arch!-g++.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
+    )
+)
+
+REM GCC+MinGW
+REM ----------------------------------------------------------------------------
+set gcc_version_list=12.2.0 !gcc_version_list!
+set gcc_version_list=11.3.0 !gcc_version_list!
+set gcc_version_list=10.3.0 !gcc_version_list!
+
+for %%a in (%gcc_version_list%) do (
+    set gcc_version=%%a
+    set gcc_mingw_version=none
+    set gcc_exe_sha256=none
+
+    if "!gcc_version!"=="12.2.0" (
+        set gcc_mingw_version=10.0.0
+        set gcc_exe_sha256=886B0F25256DDBD0F4AD09E6E3B81279F9A8B6A1B5C32C714C9C201D802CAA39
+    )
+
+    if "!gcc_version!"=="11.3.0" (
+        set gcc_mingw_version=10.0.0
+        set gcc_exe_sha256=E92ECFA0171F2AB0C3CA39F2121AB5E887B3A378399A4BE7E056820F5841C7A5
+    )
+
+    if "!gcc_version!"=="10.3.0" (
+        set gcc_mingw_version=8.0.0
+        set gcc_exe_sha256=5C93B6DA129EA01EE5FC87D5C7DB948FC3BC62BAE261DED9A883F1FA543571D2
+    )
+
+    set gcc_download_name=gcc-v!gcc_version!-mingw-v!gcc_mingw_version!-x86_64
+    set gcc_download_file=!gcc_download_name!.7z
+    set gcc_download_path=!downloads_dir!\!gcc_download_file!
+    set gcc_download_url="https://github.com/mmozeiko/build-gcc/releases/download/gcc-v!gcc_version!-mingw-v!gcc_mingw_version!/!gcc_download_file!"
+
+    set gcc_dir_name=gcc_!gcc_version!_mingw_!gcc_mingw_version!_win64
+    set gcc_dir=!tools_dir!\!gcc_dir_name!
+    set gcc_bin_dir=!gcc_dir!\bin
+    set gcc_exe=!gcc_bin_dir!\g++.exe
+
+    if not exist "!gcc_exe!" (
+        call win_helpers.bat :DownloadFile "!gcc_download_url!" "!gcc_download_path!" || exit /B %ERRORLEVEL%
+        call win_helpers.bat :Unzip "!zip7_exe!" "!gcc_download_path!" "!gcc_dir!" || exit /B %ERRORLEVEL%
+        call win_helpers.bat :MoveDir "!gcc_dir!\gcc-v!gcc_version!-mingw-v!gcc_mingw_version!-x86_64" !gcc_dir! || exit /B %ERRORLEVEL%
+    )
+
+    call win_helpers.bat :FileHashCheck sha256 "!gcc_exe!" "!gcc_exe_sha256!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MakeRelativeBatchShortcut "gcc-!gcc_version!" "..\!gcc_dir_name!\bin\gcc.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MakeRelativeBatchShortcut "g++-!gcc_version!" "..\!gcc_dir_name!\bin\g++.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
+)
+
+REM Terminal
+echo set PATH=%%~dp0!gcc_dir_name!\bin;%%PATH%%>> "!tmp_terminal_script!"
 
 REM LLVM/Clang
 REM ----------------------------------------------------------------------------
@@ -311,7 +413,8 @@ for %%a in (%llvm_version_list%) do (
     set llvm_download_path=!downloads_dir!\!llvm_download_file!
     set llvm_download_url="https://github.com/llvm/llvm-project/releases/download/llvmorg-!llvm_version!/!llvm_download_file!"
 
-    set llvm_dir=!tools_dir!\llvm_win64_!llvm_version!
+    set llvm_dir_name=llvm_win64_!llvm_version!
+    set llvm_dir=!tools_dir!\!llvm_dir_name!
     set llvm_bin_dir=!llvm_dir!\bin
     set llvm_exe=!llvm_bin_dir!\clang.exe
 
@@ -332,9 +435,9 @@ for %%a in (%llvm_version_list%) do (
     )
 
     call win_helpers.bat :FileHashCheck sha256 "!llvm_exe!" "!llvm_exe_sha256!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :MakeBatchShortcut "clang-!llvm_version!" "!llvm_bin_dir!\clang.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :MakeBatchShortcut "clang++-!llvm_version!" "!llvm_bin_dir!\clang++.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :MakeBatchShortcut "clang-cl-!llvm_version!" "!llvm_bin_dir!\clang-cl.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MakeRelativeBatchShortcut "clang-!llvm_version!"    "..\!llvm_dir_name!\bin\clang.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MakeRelativeBatchShortcut "clang++-!llvm_version!"  "..\!llvm_dir_name!\bin\clang++.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MakeRelativeBatchShortcut "clang-cl-!llvm_version!" "..\!llvm_dir_name!\bin\clang-cl.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
 )
 
 REM Clang Format
@@ -342,7 +445,7 @@ set clang_format=!home_dir!\clang-format.py
 call win_helpers.bat :OverwriteCopy "!llvm_dir!\share\clang\clang-format.py" "!clang_format!" || exit /B %ERRORLEVEL%
 
 REM Terminal
-echo set PATH=!llvm_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0!llvm_dir_name!\bin;%%PATH%%>> "!tmp_terminal_script!"
 
 REM MinGW64
 REM ------------------------------------------------------------------------
@@ -355,7 +458,8 @@ set mingw_download_file=!mingw_download_name!.7z
 set mingw_download_path=!downloads_dir!\!mingw_download_file!
 set mingw_download_url="https://sourceforge.net/projects/mingw-w64/files/Toolchains targetting Win64/Personal Builds/mingw-builds/!mingw_version!/threads-posix/seh/!mingw_download_file!\"
 
-set mingw_dir=!tools_dir!\mingw64-posix-seg-rt_v6-rev0_win64_!mingw_version!
+set mingw_dir_name=mingw64-posix-seg-rt_v6-rev0_win64_!mingw_version!
+set mingw_dir=!tools_dir!\!mingw_dir_name!
 set mingw_bin_dir=!mingw_dir!\bin
 set mingw_exe=!mingw_bin_dir!\gcc.exe
 
@@ -368,9 +472,6 @@ if not exist "!mingw_exe!" (
 
 call win_helpers.bat :FileHashCheck sha256 "!mingw_exe!" "!mingw_exe_sha256!" || exit /B %ERRORLEVEL%
 
-REM Terminal
-echo set PATH=!mingw_bin_dir!;%%PATH%%>> "!tmp_terminal_script!"
-
 REM ninja
 REM ----------------------------------------------------------------------------
 set ninja_sha256=bbde850d247d2737c5764c927d1071cbb1f1957dcabda4a130fa8547c12c695f
@@ -382,7 +483,8 @@ set ninja_download_file=!ninja_download_name!.zip
 set ninja_download_path=!downloads_dir!\!ninja_download_file!
 set ninja_download_url="https://github.com/ninja-build/ninja/releases/download/v!ninja_version!/!ninja_download_file!"
 
-set ninja_dir=!tools_dir!\ninja_win64_!ninja_version!
+set ninja_dir_name=ninja_win64_!ninja_version!
+set ninja_dir=!tools_dir!\!ninja_dir_name!
 set ninja_exe=!ninja_dir!\ninja.exe
 
 if not exist "!ninja_exe!" (
@@ -392,7 +494,7 @@ if not exist "!ninja_exe!" (
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!ninja_exe!" "!ninja_exe_sha256!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeBatchShortcut "ninja" "!ninja_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "ninja" "..\!ninja_dir_name!\ninja.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
 
 REM nodejs
 REM ----------------------------------------------------------------------------
@@ -405,7 +507,8 @@ set nodejs_download_file=!nodejs_download_name!.7z
 set nodejs_download_path=!downloads_dir!\!nodejs_download_file!
 set nodejs_download_url="https://nodejs.org/dist/v!nodejs_version!/!nodejs_download_file!"
 
-set nodejs_dir=!tools_dir!\nodejs_win64_!nodejs_version!
+set nodejs_dir_name=nodejs_win64_!nodejs_version!
+set nodejs_dir=!tools_dir!\!nodejs_dir_name!
 set nodejs_exe=!nodejs_dir!\node.exe
 
 if not exist "!nodejs_exe!" (
@@ -418,7 +521,7 @@ if not exist "!nodejs_exe!" (
 call win_helpers.bat :FileHashCheck sha256 "!nodejs_exe!" "!nodejs_exe_sha256!" || exit /B %ERRORLEVEL%
 
 REM Terminal
-echo set PATH=!nodejs_dir!;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0!nodejs_dir_name!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM Python
 REM ----------------------------------------------------------------------------
@@ -436,7 +539,8 @@ set python_download_file=!python_download_name!.tar.gz
 set python_download_path=!downloads_dir!\!python_download_file!
 set python_download_url="https://github.com/indygreg/python-build-standalone/releases/download/!python_date!/!python_download_file!"
 
-set python_dir=!tools_dir!\cpython_win64_!python_version_and_date!
+set python_dir_name=cpython_win64_!python_version_and_date!
+set python_dir=!tools_dir!\!python_dir_name!
 set python_exe=!python_dir!\python.exe
 
 if not exist "!python_exe!" (
@@ -450,8 +554,8 @@ if not exist "!python_exe!" (
 call win_helpers.bat :FileHashCheck sha256 "!python_exe!" "!python_exe_sha256!" || exit /B %ERRORLEVEL%
 
 REM Terminal
-echo set PYTHONHOME=!python_dir!>> "!tmp_terminal_script!"
-echo set PATH=!python_dir!;%%PATH%%>> "!tmp_terminal_script!"
+echo set PYTHONHOME=%%~dp0!python_dir_name!>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0!python_dir_name!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM RenderDoc
 REM ----------------------------------------------------------------------------
@@ -510,7 +614,8 @@ set zig_download_file=!zig_download_name!.zip
 set zig_download_path=!downloads_dir!\!zig_download_file!
 set zig_download_url="https://ziglang.org/download/!zig_version!/!zig_download_file!"
 
-set zig_dir=!tools_dir!\zig_win64_!zig_version!
+set zig_dir_name=zig_win64_!zig_version!
+set zig_dir=!tools_dir!\!zig_dir_name!
 set zig_exe=!zig_dir!\zig.exe
 
 if not exist "!zig_exe!" (
@@ -521,15 +626,16 @@ if not exist "!zig_exe!" (
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!zig_exe!" "!zig_exe_sha256!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeBatchShortcut "zig" "!zig_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeBatchShortcut "zig-!zig_version!" "!zig_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "zig"               "..\!zig_dir_name!\zig.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "zig-!zig_version!" "..\!zig_dir_name!\zig.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
 
 REM MSVC
 REM ----------------------------------------------------------------------------
 REM This depends on python, so it must be installed after it.
 set msvc_version=14.32
 set msvc_sdk_version=22621
-set msvc_dir=!tools_dir!\msvc_win64_!msvc_version!_win10_sdk_!msvc_sdk_version!
+set msvc_dir_name=msvc_win64_!msvc_version!_win10_sdk_!msvc_sdk_version!
+set msvc_dir=!tools_dir!\!msvc_dir_name!
 if not exist "!msvc_dir!" (
     call "!python_exe!" !installer_dir!\win_portable-msvc.py --accept-license --msvc-version !msvc_version! --sdk-version !msvc_sdk_version! || exit /B %ERRORLEVEL%
     call win_helpers.bat :MoveDir "msvc" "!msvc_dir!" || exit /B %ERRORLEVEL%
@@ -540,7 +646,7 @@ REM demand in this script.
 call !msvc_dir!\setup.bat
 
 REM Terminal
-echo call "!msvc_dir!\setup.bat">> "!tmp_terminal_script!"
+echo call "%%~dp0!msvc_dir_name!\setup.bat">> "!tmp_terminal_script!"
 
 REM Symget
 REM ----------------------------------------------------------------------------
@@ -570,8 +676,9 @@ if not exist "!symget_exe!" (
 
 REM Odin
 REM ----------------------------------------------------------------------------
-set odin_git_hash=a0135080b3d5004da6fd3ccc2ef34a7faea54245
-set odin_dir=!tools_dir!\odin_win64
+set odin_git_hash=7fe36de
+set odin_dir_name=odin_win64
+set odin_dir=!tools_dir!\!odin_dir_name!
 set odin_exe=!odin_dir!\odin.exe
 
 if not exist "!odin_dir!" (
@@ -595,7 +702,7 @@ if not exist "!odin_exe!" (
     popd
 )
 
-call win_helpers.bat :MakeBatchShortcut "odin" "!odin_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "odin" "..\!odin_dir_name!\odin.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
 
 REM QoL/Tools
 REM ----------------------------------------------------------------------------
@@ -611,9 +718,9 @@ set clink_download_file=!clink_download_name!.zip
 set clink_download_path=!downloads_dir!\!clink_download_file!
 set clink_download_url="https://github.com/chrisant996/clink/releases/download/v!clink_version!/!clink_download_file!"
 
-set clink_dir=!tools_dir!\clink_win64_!clink_version!
+set clink_dir_name=clink_win64_!clink_version!
+set clink_dir=!tools_dir!\!clink_dir_name!
 set clink_exe=!clink_dir!\clink_x64.exe
-set clink_bat=!clink_dir!\clink.bat
 
 if not exist "!clink_exe!" (
     call win_helpers.bat :DownloadFile "!clink_download_url!" "!clink_download_path!" || exit /B %ERRORLEVEL%
@@ -624,10 +731,11 @@ if not exist "!clink_exe!" (
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!clink_exe!" "!clink_exe_sha256!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeBatchShortcut "clink" "!clink_bat!" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "clink" "..\!clink_dir_name!\clink.bat" "!bin_dir!" || exit /B %ERRORLEVEL%
 
 REM Clink Completion Addon
-set clink_completions_dir=!tools_dir!\clink-completions
+set clink_completions_dir_name=clink-completions
+set clink_completions_dir=!tools_dir!\!clink_completions_dir_name!
 if not exist "!clink_completions_dir!" (
     call !git_exe! clone https://github.com/vladimir-kotikov/clink-completions !clink_completions_dir! || exit /B %ERRORLEVEL%
 )
@@ -635,7 +743,7 @@ call !git_exe! -C !clink_completions_dir! pull origin master || exit /B %ERRORLE
 call !git_exe! -C !clink_completions_dir! checkout 9ab9342 || exit /B %ERRORLEVEL%
 
 REM Terminal Script
-echo set CLINK_PATH=!clink_completions_dir!>> "!tmp_terminal_script!
+echo set CLINK_PATH=%%~dp0!clink_completions_dir_name!>> "!tmp_terminal_script!
 
 REM Dependencies (Walker) - For DLL dependency management
 REM ----------------------------------------------------------------------------
@@ -670,7 +778,8 @@ set everything_download_file=!everything_download_name!.zip
 set everything_download_path=!downloads_dir!\!everything_download_file!
 set everything_download_url="https://www.voidtools.com/!everything_download_file!"
 
-set everything_dir=!tools_dir!\everything_win64_!everything_version!
+set everything_dir_name=everything_win64_!everything_version!
+set everything_dir=!tools_dir!\!everything_dir_name!
 set everything_exe=!everything_dir!\everything.exe
 
 if not exist "!everything_exe!" (
@@ -703,7 +812,7 @@ if not exist "!fzf_exe!" (
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!fzf_exe!" "!fzf_exe_sha256!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeBatchShortcut "fzf" "!fzf_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "fzf" "..\fzf_win64_!fzf_version!.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
 
 REM Terminal
 REM Use FD for FZF to make it ultra fast
@@ -721,7 +830,8 @@ set nvim_download_file=!nvim_download_name!.zip
 set nvim_download_path=!downloads_dir!\!nvim_download_file!
 set nvim_download_url="https://github.com/neovim/neovim/releases/download/v!nvim_version!/!nvim_download_file!"
 
-set nvim_dir=!tools_dir!\nvim_win64_!nvim_version!
+set nvim_dir_name=nvim_win64_!nvim_version!
+set nvim_dir=!tools_dir!\!nvim_dir_name!
 set nvim_exe=!nvim_dir!\bin\nvim.exe
 
 if not exist "!nvim_exe!" (
@@ -732,8 +842,8 @@ if not exist "!nvim_exe!" (
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!nvim_exe!" "!nvim_exe_sha256!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeBatchShortcut "nvim" "!nvim_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeBatchShortcut "nvim-qt" "!nvim_dir!\bin\nvim-qt.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "nvim"    "..\!nvim_dir_name!\bin\nvim.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "nvim-qt" "..\!nvim_dir_name!\bin\nvim-qt.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
 
 REM Neovide
 REM ----------------------------------------------------------------------------
@@ -757,7 +867,7 @@ if not exist "!neovide_exe!" (
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!neovide_exe!" "!neovide_exe_sha256!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeBatchShortcut "neovide" "!neovide_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "neovide" "..\neovide_win64_!neovide_version!.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
 
 REM Vim Configuration
 REM ----------------------------------------------------------------------------
@@ -809,7 +919,8 @@ set keypirinha_download_file=!keypirinha_download_name!.7z
 set keypirinha_download_path=!downloads_dir!\!keypirinha_download_file!
 set keypirinha_download_url="https://github.com/Keypirinha/Keypirinha/releases/download/v!keypirinha_version!/!keypirinha_download_file!"
 
-set keypirinha_dir=!tools_dir!\keypirinha_win64_!keypirinha_version!
+set keypirinha_dir_name=keypirinha_win64_!keypirinha_version!
+set keypirinha_dir=!tools_dir!\!keypirinha_dir_name!
 set keypirinha_exe=!keypirinha_dir!\keypirinha.exe
 
 if not exist "!keypirinha_exe!" (
@@ -898,7 +1009,8 @@ set rg_download_file=!rg_download_name!.zip
 set rg_download_path=!downloads_dir!\!rg_download_file!
 set rg_download_url="https://github.com/BurntSushi/ripgrep/releases/download/!rg_version!/!ripgrep_download_file!"
 
-set rg_dir=!tools_dir!\ripgrep_win64_!rg_version!
+set rg_dir_name=ripgrep_win64_!rg_version!
+set rg_dir=!tools_dir!\!rg_dir_name!
 set rg_exe=!rg_dir!\rg.exe
 
 if not exist "!rg_exe!" (
@@ -911,7 +1023,7 @@ if not exist "!rg_exe!" (
 call win_helpers.bat :FileHashCheck sha256 "!rg_exe!" "!rg_exe_sha256!" || exit /B %ERRORLEVEL%
 
 REM Terminal
-echo set PATH=!rg_dir!;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0!rg_dir_name!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM fd
 REM ----------------------------------------------------------------------------
@@ -924,7 +1036,8 @@ set fd_download_file=!fd_download_name!.zip
 set fd_download_path=!downloads_dir!\!fd_download_file!
 set fd_download_url="https://github.com/sharkdp/fd/releases/download/!fd_version!/!fd_download_file!"
 
-set fd_dir=!tools_dir!\fd_win64_!fd_version!
+set fd_dir_name=fd_win64_!fd_version!
+set fd_dir=!tools_dir!\!fd_dir_name!
 set fd_exe=!fd_dir!\fd.exe
 
 if not exist "!fd_exe!" (
@@ -937,7 +1050,7 @@ if not exist "!fd_exe!" (
 call win_helpers.bat :FileHashCheck sha256 "!fd_exe!" "!fd_exe_sha256!" || exit /B %ERRORLEVEL%
 
 REM Terminal
-echo set PATH=!fd_dir!;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0!fd_dir_name!;%%PATH%%>> "!tmp_terminal_script!"
 
 REM wiztree
 REM ----------------------------------------------------------------------------
@@ -974,7 +1087,8 @@ set geth_download_file=!geth_download_name!.zip
 set geth_download_path=!downloads_dir!\!geth_download_file!
 set geth_download_url="https://gethstore.blob.core.windows.net/builds/!geth_download_file!"
 
-set geth_dir=!tools_dir!\geth_win64_!geth_version!
+set geth_dir_name=geth_win64_!geth_version!
+set geth_dir=!tools_dir!\!geth_dir_name!
 set geth_exe=!geth_dir!\geth.exe
 
 set geth_gpg_key_download_name=geth-windows-amd64-!geth_version!.zip
@@ -996,7 +1110,7 @@ if not exist "!geth_exe!" (
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!geth_exe!" "!geth_exe_sha256!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeBatchShortcut "geth" "!geth_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "geth" "..\!geth_dir_name!\geth.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
 
 REM remix_ide
 REM ----------------------------------------------------------------------------
@@ -1039,13 +1153,13 @@ if not exist "!solidity_exe!" (
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!solidity_exe!" "!solidity_exe_sha256!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeBatchShortcut "solc" "!solidity_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeBatchShortcut "solc-!solidity_version!" "!solidity_exe!" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "solc" "..\solidity_win64_!solidity_version!.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeRelativeBatchShortcut "solc-!solidity_version!" "..\solidity_win64_!solidity_version!.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
 
 REM Finish Terminal Script
 REM ----------------------------------------------------------------------------
-echo if exist "!tools_dir!\win_terminal_user_config.bat" call "!tools_dir!\win_terminal_user_config.bat">> "!tmp_terminal_script!"
-echo start "" /MAX "!wezterm_exe!">> "!tmp_terminal_script!"
+echo if exist "%%~dp0win_terminal_user_config.bat" call "%%~dp0win_terminal_user_config.bat">> "!tmp_terminal_script!"
+echo start "" /MAX "%%~dp0!wezterm_dir_name!\wezterm-gui.exe">> "!tmp_terminal_script!"
 echo exit>> "!tmp_terminal_script!"
 move /Y !tmp_terminal_script! !terminal_script!
 
@@ -1074,8 +1188,8 @@ REM Background Application Scripts
 REM ----------------------------------------------------------------------------
 set bg_app_script=!tools_dir!\win_start_background_apps.bat
 echo @echo off> "!bg_app_script!"
-echo start "" "!everything_dir!\everything.exe">> "!bg_app_script!"
-echo start "" "!keypirinha_dir!\keypirinha.exe">> "!bg_app_script!"
+echo start "" "%%~dp0!everything_dir_name!\everything.exe">> "!bg_app_script!"
+echo start "" "%%~dp0!keypirinha_dir_name!\keypirinha.exe">> "!bg_app_script!"
 
 REM CTags Helper Script
 REM ----------------------------------------------------------------------------

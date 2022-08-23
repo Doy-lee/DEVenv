@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-REM Win Helpers - Version 5
+REM Win Helpers - Version 10
 call %*
 goto exit
 
@@ -103,7 +103,7 @@ robocopy "!src!" "!dest!" /E /MOVE /MT /NP /NJS /NS /NC /NFL /NDL
 exit /B 0
 
 :MakeBatchShortcut
-REM call win_helpers.bat :MakeBatchShortcut <name> <src> <dest_dir>
+REM call win_helpers.bat :MakeBatchShortcut <name> <exe> <dest_dir>
 REM ------------------------------------------------------------------------------------------------
 REM NOTE we make a batch file instead of a symlink because symlinks require
 REM admin privileges in windows ...
@@ -112,18 +112,42 @@ set executable=%~2
 set dest_dir=%~3
 
 if not exist "!executable!" (
-    echo - [MakeBatchShortcut] Executable for shortcut does not exist [executable=%executable%]
-    exit /B %ERRORLEVEL%
+    echo - [MakeBatchShortcut] Executable for shortcut does not exist [exe=%executable%]
+    exit /B 1
 )
 
 if not exist "!dest_dir!" (
     echo - [MakeBatchShortcut] Shortcut destination directory does not exist [dir=%dest_dir%]
-    exit /B %ERRORLEVEL%
+    exit /B 1
 )
 
 echo - [MakeBatchShortcut] Create [name=!name!, exe=!executable!, dest=!dest_dir!]
 echo @echo off> "!dest_dir!\!name!.bat"
 echo !executable! %%*>> "!dest_dir!\!name!.bat"
+exit /B 0
+
+:MakeRelativeBatchShortcut
+REM call win_helpers.bat :MakeRelativeBatchShortcut <name> <exe> <dest_dir>
+REM ------------------------------------------------------------------------------------------------
+REM NOTE we make a batch file instead of a symlink because symlinks require
+REM admin privileges in windows ...
+set name=%~1
+set executable=%~2
+set dest_dir=%~3
+
+if not exist "!dest_dir!\!executable!" (
+    echo - [MakeRelativeBatchShortcut] Executable for shortcut does not exist [exe=!dest_dir!\%executable%]
+    exit /B 1
+)
+
+if not exist "!dest_dir!" (
+    echo - [MakeRelativeBatchShortcut] Shortcut destination directory does not exist [dir=%dest_dir%]
+    exit /B 1
+)
+
+echo - [MakeRelativeBatchShortcut] Create [name=!name!, exe=!dest_dir!\!executable!, dest=!dest_dir!]
+echo @echo off> "!dest_dir!\!name!.bat"
+echo %%~dp0!executable! %%*>> "!dest_dir!\!name!.bat"
 exit /B 0
 
 :exit
