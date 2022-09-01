@@ -5,6 +5,7 @@ call plug#begin(stdpath('config') . '/plugged')
     " vim-dispatch allows running async jobs in vim (i.e. builds in the background)
     Plug 'https://github.com/scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
     Plug 'https://github.com/tpope/vim-dispatch'
+    Plug 'https://github.com/tpope/vim-fugitive'
 
     " TODO: 2022-06-19 Treesitter is too slow on large C++ files
     " Plug 'https://github.com/nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
