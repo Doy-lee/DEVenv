@@ -128,13 +128,32 @@ cp "${installer_dir}/unix_gcc_dockerfile" "${gcc_dir}/Dockerfile"
 
 cd "${gcc_dir}" || exit
     for gcc_version in ${gcc_version_list[@]}; do
-        gcc_bin_dir=${gcc_dir}/gcc-mostlyportable-${gcc_version}/bin
+        gcc_root_dir=${gcc_dir}/gcc-mostlyportable-${gcc_version}
+        gcc_bin_dir=${gcc_root_dir}/bin
         if [[ ! -f "${gcc_bin_dir}/g++" ]]; then
             ./build.sh ${gcc_version} || exit
         fi
+
+        # Symbolic link the versioned gcc executables
         ln --symbolic --force --relative ${gcc_bin_dir}/g++ ${bin_dir}/g++-${gcc_version} || exit
         ln --symbolic --force --relative ${gcc_bin_dir}/gcc ${bin_dir}/gcc-${gcc_version} || exit
+
+        # Create script that setups the environment path for building with a versioned GCC
+        gcc_script_name=g++-${gcc_version}-vars.sh
+        gcc_script_path=${gcc_dir}/${gcc_script_name}
+
+        echo "gcc_mostlyportable_dir=\"${gcc_root_dir}\" \\" > ${gcc_script_path}
+        echo "PATH=\${gcc_mostlyportable_dir}/bin:\${PATH} \\" >> ${gcc_script_path}
+        echo "LD_LIBRARY_PATH=\${gcc_mostlyportable_dir}/lib:\${LD_LIBRARY_PATH} \\" >> ${gcc_script_path}
+        echo "LD_LIBRARY_PATH=\${gcc_mostlyportable_dir}/lib64:\${LD_LIBRARY_PATH} \\" >> ${gcc_script_path}
+        echo "\$@" >> ${gcc_script_path}
+
+        chmod +x ${gcc_script_path}
+
+        # Symbolic link the script to load the GCC environment
+        ln --symbolic --force --relative ${gcc_script_path} ${bin_dir}/gcc-${gcc_version}-vars.sh || exit
     done
+
     ln --symbolic --force --relative "${gcc_bin_dir}/g++" "${bin_dir}/g++" || exit
     ln --symbolic --force --relative "${gcc_bin_dir}/gcc" "${bin_dir}/gcc" || exit
 cd "${root_dir}" || exit
