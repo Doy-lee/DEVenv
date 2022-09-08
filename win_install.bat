@@ -474,9 +474,9 @@ call win_helpers.bat :FileHashCheck sha256 "!mingw_exe!" "!mingw_exe_sha256!" ||
 
 REM ninja
 REM ----------------------------------------------------------------------------
-set ninja_sha256=bbde850d247d2737c5764c927d1071cbb1f1957dcabda4a130fa8547c12c695f
-set ninja_exe_sha256=6a71c03f88897419f19548a8eadd941ed94144bb671be289822080f991c1ab79
-set ninja_version=1.10.2
+set ninja_sha256=524B344A1A9A55005EAF868D991E090AB8CE07FA109F1820D40E74642E289ABC
+set ninja_exe_sha256=23E7D60C17B3FCD42D9C00D49ECA3C3771B04D7CCB13E49836B06B34E20211C7
+set ninja_version=1.11.1
 
 set ninja_download_name=ninja-win
 set ninja_download_file=!ninja_download_name!.zip
@@ -847,9 +847,9 @@ call win_helpers.bat :MakeRelativeBatchShortcut "nvim-qt" "..\!nvim_dir_name!\bi
 
 REM Neovide
 REM ----------------------------------------------------------------------------
-set neovide_sha256=D1DE20E0FCBF68CB4D85CD6F15691DFB77848DAFB97519F8E67E3036A2A7927D
-set neovide_exe_sha256=C0F6ED7ED8BAC4EE910267FA785DA698A581004EA45838BE401E3FBA18DD3234
-set neovide_version=0.9.0
+set neovide_sha256=944E75545F8FAE08AE42FDB0D2073F699C7ED209EC02B2BEDF062377C0929456
+set neovide_exe_sha256=2808A6719241407AA956044DF553D6008C6D8DB3BB00D24B50893F03978E07CF
+set neovide_version=0.10.1
 
 set neovide_download_name=neovide-windows
 set neovide_download_file=!neovide_download_name!.zip
