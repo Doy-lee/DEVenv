@@ -632,7 +632,7 @@ call win_helpers.bat :MakeRelativeBatchShortcut "zig-!zig_version!" "..\!zig_dir
 REM MSVC
 REM ----------------------------------------------------------------------------
 REM This depends on python, so it must be installed after it.
-set msvc_version=14.32
+set msvc_version=14.33
 set msvc_sdk_version=22621
 set msvc_dir_name=msvc_win64_!msvc_version!_win10_sdk_!msvc_sdk_version!
 set msvc_dir=!tools_dir!\!msvc_dir_name!
