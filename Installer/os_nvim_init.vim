@@ -99,6 +99,85 @@ lua <<EOF
     signs = false,
   })
 
+  -- Check if there were args (i.e. opened file), non-empty buffer, or started in insert mode
+  if vim.fn.argc() == 0 or vim.fn.line2byte("$") ~= -1 and not opt.insertmode then
+    local ascii = {
+        "",
+        "  Useful Bindings (Normal Mode)",
+        "  --------------------------------------------------",
+        "  <ctrl+n>  to open the file tree explorer",
+        "  <ctrl+i>  clang format selected lines",
+        "  <ctrl+j>  jump to next compilation error",
+        "  <ctrl+k>  jump to prev compilation error",
+        "  <cd>      change working directory to current file",
+        "  <\\s>      split buffer vertically",
+        "  ",
+        "  Telescope Bindings (Normal Mode)",
+        "  --------------------------------------------------",
+        "  <\\te>     open telescope menu",
+        "  <\\ta>     search for symbol via tags",
+        "  <\\f>      search for file",
+        "  <\\g>      search for text",
+        "  <\\b>      search for buffer",
+        "  <\\h>      search VIM help menu",
+        "  ",
+        "  LSP Bindings (Normal Mode)",
+        "  --------------------------------------------------",
+        "  <gD>      on (applicable) symbol, jump to declaration",
+        "  <gd>      on (applicable) symbol, jump to definition",
+        "  <gt>      on (applicable) symbol, jump to type definition",
+        "  <gr>      on (applicable) symbol, show caller references",
+        "  <gf>      on (applicable) symbol, search available symbols",
+        "  <ga>      on (applicable) symbol, show code-actions prompt",
+        "  <gR>      on (applicable) symbol, code-aware symbol rename",
+        "  <gs>      on (applicable) symbol, show signature help",
+        "  <shift+k> on (applicable) symbol, show documentation",
+        "  <space+e> on red underlined symbol error, show error message",
+        "  <alt+n>   jump to next LSP error",
+        "  <alt+n>   jump to prev LSP error",
+    }
+
+    local height = vim.api.nvim_get_option("lines")
+    local width = vim.api.nvim_get_option("columns")
+    local ascii_rows = #ascii
+    local ascii_cols = #ascii[1]
+    local win = vim.api.nvim_get_current_win()
+    local buf = vim.api.nvim_create_buf(true, true)
+
+    local function reset_start_screen()
+        vim.cmd("enew")
+        local buf = vim.api.nvim_get_current_buf()
+        local win = vim.api.nvim_get_current_win()
+        vim.api.nvim_buf_set_option(buf, "modifiable", true)
+        vim.api.nvim_buf_set_option(buf, "buflisted", true)
+        vim.api.nvim_buf_set_option(buf, "buflisted", true)
+        vim.api.nvim_win_set_option(win, "colorcolumn", "80,100")
+        vim.api.nvim_win_set_option(win, "relativenumber", true)
+        vim.api.nvim_win_set_option(win, "number", true)
+        vim.api.nvim_win_set_option(win, "list", true)
+    end
+
+    -- Only display if there is enough space
+    if height >= ascii_rows and width >= ascii_cols then
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, ascii)
+      vim.api.nvim_buf_set_option(buf, "modified", false)
+      vim.api.nvim_buf_set_option(buf, "buflisted", false)
+      vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
+      vim.api.nvim_buf_set_option(buf, "buftype", "nofile")
+      vim.api.nvim_buf_set_option(buf, "swapfile", false)
+      vim.api.nvim_win_set_option(win, "colorcolumn", "")
+      vim.api.nvim_win_set_option(win, "relativenumber", false)
+      vim.api.nvim_win_set_option(win, "number", false)
+      vim.api.nvim_win_set_option(win, "list", false)
+      vim.api.nvim_set_current_buf(buf)
+
+      vim.api.nvim_create_autocmd("InsertEnter,WinEnter", {
+          pattern = "<buffer>",
+          callback = reset_start_screen,
+      })
+    end
+  end
+
   -- LSP Setup
   -- ===========================================================================
   -- Load the additional capabilities supported by nvim-cmp
