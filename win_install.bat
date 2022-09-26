@@ -496,6 +496,11 @@ if not exist "!ninja_exe!" (
 call win_helpers.bat :FileHashCheck sha256 "!ninja_exe!" "!ninja_exe_sha256!" || exit /B %ERRORLEVEL%
 call win_helpers.bat :MakeRelativeBatchShortcut "ninja" "..\!ninja_dir_name!\ninja.exe" "!bin_dir!" || exit /B %ERRORLEVEL%
 
+REM Terminal
+REM NOTE: We directly link to the ninja directory because CMake struggles to
+REM find ninja if not.
+echo set PATH=%%~dp0!ninja_dir_name!;%%PATH%%>> "!tmp_terminal_script!"
+
 REM nodejs
 REM ----------------------------------------------------------------------------
 set nodejs_sha256=f7b0e8b0bfcfad7d62eba16fa4db9f085983c12c661bd4c66d8e3bd783befa65
