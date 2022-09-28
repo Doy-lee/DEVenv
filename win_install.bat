@@ -1030,6 +1030,30 @@ call win_helpers.bat :FileHashCheck sha256 "!rg_exe!" "!rg_exe_sha256!" || exit 
 REM Terminal
 echo set PATH=%%~dp0!rg_dir_name!;%%PATH%%>> "!tmp_terminal_script!"
 
+REM sioyek (PDF Viewer)
+REM ----------------------------------------------------------------------------
+set sioyek_sha256=B9C1C02DDA4932E488DB6AA08417854FBA436B492C7261C6CF04AE2AF0329F66
+set sioyek_exe_sha256=A30306931FC5E97DAF72CF9A82C2DA1D994392CDBD5DF5C7F0D56C26FFC3A33E
+set sioyek_version=1.5.0
+
+set sioyek_download_name=sioyek-release-windows-portable
+set sioyek_download_file=!sioyek_download_name!.zip
+set sioyek_download_path=!downloads_dir!\!sioyek_download_file!
+set sioyek_download_url="https://github.com/ahrm/sioyek/releases/download/v1.5.0/sioyek-release-windows-portable.zip"
+
+set sioyek_dir_name=sioyek_win64_!sioyek_version!
+set sioyek_dir=!tools_dir!\!sioyek_dir_name!
+set sioyek_exe=!sioyek_dir!\sioyek.exe
+
+if not exist "!sioyek_exe!" (
+    call win_helpers.bat :DownloadFile "!sioyek_download_url!" "!sioyek_download_path!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :FileHashCheck sha256 "!sioyek_download_path!" "!sioyek_sha256!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :Unzip "!zip7_exe!" "!sioyek_download_path!" "!sioyek_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!sioyek_dir!\sioyek-release-windows" "!sioyek_dir!" || exit /B %ERRORLEVEL%
+)
+
+call win_helpers.bat :FileHashCheck sha256 "!sioyek_exe!" "!sioyek_exe_sha256!" || exit /B %ERRORLEVEL%
+
 REM fd
 REM ----------------------------------------------------------------------------
 set fd_sha256=F21BC26C1AB6BDBE4FE43F87A20C792D4ABE629AE97C6F42B25AC8A042F5521F
