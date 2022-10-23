@@ -151,10 +151,6 @@ lua <<EOF
         vim.api.nvim_buf_set_option(buf, "modifiable", true)
         vim.api.nvim_buf_set_option(buf, "buflisted", true)
         vim.api.nvim_buf_set_option(buf, "buflisted", true)
-        vim.api.nvim_win_set_option(win, "colorcolumn", "80,100")
-        vim.api.nvim_win_set_option(win, "relativenumber", true)
-        vim.api.nvim_win_set_option(win, "number", true)
-        vim.api.nvim_win_set_option(win, "list", true)
     end
 
     -- Only display if there is enough space
@@ -165,10 +161,6 @@ lua <<EOF
       vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
       vim.api.nvim_buf_set_option(buf, "buftype", "nofile")
       vim.api.nvim_buf_set_option(buf, "swapfile", false)
-      vim.api.nvim_win_set_option(win, "colorcolumn", "")
-      vim.api.nvim_win_set_option(win, "relativenumber", false)
-      vim.api.nvim_win_set_option(win, "number", false)
-      vim.api.nvim_win_set_option(win, "list", false)
       vim.api.nvim_set_current_buf(buf)
 
       vim.api.nvim_create_autocmd("InsertEnter,WinEnter", {
