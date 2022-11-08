@@ -264,14 +264,14 @@ call win_helpers.bat :MakeRelativeBatchShortcut "doxygen" "..\!doxygen_dir_name!
 
 REM Git
 REM ----------------------------------------------------------------------------
-set git_sha256=bc030848e282d49e562ae2392a72501cf539322ad06ffe4cea8cf766f148dfe8
-set git_exe_sha256=ae463cad04c2b15fc91de68ab096933ec08c44752e205aebd7d64c3a482df62d
-set git_version=2.33.0
+set git_sha256=cdcdb268aaed1dd2ac33d1dfdaf105369e3d7bd8d84d641d26d30b34e706b843
+set git_exe_sha256=6C4DBB77D05CA5C482CE3782255F56BB904445809F1DF3B655E2505EAC7FA0B2
+set git_version=2.38.1
 
-set git_download_name=PortableGit-!git_version!.2-64-bit.7z
+set git_download_name=PortableGit-!git_version!-64-bit.7z
 set git_download_file=!git_download_name!.exe
 set git_download_path=!downloads_dir!\!git_download_file!
-set git_download_url="https://github.com/git-for-windows/git/releases/download/v!git_version!.windows.2/!git_download_file!"
+set git_download_url="https://github.com/git-for-windows/git/releases/download/v!git_version!.windows.1/!git_download_file!"
 
 REM Do *NOT* use an environment variable named git_dir as this will conflict
 REM with git reading it as the directory to base off all git operations.
