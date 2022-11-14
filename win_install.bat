@@ -681,7 +681,7 @@ if not exist "!symget_exe!" (
 
 REM Odin
 REM ----------------------------------------------------------------------------
-set odin_git_hash=7fe36de
+set odin_git_hash=7fe36de0
 set odin_dir_name=odin_win64
 set odin_dir=!tools_dir!\!odin_dir_name!
 set odin_exe=!odin_dir!\odin.exe
@@ -696,6 +696,7 @@ for /F "tokens=1 USEBACKQ" %%F IN (`"!git_exe!" -C !odin_dir! rev-parse --short 
 set odin_curr_git_hash=!odin_curr_git_hash:~0,-1!
 
 if "!odin_curr_git_hash!" neq "!odin_git_hash!" (
+    echo - [Git] Required hash changed, rebuilding [curr="!odin_curr_git_hash!", req="!odin_git_hash!"]
     call "!git_exe!" -C "!odin_dir!" pull origin master || exit /B %ERRORLEVEL%
     call "!git_exe!" -C "!odin_dir!" checkout "!odin_git_hash!" || exit /B %ERRORLEVEL%
     if exist "!odin_exe!" del /F "!odin_exe!"
@@ -739,13 +740,24 @@ call win_helpers.bat :FileHashCheck sha256 "!clink_exe!" "!clink_exe_sha256!" ||
 call win_helpers.bat :MakeRelativeBatchShortcut "clink" "..\!clink_dir_name!\clink.bat" "!bin_dir!" || exit /B %ERRORLEVEL%
 
 REM Clink Completion Addon
+set clink_completions_git_hash=fa18736
 set clink_completions_dir_name=clink-completions
 set clink_completions_dir=!tools_dir!\!clink_completions_dir_name!
 if not exist "!clink_completions_dir!" (
     call !git_exe! clone https://github.com/vladimir-kotikov/clink-completions !clink_completions_dir! || exit /B %ERRORLEVEL%
 )
-call !git_exe! -C !clink_completions_dir! pull origin master || exit /B %ERRORLEVEL%
-call !git_exe! -C !clink_completions_dir! checkout 9ab9342 || exit /B %ERRORLEVEL%
+
+REM Extract current git hash of the repository. Remove the last character as
+REM rev-parse has a trailing whitespace.
+for /F "tokens=1 USEBACKQ" %%F IN (`"!git_exe!" -C !clink_completions_dir! rev-parse --short HEAD`) do ( SET clink_completions_curr_git_hash=%%F )
+set clink_completions_curr_git_hash=!clink_completions_curr_git_hash:~0,-1!
+
+if "!clink_completions_curr_git_hash!" neq "!clink_completions_git_hash!" (
+    echo - [Git] Required hash changed, rebuilding [curr="!clink_completions_curr_git_hash!", req="!clink_completions_git_hash!"]
+    call "!git_exe!" -C "!clink_completions_dir!" pull origin master || exit /B %ERRORLEVEL%
+    call "!git_exe!" -C "!clink_completions_dir!" checkout "!clink_completions_git_hash!" || exit /B %ERRORLEVEL%
+)
+
 
 REM Terminal Script
 echo set CLINK_PATH=%%~dp0!clink_completions_dir_name!>> "!tmp_terminal_script!
@@ -823,6 +835,56 @@ REM Terminal
 REM Use FD for FZF to make it ultra fast
 echo set FZF_DEFAULT_OPTS=--multi --layout=reverse>> "!tmp_terminal_script!"
 echo set FZF_DEFAULT_COMMAND=fd --unrestricted>> "!tmp_terminal_script!"
+
+REM jpegview
+REM ----------------------------------------------------------------------------
+set jpegview_sha256=82BA6F84A7D7C88C655253ACB41FFED9E8667CF1F3AC9573836952C08C4DC82C
+set jpegview_exe_sha256=1FFE58601AB160C57D01823FAC8BFEB36C1BFD782E6F60ADFA57EED6240B09B3
+set jpegview_version=1.0.40
+
+set jpegview_download_name=JPEGView_!jpegview_version!
+set jpegview_download_file=!jpegview_download_name!.7z
+set jpegview_download_path=!downloads_dir!\!jpegview_download_file!
+set jpegview_download_url="https://github.com/sylikc/jpegview/releases/download/v!jpegview_version!/!jpegview_download_file!"
+
+set jpegview_dir_name=jpegview_win64_!jpegview_version!
+set jpegview_dir=!tools_dir!\!jpegview_dir_name!
+set jpegview_exe=!jpegview_dir!\JPEGView.exe
+
+if not exist "!jpegview_exe!" (
+    call win_helpers.bat :DownloadFile "!jpegview_download_url!" "!jpegview_download_path!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :FileHashCheck sha256 "!jpegview_download_path!" "!jpegview_sha256!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :Unzip "!zip7_exe!" "!jpegview_download_path!" "!jpegview_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :MoveDir "!jpegview_dir!\JPEGView64" "!jpegview_dir!" || exit /B %ERRORLEVEL%
+    rmdir /s /q "!jpegview_dir!\JPEGView32" || exit /B %ERRORLEVEL%
+    del "!jpegview_dir!\HowToInstall.txt" "!jpegview_dir!\HowToInstall_ru.txt" || exit /B %ERRORLEVEL%
+)
+
+call win_helpers.bat :FileHashCheck sha256 "!jpegview_exe!" "!jpegview_exe_sha256!" || exit /B %ERRORLEVEL%
+
+REM mpc_qt
+REM ----------------------------------------------------------------------------
+set mpc_qt_sha256=2230c4f4de1a429ccc67e5c590efc0a86fbaffeb33a4dc5f391aa45e660b80c2
+set mpc_qt_exe_sha256=d7ee46b0d4a61a26f8acd5d5fd4da2d252d6bc80c5cab6a55db06e853f2acefb
+set mpc_qt_version=22.02
+set mpc_qt_version_no_dot=2202
+
+set mpc_qt_download_name=mpc-qt-win-x64-!mpc_qt_version_no_dot!
+set mpc_qt_download_file=!mpc_qt_download_name!.zip
+set mpc_qt_download_path=!downloads_dir!\!mpc_qt_download_file!
+set mpc_qt_download_url="https://github.com/mpc-qt/mpc-qt/releases/download/v!mpc_qt_version!/!mpc_qt_download_file!"
+
+set mpc_qt_dir_name=mpc-qt_win64_!mpc_qt_version!
+set mpc_qt_dir=!tools_dir!\!mpc_qt_dir_name!
+set mpc_qt_exe=!mpc_qt_dir!\mpc-qt.exe
+
+if not exist "!mpc_qt_exe!" (
+    call win_helpers.bat :DownloadFile "!mpc_qt_download_url!" "!mpc_qt_download_path!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :FileHashCheck sha256 "!mpc_qt_download_path!" "!mpc_qt_sha256!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :Unzip "!zip7_exe!" "!mpc_qt_download_path!" "!mpc_qt_dir!" || exit /B %ERRORLEVEL%
+)
+
+call win_helpers.bat :FileHashCheck sha256 "!mpc_qt_exe!" "!mpc_qt_exe_sha256!" || exit /B %ERRORLEVEL%
 
 REM NVIM
 REM ----------------------------------------------------------------------------
