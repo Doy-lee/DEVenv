@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-REM Win Helpers - Version 10
+REM Win Helpers - Version 11
 call %*
 goto exit
 
@@ -148,6 +148,56 @@ if not exist "!dest_dir!" (
 echo - [MakeRelativeBatchShortcut] Create [name=!name!, exe=!dest_dir!\!executable!, dest=!dest_dir!]
 echo @echo off> "!dest_dir!\!name!.bat"
 echo %%~dp0!executable! %%*>> "!dest_dir!\!name!.bat"
+exit /B 0
+
+:MakeFileHardLink
+REM call win_helpers.bat :MakeFileHardLink dest src
+REM ------------------------------------------------------------------------------------------------
+set dest=%~1
+set src=%~2
+if not exist "!src!" (
+    echo - [MakeFileHardLink] Source file does not exist [src=!src!]
+    exit /B 1
+)
+
+if exist "%dest%" (
+    del "!dest!"
+    if exist "!dest!" (
+        echo - [MakeFileHardLink] Failed to delete destination file [dest=!dest!]
+        exit /B 1
+    )
+)
+
+mklink /H "!dest!" "!src!"
+if not exist "!dest!" (
+    echo - [MakeFileHardLink] Failed to make hard link at dest [src=!src!, dest=!dest!]
+    exit /B 1
+)
+exit /B 0
+
+:MakeDirHardLink
+REM call win_helpers.bat :MakeDirHardLink dest src
+REM ------------------------------------------------------------------------------------------------
+set dest=%~1
+set src=%~2
+if not exist "!src!" (
+    echo - [MakeDirHardLink] Source file does not exist [src=!src!]
+    exit /B 1
+)
+
+if exist "%dest%" (
+    rmdir /S /Q "!dest!"
+    if exist "!dest!" (
+        echo - [MakeDirHardLink] Failed to delete destination dir [dest=!dest!]
+        exit /B 1
+    )
+)
+
+mklink /J "!dest!" "!src!"
+if not exist "!dest!" (
+    echo - [MakeDirHardLink] Failed to make hard link at dest [src=!src!, dest=!dest!]
+    exit /B 1
+)
 exit /B 0
 
 :exit
