@@ -19,12 +19,23 @@ if not exist !bin_dir! mkdir !bin_dir!
 set tmp_terminal_script=!tools_dir!\win_terminal.bat.tmp
 set terminal_script=!tools_dir!\win_terminal.bat
 echo @echo off> "!tmp_terminal_script!"
+echo setlocal EnableDelayedExpansion>> "!tmp_terminal_script!"
+
+echo.>> "!tmp_terminal_script!"
+echo set working_dir=>> "!tmp_terminal_script!"
+echo if "%%~1" neq "" (>> "!tmp_terminal_script!"
+echo     set working_dir=start --cwd "%%~1">> "!tmp_terminal_script!"
+echo     set working_dir=^^!working_dir:\=/^^!>> "!tmp_terminal_script!"
+echo )>> "!tmp_terminal_script!"
+echo.>> "!tmp_terminal_script!"
+
 echo set HOME=%%~dp0..\Home>> "!tmp_terminal_script!"
 echo set HOMEPATH=%%~dp0..\Home>> "!tmp_terminal_script!"
 echo set USERPROFILE=%%~dp0..\Home>> "!tmp_terminal_script!"
 echo set APPDATA=%%~dp0..\Home\AppData>> "!tmp_terminal_script!"
 echo set LOCALAPPDATA=%%~dp0..\Home\AppData\Local>> "!tmp_terminal_script!"
 echo set PATH=%%~dp0Binaries;%%PATH%%>> "!tmp_terminal_script!"
+echo.>> "!tmp_terminal_script!"
 
 REM Setup tools for setting up the development environment
 REM ----------------------------------------------------------------------------
@@ -261,7 +272,7 @@ set doxygen_name=doxygen_win64
 set doxygen_download_name=doxygen-!doxygen_version!.windows.x64.bin
 set doxygen_download_file=!doxygen_download_name!.zip
 set doxygen_download_path=!downloads_dir!\!doxygen_download_file!
-set doxygen_download_url="https://www.doxygen.nl/files/!doxygen_download_file!"
+set doxygen_download_url="https://downloads.sourceforge.net/project/doxygen/rel-!doxygen_version!/!doxygen_download_file!"
 
 set doxygen_dir_name=!doxygen_name!_!doxygen_version!
 set doxygen_dir=!tools_dir!\!doxygen_dir_name!
@@ -652,7 +663,9 @@ REM demand in this script.
 call !msvc_dir!\setup.bat
 
 REM Terminal
+echo.>> "!tmp_terminal_script!"
 echo call "%%~dp0!msvc_dir_name!\setup.bat">> "!tmp_terminal_script!"
+echo.>> "!tmp_terminal_script!"
 
 REM Symget
 REM ----------------------------------------------------------------------------
@@ -669,7 +682,7 @@ for /F "tokens=1 USEBACKQ" %%F IN (`"!git_exe!" -C !symget_dir! rev-parse --shor
 set symget_curr_git_hash=!symget_curr_git_hash:~0,-1!
 
 if !symget_curr_git_hash! neq !symget_git_hash! (
-    call "!git_exe!" -C "!symget_dir!" pull origin master || exit /B %ERRORLEVEL%
+    call "!git_exe!" -C "!symget_dir!" pull origin main || exit /B %ERRORLEVEL%
     call "!git_exe!" -C "!symget_dir!" checkout "!symget_git_hash!" || exit /B %ERRORLEVEL%
     if exist "!symget_exe!" del /F "!symget_exe!"
 )
@@ -713,6 +726,8 @@ call win_helpers.bat :MakeRelativeBatchShortcut "odin" "..\!odin_dir_name!\odin.
 
 REM QoL/Tools
 REM ----------------------------------------------------------------------------
+echo.>> "!tmp_terminal_script!"
+
 REM clink - Bash style tab completion in terminal
 REM ----------------------------------------------------------------------------
 set clink_sha256=6FD44B1D085ABC8319108986C0E19B119D54BC84A753397D567A5F62950F0ACC
@@ -974,15 +989,15 @@ set PYTHONHOME=!python_dir!
 
 REM ImHex
 REM ----------------------------------------------------------------------------
-set imhex_sha256=080f537d3ea58c002cc2112adbec1352144710b43764de9a1dc04f129d3a3343
-set imhex_exe_sha256=6a4b0e70bf7c78af074af0de2346164d9f5aec28ea224f9ee903412e1c774d95
-set imhex_version=1.17.0
+set imhex_sha256=996FF7A1F26B40CED225A9D3CC7D9B695EA389895BC2BBBA7734C39FC5044E2A
+set imhex_exe_sha256=843166E3192D1443938B32CC4695E47B153FD94787875816A76C95D2F6F15A4B
+set imhex_version=1.25.0
 set imhex_name=imhex_win64
 
-set imhex_download_name=Windows.Portable.ZIP
+set imhex_download_name=imhex-!imhex_version!-Windows-Portable
 set imhex_download_file=!imhex_download_name!.zip
 set imhex_download_path=!downloads_dir!\!imhex_download_file!
-set imhex_download_url="https://github.com/WerWolv/ImHex/releases/download/v!imhex_version!/!imhex_download_url!"
+set imhex_download_url="https://github.com/WerWolv/ImHex/releases/download/v!imhex_version!/!imhex_download_file!"
 
 set imhex_dir=!tools_dir!\!imhex_name!_!imhex_version!
 set imhex_exe=!imhex_dir!\imhex.exe
@@ -1146,15 +1161,15 @@ call win_helpers.bat :MakeDirHardLink "!tools_dir!\!sioyek_name!" "!sioyek_dir!"
 
 REM fd
 REM ----------------------------------------------------------------------------
-set fd_sha256=F21BC26C1AB6BDBE4FE43F87A20C792D4ABE629AE97C6F42B25AC8A042F5521F
-set fd_exe_sha256=764F31AC5B477707B51DAEC32458E4D66059BA0D17F03032B7CD0C0534703354
-set fd_version=8.4.0
+set fd_sha256=2E9FE19B0C3B1EC67F9B834FA763B3A614EC9D0ADDAACBCA4614E862FB3EE4FB
+set fd_exe_sha256=b90ab51a05f933c22f3b87b3135cc5888dadb1527f7e18c83f7bb8978c4afeb6
+set fd_version=8.5.3
 set fd_name=fd_win64
 
-set fd_download_name=fd-!fd_version!-x86_64-pc-windows-msvc
+set fd_download_name=fd-v!fd_version!-x86_64-pc-windows-msvc
 set fd_download_file=!fd_download_name!.zip
 set fd_download_path=!downloads_dir!\!fd_download_file!
-set fd_download_url="https://github.com/sharkdp/fd/releases/download/!fd_version!/!fd_download_file!"
+set fd_download_url="https://github.com/sharkdp/fd/releases/download/v!fd_version!/!fd_download_file!"
 
 set fd_dir_name=!fd_name!_!fd_version!
 set fd_dir=!tools_dir!\!fd_dir_name!
@@ -1172,9 +1187,9 @@ call win_helpers.bat :MakeFileHardLink "!bin_dir!\fd.exe" "!fd_exe!" || exit /B 
 
 REM wiztree
 REM ----------------------------------------------------------------------------
-set wiztree_sha256=066E270DE1E398CC8447428047628C241832D53839AAE9815443B486AFFD66C9
-set wiztree_exe_sha256=688a21f225af918c47b883a0d905922411a63cbe55785aa4fbc16af244c1fcdf
-set wiztree_version=4_08
+set wiztree_sha256=1625BAA8854B4F5BCEBEDE832AECFBBA079C0CAC623F1AACD56A7BF5011FFA51
+set wiztree_exe_sha256=3c33e9167b303dfca7ada6405b5ec0859b1bcc317dc4922664b59736b264cd26
+set wiztree_version=4_11
 set wiztree_name=wiztree_win64
 
 set wiztree_download_name=wiztree_!wiztree_version!_portable
@@ -1269,7 +1284,7 @@ set solidity_exe=!solidity_dir!\solidity_win64_!solidity_version!.exe
 
 if not exist "!solidity_exe!" (
     if not exist "!solidity_dir!" mkdir "!solidity_dir!"
-    call win_helpers.bat :DownloadFile "" "!solidity_exe!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :DownloadFile "!solidity_download_url!" "!solidity_exe!" || exit /B %ERRORLEVEL%
 )
 
 call win_helpers.bat :FileHashCheck sha256 "!solidity_exe!" "!solidity_exe_sha256!" || exit /B %ERRORLEVEL%
@@ -1279,9 +1294,11 @@ call win_helpers.bat :MakeFileHardLink "!bin_dir!\solc-!solidity_version!" "!sol
 
 REM Finish Terminal Script
 REM ----------------------------------------------------------------------------
+echo.>> "!tmp_terminal_script!"
 echo if exist "%%~dp0win_terminal_user_config.bat" call "%%~dp0win_terminal_user_config.bat">> "!tmp_terminal_script!"
-echo start "" /MAX "%%~dp0!wezterm_name!\wezterm-gui.exe">> "!tmp_terminal_script!"
-echo exit>> "!tmp_terminal_script!"
+echo start "" /MAX "%%~dp0!wezterm_name!\wezterm-gui.exe" ^^!working_dir^^!>> "!tmp_terminal_script!"
+echo.>> "!tmp_terminal_script!"
+
 move /Y !tmp_terminal_script! !terminal_script!
 
 REM Odin & Portable MSVC Work-around
