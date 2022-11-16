@@ -140,16 +140,16 @@ set wezterm_download_url="https://github.com/wez/wezterm/releases/download/!wezt
 
 set wezterm_dir_name=!wezterm_name!_!wezterm_version!
 set wezterm_dir=!tools_dir!\!wezterm_dir_name!
-set wezterm_version_exe=!wezterm_dir!\wezterm-gui.exe
+set wezterm_exe=!wezterm_dir!\wezterm-gui.exe
 
-if not exist "!wezterm_version_exe!" (
+if not exist "!wezterm_exe!" (
     call win_helpers.bat :DownloadFile "!wezterm_download_url!" "!wezterm_download_path!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!wezterm_download_path!" "!wezterm_sha256!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Unzip "!zip7_version_exe!" "!wezterm_download_path!" "!wezterm_dir!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :Unzip "!zip7_exe!" "!wezterm_download_path!" "!wezterm_dir!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :MoveDir "!wezterm_dir!\!wezterm_download_Name!" "!wezterm_dir!" || exit /B %ERRORLEVEL%
 )
 
-call win_helpers.bat :FileHashCheck sha256 "!wezterm_version_exe!" "!wezterm_exe_sha256!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :FileHashCheck sha256 "!wezterm_exe!" "!wezterm_exe_sha256!" || exit /B %ERRORLEVEL%
 call win_helpers.bat :OverwriteCopy "!installer_dir!\os_wezterm.lua" "!wezterm_dir!\wezterm.lua" || exit /B %ERRORLEVEL%
 call win_helpers.bat :MakeDirHardLink "!tools_dir!\!wezterm_name!" "!wezterm_dir!" || exit /B %ERRORLEVEL%
 
@@ -246,7 +246,6 @@ if not exist "!ctags_exe!" (
     call win_helpers.bat :DownloadFile "!ctags_download_url!" "!ctags_download_path!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :FileHashCheck sha256 "!ctags_download_path!" "!ctags_sha256!" || exit /B %ERRORLEVEL%
     call win_helpers.bat :Unzip "!zip7_exe!" "!ctags_download_path!" "!ctags_dir!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :MoveDir "!ctags_dir!/ctags-!ctags_version!-windows-x86_64" "!ctags_dir!" || exit /B %ERRORLEVEL%
 )
 call win_helpers.bat :FileHashCheck sha256 "!ctags_exe!" "!ctags_exe_sha256!" || exit /B %ERRORLEVEL%
 call win_helpers.bat :MakeFileHardLink "!bin_dir!\ctags.exe" "!ctags_exe!" || exit /B %ERRORLEVEL%
@@ -1310,7 +1309,7 @@ REM Background Application Scripts
 REM ----------------------------------------------------------------------------
 set bg_app_script=!tools_dir!\win_start_background_apps.bat
 echo @echo off> "!bg_app_script!"
-echo start "" "%%~dp0!everything_name!\everything.exe">> "!bg_app_script!"
+echo start "" "%%~dp0!everything_name!\everything64.exe">> "!bg_app_script!"
 echo start "" "%%~dp0!keypirinha_name!\keypirinha.exe">> "!bg_app_script!"
 
 REM CTags Helper Script
