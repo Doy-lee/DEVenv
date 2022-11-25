@@ -6,6 +6,7 @@ call plug#begin(stdpath('config') . '/plugged')
     Plug 'https://github.com/scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
     Plug 'https://github.com/tpope/vim-dispatch'
     Plug 'https://github.com/tpope/vim-fugitive'
+    Plug 'https://github.com/tpope/vim-abolish'
 
     " TODO: 2022-06-19 Treesitter is too slow on large C++ files
     " Plug 'https://github.com/nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -110,8 +111,13 @@ lua <<EOF
         "  <ctrl+j>  jump to next compilation error",
         "  <ctrl+k>  jump to prev compilation error",
         "  <cd>      change working directory to current file",
-        "  <\\s>      split buffer vertically",
-        "  ",
+        "  <\\s>     split buffer vertically",
+        "",
+        "  Abolish Plugin (Text Substitution) (Normal Mode)",
+        "  --------------------------------------------------",
+        "  %Subvert/facilit{y,ies}/building{,s}/g Convert facility->building, facilities->buildings",
+        "  %Subvert/action/sleep/g                Convert action to sleep, (preserve case sensitivity ACTION->SLEEP, action->sleep) ",
+        "",
         "  Telescope Bindings (Normal Mode)",
         "  --------------------------------------------------",
         "  <\\te>     open telescope menu",
@@ -120,7 +126,7 @@ lua <<EOF
         "  <\\g>      search for text",
         "  <\\b>      search for buffer",
         "  <\\h>      search VIM help menu",
-        "  ",
+        "",
         "  LSP Bindings (Normal Mode)",
         "  --------------------------------------------------",
         "  <gD>      on (applicable) symbol, jump to declaration",
