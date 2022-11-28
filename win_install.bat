@@ -235,7 +235,7 @@ for %%a in (%cmake_version_list%) do (
 )
 
 call win_helpers.bat :MakeDirHardLink "!tools_dir!/!cmake_name!" "!cmake_dir!" || exit /B %ERRORLEVEL%
-echo set PATH=%%~dp0!cmake_dir_name!\bin;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0cmake_win64\bin;%%PATH%%>> "!tmp_terminal_script!"
 
 REM ctags
 REM ----------------------------------------------------------------------------
