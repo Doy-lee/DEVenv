@@ -10,7 +10,7 @@ do
     docker create --name ${container_name} ${image_name} || exit
 
     mkdir --parent build || exit
-    docker cp ${container_name}:/usr/local/docker/mostlyportable-gcc/gcc-mostlyportable-${gcc_version} . || exit
+    docker cp ${container_name}:/usr/local/docker/mostlyportable-gcc/mostly-built/gcc-mostlyportable-${gcc_version} . || exit
 
     docker container rm ${container_name} || exit
 done
