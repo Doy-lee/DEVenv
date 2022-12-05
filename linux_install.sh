@@ -226,8 +226,8 @@ git checkout master
 
 # Use our custom G++ because I typically run Ubuntu 18.04 which uses G++7
 # which is too old to compile GF.
-PATH=${gcc_bin_dir}:${PATH} ./build.sh || exit
-ln --force --symbolic --relative "gf2" "${bin_dir}"
+#PATH=${gcc_bin_dir}:${PATH} ./build.sh || exit
+#ln --force --symbolic --relative "gf2" "${bin_dir}"
 
 cd "${root_dir}"
 
@@ -390,7 +390,7 @@ chmod +x ${bin_dir}/ctags_cpp.sh
 # Linux Terminal
 # ------------------------------------------------------------------------------
 echo \#!/usr/bin/env bash> ${tools_dir}/linux_terminal.sh
-echo PATH=${tools_dir}/Binaries>> ${tools_dir}/linux_terminal.sh
+echo PATH=${tools_dir}/Binaries:\$\{PATH\}>> ${tools_dir}/linux_terminal.sh
 echo PATH=\$\{PATH\}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin>> ${tools_dir}/linux_terminal.sh
 echo [[ -d /usr/lib/wsl/lib ]] \&\& PATH=\$\{PATH\}:/usr/lib/wsl/lib>> ${tools_dir}/linux_terminal.sh
 echo [[ -d /snap/bin ]] \&\& PATH=\$\{PATH\}:/snap/bin>> ${tools_dir}/linux_terminal.sh
