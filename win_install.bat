@@ -569,6 +569,7 @@ call win_helpers.bat :MakeDirHardLink "!tools_dir!\!python_name!" "!python_dir!"
 REM Terminal
 echo set PYTHONHOME=%%~dp0!python_name!>> "!tmp_terminal_script!"
 echo set PATH=%%~dp0!python_name!;%%PATH%%>> "!tmp_terminal_script!"
+echo set PATH=%%~dp0!python_name!\Scripts;%%PATH%%>> "!tmp_terminal_script!"
 
 REM RenderDoc
 REM ----------------------------------------------------------------------------
