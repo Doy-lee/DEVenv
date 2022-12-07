@@ -5,7 +5,7 @@ REM Setup
 REM ----------------------------------------------------------------------------
 set root_dir=%~dp0
 
-set home_dir=!root_dir!Home
+set home_dir=%home%
 set installer_dir=!root_dir!Installer
 set tools_dir=!root_dir!Tools
 set downloads_dir=!root_dir!Downloads
@@ -29,11 +29,6 @@ echo     set working_dir=^^!working_dir:\=/^^!>> "!tmp_terminal_script!"
 echo )>> "!tmp_terminal_script!"
 echo.>> "!tmp_terminal_script!"
 
-echo set HOME=%%~dp0..\Home>> "!tmp_terminal_script!"
-echo set HOMEPATH=%%~dp0..\Home>> "!tmp_terminal_script!"
-echo set USERPROFILE=%%~dp0..\Home>> "!tmp_terminal_script!"
-echo set APPDATA=%%~dp0..\Home\AppData>> "!tmp_terminal_script!"
-echo set LOCALAPPDATA=%%~dp0..\Home\AppData\Local>> "!tmp_terminal_script!"
 echo set PATH=%%~dp0Binaries;%%PATH%%>> "!tmp_terminal_script!"
 echo.>> "!tmp_terminal_script!"
 
