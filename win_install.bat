@@ -5,7 +5,7 @@ REM Setup
 REM ----------------------------------------------------------------------------
 set root_dir=%~dp0
 
-set home_dir=%home%
+set home_dir=%userprofile%
 set installer_dir=!root_dir!Installer
 set tools_dir=!root_dir!Tools
 set downloads_dir=!root_dir!Downloads
@@ -1045,18 +1045,18 @@ call win_helpers.bat :OverwriteCopy "!installer_dir!\os_clang_format_style_file"
 
 REM MobaXTerm
 REM ------------------------------------------------------------------------
-set mobaxterm_sha256=91f80537f12c2ad34a5eba99a285c149781c6d35a144a965ce3aea8a9bc6868c
-set mobaxterm_exe_sha256=1053c81b44018d6e6519a9c80d7413f7bb36e9f6e43b3da619b2229aa362a522
-set mobaxterm_version=21.2
+set mobaxterm_sha256=C8DE508D6731F31A73F061E58942691466D1D24CFA941E642E16E0930BE2FAD9
+set mobaxterm_exe_sha256=e47cb54645a368411c5d6b6cbfa7e25980a2a674d7d0c082f5137b6e77a2f362
+set mobaxterm_version=22.3
 set mobaxterm_name=mobaxterm_win64
 
 set mobaxterm_download_name=MobaXterm_Portable_v!mobaxterm_version!
 set mobaxterm_download_file=!mobaxterm_download_name!.zip
 set mobaxterm_download_path=!downloads_dir!\!mobaxterm_download_file!
-set mobaxterm_download_url="https://download.mobatek.net/2122021051924233/!mobaxterm_download_file!"
+set mobaxterm_download_url="https://download.mobatek.net/2232022120824733/!mobaxterm_download_file!"
 
 set mobaxterm_dir=!tools_dir!\!mobaxterm_name!_!mobaxterm_version!
-set mobaxterm_exe=!mobaxterm_dir!\MobaXterm_Personal_21.2.exe
+set mobaxterm_exe=!mobaxterm_dir!\MobaXterm_Personal_!mobaxterm_version!.exe
 
 if not exist "!mobaxterm_exe!" (
     call win_helpers.bat :DownloadFile "!mobaxterm_download_url!" !mobaxterm_download_path! || exit /B %ERRORLEVEL%
@@ -1079,29 +1079,29 @@ if not exist "!oo_shutup_10_file!" (
     call win_helpers.bat :DownloadFile "https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe" "!oo_shutup_10_file!" || exit /B %ERRORLEVEL%
 )
 
-REM ProcessHacker
+REM SystemInformer
 REM ----------------------------------------------------------------------------
-set process_hacker_sha256=c662b756324c9727760b4e921459d31a30f99cf8d3f24b64f4fcb3b29a26beb4
-set process_hacker_exe_sha256=22b1b8f080a41a07f23eae8ab0ad2e5f88d3c5af5d8c1cd1bb4f6856482e945c
-set process_hacker_version=3.0.4861
-set process_hacker_name=process_hacker_win64
+set system_informer_sha256=48C869FF4CCEA0EA0D4E9A23E5BFBBA640B5F092BD69E779F320262BCCE0A491
+set system_informer_exe_sha256=77630EDBE08B29D1D0A709A3AFB54C1C7E198EAEE1013B8057EFEDC1D14F158D
+set system_informer_version=3.0.5553
+set system_informer_name=system_informer_win64
 
-set process_hacker_download_name=processhacker-!process_hacker_version!-bin
-set process_hacker_download_file=!process_hacker_download_name!.zip
-set process_hacker_download_path=!downloads_dir!\!process_hacker_download_file!
-set process_hacker_download_url="https://github.com/ProcessHackerRepoTool/nightly-builds-mirror/releases/download/v!process_hacker_version!/!process_hacker_download_file!"
+set system_informer_download_name=systeminformer-!system_informer_version!-bin
+set system_informer_download_file=!system_informer_download_name!.zip
+set system_informer_download_path=!downloads_dir!\!system_informer_download_file!
+set system_informer_download_url="https://github.com/winsiderss/si-builds/releases/download/!system_informer_version!/!system_informer_download_file!"
 
-set process_hacker_dir=!tools_dir!\!process_hacker_name!_!process_hacker_version!
-set process_hacker_exe=!process_hacker_dir!\64bit\ProcessHacker.exe
+set system_informer_dir=!tools_dir!\!system_informer_name!_!system_informer_version!
+set system_informer_exe=!system_informer_dir!\64bit\SystemInformer.exe
 
-if not exist "!process_hacker_exe!" (
-    call win_helpers.bat :DownloadFile "!process_hacker_download_url!" "!process_hacker_download_path!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :FileHashCheck sha256 "!process_hacker_download_path!" "!process_hacker_sha256!" || exit /B %ERRORLEVEL%
-    call win_helpers.bat :Unzip "!zip7_exe!" "!process_hacker_download_path!" "!process_hacker_dir!" || exit /B %ERRORLEVEL%
+if not exist "!system_informer_exe!" (
+    call win_helpers.bat :DownloadFile "!system_informer_download_url!" "!system_informer_download_path!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :FileHashCheck sha256 "!system_informer_download_path!" "!system_informer_sha256!" || exit /B %ERRORLEVEL%
+    call win_helpers.bat :Unzip "!zip7_exe!" "!system_informer_download_path!" "!system_informer_dir!" || exit /B %ERRORLEVEL%
 )
 
-call win_helpers.bat :FileHashCheck sha256 "!process_hacker_exe!" "!process_hacker_exe_sha256!" || exit /B %ERRORLEVEL%
-call win_helpers.bat :MakeDirHardLink "!tools_dir!\!process_hacker_name!" "!process_hacker_dir!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :FileHashCheck sha256 "!system_informer_exe!" "!system_informer_exe_sha256!" || exit /B %ERRORLEVEL%
+call win_helpers.bat :MakeDirHardLink "!tools_dir!\!system_informer_name!" "!system_informer_dir!" || exit /B %ERRORLEVEL%
 
 REM ripgrep
 REM ----------------------------------------------------------------------------
