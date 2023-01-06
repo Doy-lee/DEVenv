@@ -16,6 +16,10 @@ call plug#begin(stdpath('config') . '/plugged')
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
 
+    " FZF for LSP
+    Plug 'gfanto/fzf-lsp.nvim'
+    Plug 'nvim-lua/plenary.nvim'
+
     " odin for syntax highlighting
     Plug 'https://github.com/Tetralux/odin.vim'
     Plug 'https://github.com/sainnhe/gruvbox-material'
@@ -126,7 +130,7 @@ lua <<EOF
         "  <Ctrl+j>    jump to next compilation error",
         "  <Ctrl+k>    jump to prev compilation error",
         "  <cd>        change working directory to current file",
-        "  <\\s>       split buffer vertically",
+        "  <\\s>        split buffer vertically",
         "",
         "  Abolish (Text Substitution in Normal Mode)",
         "  --------------------------------------------------",
@@ -135,14 +139,14 @@ lua <<EOF
         "",
         "  FZF (Normal Mode)",
         "  --------------------------------------------------",
-        "  <\\h>       vim command history",
-        "  <\\f>       find files",
-        "  <\\g>       search for text (via ripgrep)",
-        "  <\\tt>      search for tag (global)",
-        "  <\\tb>      search for tag (buffer)",
-        "  <\\cc>      search for commit (global)",
-        "  <\\cb>      search for commit (buffer)",
-        "  <\\b>       search for buffer",
+        "  <\\h>        vim command history",
+        "  <\\f>        find files",
+        "  <\\g>        search for text (via ripgrep)",
+        "  <\\tt>       search for tag (global)",
+        "  <\\tb>       search for tag (buffer)",
+        "  <\\cc>       search for commit (global)",
+        "  <\\cb>       search for commit (buffer)",
+        "  <\\b>        search for buffer",
         "",
         "  Autocompletion (nvim-cmp in Normal Mode)",
         "  --------------------------------------------------",
@@ -278,16 +282,42 @@ augroup persistent_settings
   au bufenter * :set formatoptions=q1j
 augroup end
 
+" FZF
+" ==============================================================================
+" Empty value to disable preview window altogether
+let g:fzf_preview_window = []
+
+" Prefix all commands with Fzf for discoverability
+let g:fzf_command_prefix = 'Fzf'
+
+" - down / up / left / right
+let g:fzf_layout = { 'down': '40%' }
+
+" Add "FzfCustomRG" command which reinitializes
+function! RipgrepFzf(query, fullscreen)
+  let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case -- %s || true'
+  let initial_command = printf(command_fmt, shellescape(a:query))
+  let reload_command = printf(command_fmt, '{q}')
+  let spec = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
+  call fzf#vim#grep(initial_command, 1, fzf#vim#with_preview(spec), a:fullscreen)
+endfunction
+
+command! -nargs=* -bang FzfCustomRG call RipgrepFzf(<q-args>, <bang>0)
+
+" Augment the "FzfCustomFiles" command
+command! -bang -nargs=? -complete=dir FzfCustomFiles
+    \ call fzf#vim#files(<q-args>, {'options': ['--layout=reverse', '--info=inline', '--preview', 'cat {}']}, <bang>0)
+
 " General Key Bindings
 " ==============================================================================
 " Telescope Bindings
-nnoremap <leader>h   <cmd>FzfHistory<cr>
-nnoremap <leader>f   <cmd>FzfFiles<cr>
-nnoremap <leader>g   <cmd>FzfRg<cr>
-nnoremap <leader>tt  <cmd>FzfTags<cr>
-nnoremap <leader>tb  <cmd>FzfBTags<cr>
-nnoremap <leader>cc  <cmd>FzfCommits<cr>
-nnoremap <leader>cb  <cmd>FzfBCommits<cr>
+nnoremap <leader>h  <cmd>FzfHistory<cr>
+nnoremap <leader>f  <cmd>FzfCustomFiles<cr>
+nnoremap <leader>g  <cmd>FzfCustomRG<cr>
+nnoremap <leader>tt <cmd>FzfTags<cr>
+nnoremap <leader>tb <cmd>FzfBTags<cr>
+nnoremap <leader>cc <cmd>FzfCommits<cr>
+nnoremap <leader>cb <cmd>FzfBCommits<cr>
 nnoremap <leader>b  <cmd>FzfBuffers<cr>
 
 " Map Ctrl+HJKL to navigate buffer window
@@ -315,17 +345,6 @@ nnoremap <leader>s :vs<CR>
 " Go to previous error
 nnoremap <A-j> :cn<CR>
 nnoremap <A-k> :cp<CR>
-
-" FZF
-" ==============================================================================
-" Empty value to disable preview window altogether
-let g:fzf_preview_window = []
-
-" Prefix all commands with Fzf for discoverability
-let g:fzf_command_prefix = 'Fzf'
-
-" - down / up / left / right
-let g:fzf_layout = { 'down': '40%' }
 
 " Clang Format
 " ==============================================================================

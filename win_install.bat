@@ -855,7 +855,7 @@ call win_helpers.bat :MakeFileHardLink "!bin_dir!\fzf.exe" "!fzf_exe!" || exit /
 REM Terminal
 REM Use FD for FZF to make it ultra fast
 echo set FZF_DEFAULT_OPTS=--multi --layout=reverse>> "!tmp_terminal_script!"
-echo set FZF_DEFAULT_COMMAND=fd --unrestricted>> "!tmp_terminal_script!"
+echo set FZF_DEFAULT_COMMAND=fd --type f --strip-cwd-prefix --hidden --follow --exclude .git --exclude .cache --exclude .vs>> "!tmp_terminal_script!"
 
 REM jpegview
 REM ----------------------------------------------------------------------------
