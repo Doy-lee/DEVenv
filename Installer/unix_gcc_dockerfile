@@ -1,0 +1,43 @@
+FROM ubuntu:16.04 as builder
+
+RUN set -ex \
+    && apt-get update \
+    && apt-get --no-install-recommends --yes install \
+        apt-transport-https \
+        eatmydata \
+        ca-certificates
+
+# Build tools
+RUN set -ex \
+    && apt-get update \
+    && eatmydata apt-get --no-install-recommends --yes install \
+        build-essential \
+        g++-multilib \
+        git \
+        libgmp-dev \
+        libz-dev \
+        m4 \
+        schedtool \
+        texinfo \
+        texlive \
+        wget
+
+WORKDIR /usr/local/docker
+
+ARG MOSTLY_PORTABLE_GCC_GIT_BRANCH=master
+RUN set -ex \
+    && git clone https://github.com/Frogging-Family/mostlyportable-gcc \
+    && cd mostlyportable-gcc \
+    && git checkout $MOSTLY_PORTABLE_GIT_BRANCH
+
+ARG GCC_VERSION=11.3.0
+ARG BIN_UTILS_VERSION=2.38
+RUN set -ex \
+    && cd mostlyportable-gcc \
+    && sed --in-place "s/^_use_gcc_git=\".*\"$/_use_gcc_git=\"false\"/" mostlyportable-gcc.cfg \
+    && sed --in-place "s/^_gcc_version=\".*\"$/_gcc_version=\"$GCC_VERSION\"/" mostlyportable-gcc.cfg \
+    && sed --in-place "s/^_use_binutils_git=\".*\"$/_use_binutils_git=\"false\"/" mostlyportable-gcc.cfg \
+    && sed --in-place "s/^_binutils=.*$/_binutils=$BIN_UTILS_VERSION/" mostlyportable-gcc.cfg \
+    && sed --in-place "s/^_use_isl_git=\".*\"$/_use_isl_git=\"false\"/" mostlyportable-gcc.cfg \
+    && sed --in-place -E "s/^(\s*)(.*)_ldconfmostlyportable;$/\1_ldconfmostlyportable=\"n\"/" mostlyportable-gcc.sh \
+    && ./mostlyportable-gcc.sh gcc

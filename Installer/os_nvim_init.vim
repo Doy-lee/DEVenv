@@ -5,30 +5,20 @@ call plug#begin(stdpath('config') . '/plugged')
     " vim-dispatch allows running async jobs in vim (i.e. builds in the background)
     Plug 'https://github.com/scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
     Plug 'https://github.com/tpope/vim-dispatch'
+    Plug 'https://github.com/tpope/vim-fugitive'
+    Plug 'https://github.com/tpope/vim-abolish'
 
     " TODO: 2022-06-19 Treesitter is too slow on large C++ files
     " Plug 'https://github.com/nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
     Plug 'https://github.com/bfrg/vim-cpp-modern'
 
-    " Telescope file picker, sorter and previewer
-    Plug 'https://github.com/nvim-lua/plenary.nvim'
-    Plug 'https://github.com/nvim-telescope/telescope.nvim'
-    Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
+    " FZF
+    Plug 'junegunn/fzf'
+    Plug 'junegunn/fzf.vim'
 
-    " nvim-lspconfig sets up sane defaults for LSP servers (i.e. clangd)
-    " nvim-cmp is a more powerful autocomplete engine
-    " LuaSnip allow writing snippets into the buffer, we can power the snippets from LSP
-    " cmp-nvim-lsp preset capability flags to request more powerful autocomplete from LSP server
-    " cmp_luasnip a LuaSnip addon that provides a completion source to nvim-cmp
-    " cmp-buffer provides a buffer completion source to nvim-cmp
-    " cmp-path provides a path completion source to nvim-cmp
-    Plug 'https://github.com/neovim/nvim-lspconfig'
-    Plug 'https://github.com/hrsh7th/nvim-cmp'
-    Plug 'https://github.com/L3MON4D3/LuaSnip'
-    Plug 'https://github.com/hrsh7th/cmp-nvim-lsp'
-    Plug 'https://github.com/saadparwaiz1/cmp_luasnip'
-    Plug 'https://github.com/hrsh7th/cmp-buffer'
-    Plug 'https://github.com/hrsh7th/cmp-path'
+    " FZF for LSP
+    Plug 'gfanto/fzf-lsp.nvim'
+    Plug 'nvim-lua/plenary.nvim'
 
     " odin for syntax highlighting
     Plug 'https://github.com/Tetralux/odin.vim'
@@ -36,35 +26,65 @@ call plug#begin(stdpath('config') . '/plugged')
 
     " Lua cache to speed up load times
     Plug 'https://github.com/lewis6991/impatient.nvim'
+
+    " lsp-zero begin
+        " LSP Support
+        Plug 'neovim/nvim-lspconfig'
+        Plug 'williamboman/mason.nvim'
+        Plug 'williamboman/mason-lspconfig.nvim'
+
+        " Autocompletion
+        Plug 'hrsh7th/nvim-cmp'
+        Plug 'hrsh7th/cmp-buffer'
+        Plug 'hrsh7th/cmp-path'
+        Plug 'saadparwaiz1/cmp_luasnip'
+        Plug 'hrsh7th/cmp-nvim-lsp'
+        Plug 'hrsh7th/cmp-nvim-lua'
+
+        "  Snippets
+        Plug 'L3MON4D3/LuaSnip'
+
+        " Snippet collection (Optional)
+        Plug 'rafamadriz/friendly-snippets'
+        Plug 'VonHeikemen/lsp-zero.nvim'
+    " lsp-zero end
 call plug#end()
 
 " Lua Setup
 " ==============================================================================
 lua <<EOF
   require('impatient')
-  require('telescope').load_extension('fzf')
-  require('telescope').setup {
-    defaults = {
-      layout_config = {
-        horizontal = { width = 0.95 }
-      },
-      mappings = {
-        i = {
-          ["<C-j>"] = require('telescope.actions').move_selection_next,
-          ["<C-k>"] = require('telescope.actions').move_selection_previous,
-        },
-        n = {
-          ["<C-j>"] = require('telescope.actions').move_selection_next,
-          ["<C-k>"] = require('telescope.actions').move_selection_previous,
-        },
-      },
-    },
-    pickers = {
-      find_files = {
-        find_command = { "fd", "--unrestricted", "--strip-cwd-prefix" }
-      },
-    }
-  }
+
+  -- LSP Setup
+  -- ===========================================================================
+  local lsp = require('lsp-zero')
+  lsp.preset('recommended')
+  lsp.setup()
+
+  -- Treesitter
+  -- ===========================================================================
+  -- TODO: 2022-06-19 Treesitter is too slow on large C++ files
+  -- require('nvim-treesitter.configs').setup {
+  --   ensure_installed = { "c", "cpp" }, -- A list of parser names, or "all"
+  --   sync_install     = false,          -- Install parsers synchronously (only applied to `ensure_installed`)
+  --   ignore_install   = { },            -- List of parsers to ignore installing (for "all")
+
+  --   highlight = {
+  --     enable = false, -- `false` will disable the whole extension
+
+  --     -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
+  --     -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
+  --     -- the name of the parser)
+  --     -- list of language that will be disabled
+  --     disable = { },
+
+  --     -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+  --     -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+  --     -- Using this option may slow down your editor, and you may see some duplicate highlights.
+  --     -- Instead of true it can also be a list of languages
+  --     additional_vim_regex_highlighting = false,
+  --   },
+  -- }
 
   -- Vim Options
   -- ===========================================================================
@@ -90,6 +110,7 @@ lua <<EOF
   vim.opt.textwidth=80          -- On format, format to 80 char long lines
   vim.opt.visualbell=true       -- Flash the screen on error
   vim.opt.wrap=false            -- Don't wrap lines of text automatically
+  vim.opt.signcolumn = 'no'
 
   vim.diagnostic.config({
     -- Turn off the diagnostics signs on the line number. In LSP mode, editing
@@ -98,123 +119,97 @@ lua <<EOF
     signs = false,
   })
 
-  -- LSP Setup
-  -- ===========================================================================
-  -- Load the additional capabilities supported by nvim-cmp
-  local custom_capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  -- Check if there were args (i.e. opened file), non-empty buffer, or started in insert mode
+  if vim.fn.argc() == 0 or vim.fn.line2byte("$") ~= -1 and not opt.insertmode then
+    local ascii = {
+        "",
+        "  Useful Bindings (Normal Mode)",
+        "  --------------------------------------------------",
+        "  <Ctrl+n>    to open the file tree explorer",
+        "  <Ctrl+i>    clang format selected lines",
+        "  <Ctrl+j>    jump to next compilation error",
+        "  <Ctrl+k>    jump to prev compilation error",
+        "  <cd>        change working directory to current file",
+        "  <\\s>        split buffer vertically",
+        "",
+        "  Abolish (Text Substitution in Normal Mode)",
+        "  --------------------------------------------------",
+        "  %S/facilit{y,ies}/building{,s}/g Convert facility->building, facilities->buildings",
+        "  %S/action/sleep/g                Convert action to sleep, (preserve case sensitivity ACTION->SLEEP, action->sleep) ",
+        "",
+        "  FZF (Normal Mode)",
+        "  --------------------------------------------------",
+        "  <\\h>        vim command history",
+        "  <\\f>        find files",
+        "  <\\g>        search for text (via ripgrep)",
+        "  <\\tt>       search for tag (global)",
+        "  <\\tb>       search for tag (buffer)",
+        "  <\\cc>       search for commit (global)",
+        "  <\\cb>       search for commit (buffer)",
+        "  <\\b>        search for buffer",
+        "",
+        "  Autocompletion (nvim-cmp in Normal Mode)",
+        "  --------------------------------------------------",
+        "  <Enter>     Confirms selection.",
+        "  <Ctrl-y>    Confirms selection.",
+        "  <Up>        Navigate to previous item on the list.",
+        "  <Down>      Navigate to the next item on the list.",
+        "  <Ctrl-p>    Navigate to previous item on the list.",
+        "  <Ctrl-n>    Navigate to the next item on the list.",
+        "  <Ctrl-u>    Scroll up in the item's documentation.",
+        "  <Ctrl-f>    Scroll down in the item's documentation.",
+        "  <Ctrl-e>    Toggles the completion.",
+        "  <Ctrl-d>    Go to the next placeholder in the snippet.",
+        "  <Ctrl-b>    Go to the previous placeholder in the snippet.",
+        "  <Tab>       Enables completion when the cursor is inside a word. If the completion menu is visible it will navigate to the next item in the list.",
+        "  <Shift-Tab> When the completion menu is visible navigate to the previous item in the list.",
+        "",
+        "  LSP Bindings (Normal Mode)",
+        "  --------------------------------------------------",
+        "  <Shift-K>   Displays hover information about the symbol under the cursor in a floating window. See help vim.lsp.buf.hover().",
+        "  gd          Jumps to the definition of the symbol under the cursor. See help vim.lsp.buf.definition().",
+        "  gD          Jumps to the declaration of the symbol under the cursor. Some servers don't implement this feature. See help vim.lsp.buf.declaration().",
+        "  gi          Lists all the implementations for the symbol under the cursor in the quickfix window. See help vim.lsp.buf.implementation().",
+        "  go          Jumps to the definition of the type of the symbol under the cursor. See help vim.lsp.buf.type_definition().",
+        "  gr          Lists all the references to the symbol under the cursor in the quickfix window. See help vim.lsp.buf.references().",
+        "  <Ctrl-k>    Displays signature information about the symbol under the cursor in a floating window. See help vim.lsp.buf.signature_help(). If a mapping already exists for this key this function is not bound.",
+        "  <F2>        Renames all references to the symbol under the cursor. See help vim.lsp.buf.rename().",
+        "  <F4>        Selects a code action available at the current cursor position. See help vim.lsp.buf.code_action().",
+        "  gl          Show diagnostics in a floating window. See :help vim.diagnostic.open_float().",
+        "  [d          Move to the previous diagnostic in the current buffer. See :help vim.diagnostic.goto_prev().",
+        "  ]d          Move to the next diagnostic. See :help vim.diagnostic.goto_next()."
+    }
 
-  -- Use an on_attach function to only map the following keys
-  -- after the language server attaches to the current buffer
-  local custom_on_attach = function(client, bufnr)
-    -- Enable completion triggered by <c-x><c-o>
-    vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+    local height = vim.api.nvim_get_option("lines")
+    local width = vim.api.nvim_get_option("columns")
+    local ascii_rows = #ascii
+    local ascii_cols = #ascii[1]
+    local win = vim.api.nvim_get_current_win()
+    local buf = vim.api.nvim_create_buf(true, true)
 
-    -- See `:help vim.diagnostic.*` for documentation on any of the below functions
-    local opts = { noremap=true, silent=true }
-    vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
-    vim.keymap.set('n', '<A-n>',    vim.diagnostic.goto_next,  opts)
-    vim.keymap.set('n', '<A-p>',    vim.diagnostic.goto_prev,  opts)
+    local function reset_start_screen()
+        vim.cmd("enew")
+        local buf = vim.api.nvim_get_current_buf()
+        local win = vim.api.nvim_get_current_win()
+        vim.api.nvim_buf_set_option(buf, "modifiable", true)
+        vim.api.nvim_buf_set_option(buf, "buflisted", true)
+        vim.api.nvim_buf_set_option(buf, "buflisted", true)
+    end
 
-    -- See `:help vim.lsp.*` for documentation on any of the below functions
-    local bufopts = { noremap=true, silent=true, buffer=bufnr }
-    vim.keymap.set('n',  'K', vim.lsp.buf.hover,           bufopts)
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration,     bufopts)
-    vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help,  bufopts)
-    vim.keymap.set('n', 'ga', vim.lsp.buf.code_action,     bufopts)
-    vim.keymap.set('n', 'gR', vim.lsp.buf.rename,          bufopts)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, ascii)
+    vim.api.nvim_buf_set_option(buf, "modified", false)
+    vim.api.nvim_buf_set_option(buf, "buflisted", false)
+    vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
+    vim.api.nvim_buf_set_option(buf, "buftype", "nofile")
+    vim.api.nvim_buf_set_option(buf, "swapfile", false)
+    vim.api.nvim_set_current_buf(buf)
+
+    vim.api.nvim_create_autocmd("InsertEnter,WinEnter", {
+        pattern = "<buffer>",
+        callback = reset_start_screen,
+    })
   end
 
-  -- Request additional completion capabilities from the LSP server(s)
-  local lspconfig = require('lspconfig')
-
-  -- Clangd LSP Setup
-  -- ===========================================================================
-  lspconfig.clangd.setup {
-    on_attach           = custom_on_attach,
-    capabilities        = custom_capabilities,
-    single_file_support = false, --- Don't launch LSP if the directory does not have LSP metadata
-  }
-
-  lspconfig.cmake.setup {
-    on_attach    = custom_on_attach,
-    capabilities = custom_capabilities,
-  }
-
-  -- Autocomplete Setup
-  -- ===========================================================================
-  local luasnip = require 'luasnip'
-  local cmp     = require 'cmp'
-
-  local has_words_before = function()
-    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-    return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-  end
-
-  cmp.setup {
-    snippet = {
-      expand = function(args) luasnip.lsp_expand(args.body) end,
-    },
-    window = {
-        completion = cmp.config.window.bordered(),
-        documentation = cmp.config.window.bordered(),
-    },
-    completion = { autocomplete = false },
-    mapping = cmp.mapping.preset.insert({
-      ['<C-d>'] = cmp.mapping.scroll_docs(4),
-      ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-      ['<C-k>'] = cmp.mapping.scroll_docs(-1),   -- Scroll the docs up   by 1 line
-      ['<C-j>'] = cmp.mapping.scroll_docs(1),    -- Scroll the docs down by 1 line
-      ['<CR>']  = cmp.mapping.confirm { behavior = cmp.ConfirmBehavior.Replace, select = true, },
-      ['<Tab>'] = cmp.mapping(function(fallback) -- Move down the autocomplete list
-        if cmp.visible() then
-          cmp.select_next_item()
-        elseif luasnip.expand_or_jumpable() then
-          luasnip.expand_or_jump()
-        elseif has_words_before() then
-          cmp.complete()
-        else
-          fallback()
-        end
-      end, { 'i', 's' }),
-      ['<S-Tab>'] = cmp.mapping(function(fallback) -- Move up the autocomplete list
-        if cmp.visible() then
-          cmp.select_prev_item()
-        elseif luasnip.jumpable(-1) then
-          luasnip.jump(-1)
-        else
-          fallback()
-        end
-      end, { 'i', 's' }),
-    }),
-    sources = {
-      { name = 'nvim_lsp' },
-      { name = 'luasnip' },
-      { name = 'buffer' },
-    },
-  }
-
-  -- TODO: 2022-06-19 Treesitter is too slow on large C++ files
-  -- require('nvim-treesitter.configs').setup {
-  --   ensure_installed = { "c", "cpp" }, -- A list of parser names, or "all"
-  --   sync_install     = false,          -- Install parsers synchronously (only applied to `ensure_installed`)
-  --   ignore_install   = { },            -- List of parsers to ignore installing (for "all")
-
-  --   highlight = {
-  --     enable = false, -- `false` will disable the whole extension
-
-  --     -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
-  --     -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
-  --     -- the name of the parser)
-  --     -- list of language that will be disabled
-  --     disable = { },
-
-  --     -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-  --     -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-  --     -- Using this option may slow down your editor, and you may see some duplicate highlights.
-  --     -- Instead of true it can also be a list of languages
-  --     additional_vim_regex_highlighting = false,
-  --   },
-  -- }
 EOF
 
 " Theme
@@ -287,20 +282,43 @@ augroup persistent_settings
   au bufenter * :set formatoptions=q1j
 augroup end
 
+" FZF
+" ==============================================================================
+" Empty value to disable preview window altogether
+let g:fzf_preview_window = []
+
+" Prefix all commands with Fzf for discoverability
+let g:fzf_command_prefix = 'Fzf'
+
+" - down / up / left / right
+let g:fzf_layout = { 'down': '40%' }
+
+" Add "FzfCustomRG" command which reinitializes
+function! RipgrepFzf(query, fullscreen)
+  let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case -- %s || true'
+  let initial_command = printf(command_fmt, shellescape(a:query))
+  let reload_command = printf(command_fmt, '{q}')
+  let spec = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
+  call fzf#vim#grep(initial_command, 1, fzf#vim#with_preview(spec), a:fullscreen)
+endfunction
+
+command! -nargs=* -bang FzfCustomRG call RipgrepFzf(<q-args>, <bang>0)
+
+" Augment the "FzfCustomFiles" command
+command! -bang -nargs=? -complete=dir FzfCustomFiles
+    \ call fzf#vim#files(<q-args>, {'options': ['--layout=reverse', '--info=inline', '--preview', 'cat {}']}, <bang>0)
+
 " General Key Bindings
 " ==============================================================================
 " Telescope Bindings
-nnoremap <leader>f  <cmd>Telescope find_files<cr>
-nnoremap <leader>g  <cmd>Telescope live_grep<cr>
-nnoremap <leader>ta <cmd>Telescope tags<cr>
-nnoremap <leader>te <cmd>Telescope<cr>
-nnoremap <leader>b  <cmd>Telescope buffers<cr>
-nnoremap <leader>h  <cmd>Telescope help_tags<cr>
-
-nnoremap gf <cmd>Telescope lsp_dynamic_workspace_symbols<cr>
-nnoremap gd <cmd>Telescope lsp_definitions<cr>
-nnoremap gt <cmd>Telescope lsp_type_definitions<cr>
-nnoremap gr <cmd>Telescope lsp_references<cr>
+nnoremap <leader>h  <cmd>FzfHistory<cr>
+nnoremap <leader>f  <cmd>FzfCustomFiles<cr>
+nnoremap <leader>g  <cmd>FzfCustomRG<cr>
+nnoremap <leader>tt <cmd>FzfTags<cr>
+nnoremap <leader>tb <cmd>FzfBTags<cr>
+nnoremap <leader>cc <cmd>FzfCommits<cr>
+nnoremap <leader>cb <cmd>FzfBCommits<cr>
+nnoremap <leader>b  <cmd>FzfBuffers<cr>
 
 " Map Ctrl+HJKL to navigate buffer window
 nmap <silent> <C-h> :wincmd h<CR>
@@ -327,17 +345,6 @@ nnoremap <leader>s :vs<CR>
 " Go to previous error
 nnoremap <A-j> :cn<CR>
 nnoremap <A-k> :cp<CR>
-
-" FZF
-" ==============================================================================
-" Empty value to disable preview window altogether
-let g:fzf_preview_window = []
-
-" Prefix all commands with Fzf for discoverability
-let g:fzf_command_prefix = 'Fzf'
-
-" - down / up / left / right
-let g:fzf_layout = { 'down': '40%' }
 
 " Clang Format
 " ==============================================================================
