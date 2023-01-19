@@ -1,0 +1,39 @@
+# ~/Developer/Tools/python_linux64_3.10.5/bin/ansible-playbook --inventory inventory.yml --ask-become-pass -vv playbook.yml
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    root_dir:               "{{ playbook_dir }}"
+    download_dir:           "{{ root_dir }}/Downloads"
+    install_dir:            "{{ root_dir }}/Tools"
+
+    zip7_version:           "2201"
+    zip7_install_dir:       "{{ install_dir }}/7zip_win64_{{ zip7_version }}"
+    zip7_download_url:      "https://www.7-zip.org/a/7z{{ zip7_version }}-x64.exe"
+    zip7_download_checksum: "sha256:b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4"
+
+  tasks:
+    - name: Setup root directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ download_dir }}"
+        - "{{ zip7_install_dir }}"
+
+    - name: Download 7zip
+      register: zip7_download_result
+      ansible.builtin.get_url:
+        url:      "{{ zip7_download_url }}"
+        dest:     "{{ download_dir }}"
+        checksum: "{{ zip7_download_checksum }}"
+
+    - name: Unzip 7zip
+      community.windows.win_unzip:
+        src:     "{{ zip7_download_result.dest }}"
+        dest:    "{{ zip7_install_dir }}"
+        remote_src: true
+
