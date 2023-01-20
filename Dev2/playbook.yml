@@ -1,18 +1,32 @@
-# ~/Developer/Tools/python_linux64_3.10.5/bin/ansible-playbook --inventory inventory.yml --ask-become-pass -vv playbook.yml
+# ~/Developer/Tools/python_linux64_3.10.5/bin/ansible-playbook -vv playbook.yml
 ---
 - hosts: localhost
-  connection: local
   gather_facts: no
 
   vars:
+    ansible_connection:                   winrm
+    ansible_port:                         5985
+    ansible_winrm_transport:              basic
+    ansible_winrm_server_cert_validation: ignore # Connect over HTTP, not HTTPs, local setup ...
+
     root_dir:               "{{ playbook_dir }}"
     download_dir:           "{{ root_dir }}/Downloads"
-    install_dir:            "{{ root_dir }}/Tools"
+    internal_dir:           "{{ root_dir }}/Internal"
+    install_dir:            "{{ root_dir }}/Install"
 
-    zip7_version:           "2201"
+    zip7_version:           2201
     zip7_install_dir:       "{{ install_dir }}/7zip_win64_{{ zip7_version }}"
-    zip7_download_url:      "https://www.7-zip.org/a/7z{{ zip7_version }}-x64.exe"
-    zip7_download_checksum: "sha256:b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4"
+    zip7_download_url:      https://www.7-zip.org/a/7z{{ zip7_version }}-x64.exe
+    zip7_download_checksum: sha256:b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4
+
+
+  vars_prompt:
+    - name: ansible_user
+      prompt: Windows username
+      private: false
+
+    - name: ansible_password
+      prompt: Windows password
 
   tasks:
     - name: Setup root directories
@@ -22,6 +36,7 @@
         mode: '0755'
       loop:
         - "{{ download_dir }}"
+        - "{{ install_dir }}"
         - "{{ zip7_install_dir }}"
 
     - name: Download 7zip
@@ -32,8 +47,9 @@
         checksum: "{{ zip7_download_checksum }}"
 
     - name: Unzip 7zip
-      community.windows.win_unzip:
-        src:     "{{ zip7_download_result.dest }}"
-        dest:    "{{ zip7_install_dir }}"
-        remote_src: true
+      ansible.windows.win_command: "{{ install_dir }}/7zr.exe -x {{ zip7_download_result.dest }} -o{{ zip7_install_dir }}"
+
+        # src:     "{{ zip7_download_result.dest }}"
+        # dest:    "{{ zip7_install_dir }}"
+        # remote_src: true
 
