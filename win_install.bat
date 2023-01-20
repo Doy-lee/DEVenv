@@ -503,9 +503,9 @@ call win_helpers.bat :MakeFileHardLink "!bin_dir!\ninja.exe" "!ninja_exe!" || ex
 
 REM nodejs
 REM ----------------------------------------------------------------------------
-set nodejs_sha256=f7b0e8b0bfcfad7d62eba16fa4db9f085983c12c661bd4c66d8e3bd783befa65
-set nodejs_exe_sha256=7f33cbe04cb2940427e6dd97867c1fcf3ddd60911d2ae0260da3cab9f6ea6365
-set nodejs_version=16.7.0
+set nodejs_sha256=e07399a4a441091ca0a5506faf7a9236ea1675220146daeea3bee828c2cbda3f
+set nodejs_exe_sha256=E4E7F389FBEC9300275DEFC749246C62BDBE4F66406EB01E7C9A4101E07352DA
+set nodejs_version=16.19.0
 set nodejs_name=nodejs_win64
 
 set nodejs_download_name=node-v!nodejs_version!-win-x64
