@@ -1,0 +1,22 @@
+- name: Check {{ item.app_label }} {{ item.app_version }} executable checksum
+  register: "item_exe_checksum_result"
+  ansible.windows.win_stat:
+    path: "{{ item_exe_path }}"
+    get_checksum: yes
+    checksum_algorithm: "{{ item.app_checksum_type }}"
+
+- name: Download {{ item.app_label }}
+  register: item_download_result
+  when: item_exe_checksum_result.stat.exists == false or item_exe_checksum_result.stat.checksum != item_exe_checksum
+  ansible.windows.win_get_url:
+    url:                "{{ item_download_url }}"
+    dest:               "{{ download_dir }}"
+    checksum:           "{{ item_download_checksum }}"
+    checksum_algorithm: "{{ item.app_checksum_type }}"
+    force:              false
+
+- name: Install {{ item.app_label }} {{ item.version }} executable
+  ansible.windows.win_command: "{{ item }}"
+  loop: "{{ item.app_install_commands }}"
+  when: item_exe_checksum_result.stat.exists == false or item_exe_checksum_result.stat.checksum != item_exe_checksum
+

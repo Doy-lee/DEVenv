@@ -1,24 +1,33 @@
 # ~/Developer/Tools/python_linux64_3.10.5/bin/ansible-playbook -vv playbook.yml
 ---
-- hosts: localhost
+- hosts: all
+  connection: winrm
   gather_facts: no
 
   vars:
+    backslash_char: '\'
+
     ansible_connection:                   winrm
     ansible_port:                         5985
     ansible_winrm_transport:              basic
     ansible_winrm_server_cert_validation: ignore # Connect over HTTP, not HTTPs, local setup ...
 
-    root_dir:               "{{ playbook_dir }}"
-    download_dir:           "{{ root_dir }}/Downloads"
-    internal_dir:           "{{ root_dir }}/Internal"
-    install_dir:            "{{ root_dir }}/Install"
+    # The root directory is the playbook directory, but since we are calling
+    # from WSL, the playbook directory is in unix format. We will convert it to
+    # a Windows style-path using some basic text manipulation.
+    #
+    # {{ playbook_dir }}   => /mnt/c/Home/Some/Path
+    #   [5:]               => c/Home/Some/Path
+    #   regex_replace(...) => c:/Home/Some/Path
+    #   replace('/', '\')  => c:\Home\Some\Path
+    #
+    root_dir:               "{{ playbook_dir[5:] | regex_replace('^([A-z])/(.*)$', '\\1:/\\2') | replace('/', backslash_char) }}"
+    download_dir:           "{{ root_dir }}\\Downloads"
+    internal_dir:           "{{ root_dir }}\\Internal"
+    install_dir:            "{{ root_dir }}\\Install"
 
     zip7_version:           2201
-    zip7_install_dir:       "{{ install_dir }}/7zip_win64_{{ zip7_version }}"
-    zip7_download_url:      https://www.7-zip.org/a/7z{{ zip7_version }}-x64.exe
-    zip7_download_checksum: sha256:b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4
-
+    zip7_install_dir:       "{{ install_dir }}\\7zip_win64\\{{ zip7_version }}"
 
   vars_prompt:
     - name: ansible_user
@@ -30,26 +39,73 @@
 
   tasks:
     - name: Setup root directories
-      ansible.builtin.file:
+      ansible.windows.win_file:
         path: "{{ item }}"
         state: directory
-        mode: '0755'
       loop:
         - "{{ download_dir }}"
         - "{{ install_dir }}"
-        - "{{ zip7_install_dir }}"
 
-    - name: Download 7zip
-      register: zip7_download_result
-      ansible.builtin.get_url:
-        url:      "{{ zip7_download_url }}"
-        dest:     "{{ download_dir }}"
-        checksum: "{{ zip7_download_checksum }}"
+    - name: Install 7zip from archive
+      ansible.builtin.import_tasks: install_from_archive.yml
+      vars:
+        item_label:             "7zip"
+        item_version:           "{{ zip7_version }}"
+        item_install_dir:       "{{ zip7_install_dir }}"
+        item_checksum_type:     sha256
+        item_download_url:      https://www.7-zip.org/a/7z{{ item_version }}-x64.exe
+        item_download_checksum: b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4
+        item_exe_path:          "{{ item_install_dir}}\\7z.exe"
+        item_exe_checksum:      254cf6411d38903b2440819f7e0a847f0cfee7f8096cfad9e90fea62f42b0c23
+        item_install_commands:
+          - "{{ internal_dir }}\\7zr.exe x {{ item_download_result.dest }} -o{{ item_install_dir }} -aoa"
 
-    - name: Unzip 7zip
-      ansible.windows.win_command: "{{ install_dir }}/7zr.exe -x {{ zip7_download_result.dest }} -o{{ zip7_install_dir }}"
+    - name: Install WezTerm from archive
+      ansible.builtin.import_tasks: install_from_archive.yml
+      async: 45
+      poll: 0
+      vars:
+        item_label:             WezTerm
+        item_version:           20221119-145034-49b9839f
+        item_install_dir:       "{{ install_dir }}\\{{ item_label | replace(' ', '') }}_win64\\{{ item_version }}"
+        item_checksum_type:     sha256
+        item_download_filename: WezTerm-windows-{{ item_version }}
+        item_download_url:      https://github.com/wez/wezterm/releases/download/{{ item_version }}/{{ item_download_filename }}.zip
+        item_download_checksum: 7041d2c02d226c0c051cc9f6373d51ac9a2de00025e18582077c76e8ad68abe1
+        item_exe_path:          "{{ item_install_dir}}\\wezterm-gui.exe"
+        item_exe_checksum:      e3faa247d69a8a966302a2ab4e655b08b79548707db79a7b724cf18cccf5ae35
+        item_install_commands:
+          - "{{ zip7_install_dir }}\\7z.exe x {{ item_download_result.dest }} -o{{ item_install_dir }} -aoa -spe"
+          - "xcopy /Y /E /V /H {{ item_install_dir }}\\{{ item_download_filename }}\\* {{ item_install_dir }}"
+          - "cmd /c rmdir /S /Q {{ item_install_dir}}\\{{ item_download_filename }}"
 
-        # src:     "{{ zip7_download_result.dest }}"
-        # dest:    "{{ zip7_install_dir }}"
-        # remote_src: true
+            # - name: Install JetBrains Mono Font from archive
+            #   ansible.builtin.import_tasks: install_from_archive.yml
+            #   async: 45
+            #   poll: 0
+            #   vars:
+            #     item_label:             JetBrains Mono Font
+            #     item_version:           2.304
+            #     item_install_dir:       "{{ install_dir }}\\{{ item_label | replace(' ', '_') }}_win64\\{{ item_version }}"
+            #     item_checksum_type:     sha256
+            #     item_download_url:      https://download.jetbrains.com/fonts/JetBrainsMono-{{ item_version }}.zip
+            #     item_download_checksum: 6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf
+            #     item_exe_path:          "{{ item_install_dir }}\\fonts\\ttf\\JetBrainsMono-Regular.ttf"
+            #     item_exe_checksum:      a0bf60ef0f83c5ed4d7a75d45838548b1f6873372dfac88f71804491898d138f
+            #     item_install_commands:
+            #       - "{{ zip7_install_dir }}\\7z.exe x {{ item_download_result.dest }} -o{{ item_install_dir }} -aoa -spe"
 
+    - name: Install JetBrains Mono Font from archive
+      ansible.builtin.include_tasks: install_from_archive2.yml
+      loop:
+        - { app_label:             JetBrains Mono Font,
+            app_version:           2.304,
+            app_install_dir:       "{{ install_dir }}\\{{ app_label | replace(' ', '_') }}_win64\\{{ app_version }}",
+            app_checksum_type:     sha256,
+            app_download_url:      https://download.jetbrains.com/fonts/JetBrainsMono-{{ app_version }}.zip,
+            app_download_checksum: 6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf,
+            app_exe_path:          "{{ app_install_dir }}\\fonts\\ttf\\JetBrainsMono-Regular.ttf",
+            app_exe_checksum:      a0bf60ef0f83c5ed4d7a75d45838548b1f6873372dfac88f71804491898d138f,
+            app_install_commands:
+              - "{{ zip7_install_dir }}\\7z.exe x {{ app_download_result.dest }} -o{{ app_install_dir }} -aoa -spe"
+          }
