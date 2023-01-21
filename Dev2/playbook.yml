@@ -29,6 +29,25 @@
     zip7_version:           2201
     zip7_install_dir:       "{{ install_dir }}\\7zip_win64\\{{ zip7_version }}"
 
+    default_unzip_install_command: "{{ zip7_install_dir }}\\7z.exe x {{ app_download_result.dest }} -o{{ app_install_dir }} -aoa -spe"
+
+    default_unzip_install_commands:
+      - "{{ default_unzip_install_command }}"
+
+    default_unzip_remove_dupe_root_install_commands:
+      - "{{ default_unzip_install_command }}"
+      - "xcopy /Y /E /V /H /Q {{ app_install_dir }}\\{{ app_download_filename }}\\* {{ app_install_dir }}"
+      - "cmd /c rmdir /S /Q {{ app_install_dir}}\\{{ app_download_filename }}"
+
+    # Default values for installation
+    # --------------------------------------------------------------------------
+    app_checksum_type:      sha256
+    app_version:           "{{ item.version }}"
+    app_download_checksum: "{{ item.download_checksum }}"
+    app_exe_checksum:      "{{ item.exe_checksum }}"
+    app_install_dir:       "{{ install_dir }}\\{{ app_label | replace(' ', '_') }}_win64\\{{ app_version }}"
+    app_install_commands:  "{{ default_unzip_install_commands }}"
+
   vars_prompt:
     - name: ansible_user
       prompt: Windows username
@@ -46,66 +65,76 @@
         - "{{ download_dir }}"
         - "{{ install_dir }}"
 
-    - name: Install 7zip from archive
+    - name: Install {{ app_label }} from archive
       ansible.builtin.import_tasks: install_from_archive.yml
       vars:
-        item_label:             "7zip"
-        item_version:           "{{ zip7_version }}"
-        item_install_dir:       "{{ zip7_install_dir }}"
-        item_checksum_type:     sha256
-        item_download_url:      https://www.7-zip.org/a/7z{{ item_version }}-x64.exe
-        item_download_checksum: b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4
-        item_exe_path:          "{{ item_install_dir}}\\7z.exe"
-        item_exe_checksum:      254cf6411d38903b2440819f7e0a847f0cfee7f8096cfad9e90fea62f42b0c23
-        item_install_commands:
-          - "{{ internal_dir }}\\7zr.exe x {{ item_download_result.dest }} -o{{ item_install_dir }} -aoa"
+        app_label:             "7zip"
+        app_version:           "{{ zip7_version }}"
+        app_download_checksum: b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4
+        app_download_filename: 7z{{ app_version }}-x64
+        app_download_url:      https://www.7-zip.org/a/{{ app_download_filename }}.exe
+        app_exe_path:          "{{ app_install_dir}}\\7z.exe"
+        app_exe_checksum:      254cf6411d38903b2440819f7e0a847f0cfee7f8096cfad9e90fea62f42b0c23
+        app_install_commands:
+          - "{{ internal_dir }}\\7zr.exe x {{ app_download_result.dest }} -o{{ app_install_dir }} -aoa -spe"
 
-    - name: Install WezTerm from archive
+    - name: Install {{ app_label }} from archive
       ansible.builtin.import_tasks: install_from_archive.yml
-      async: 45
-      poll: 0
       vars:
-        item_label:             WezTerm
-        item_version:           20221119-145034-49b9839f
-        item_install_dir:       "{{ install_dir }}\\{{ item_label | replace(' ', '') }}_win64\\{{ item_version }}"
-        item_checksum_type:     sha256
-        item_download_filename: WezTerm-windows-{{ item_version }}
-        item_download_url:      https://github.com/wez/wezterm/releases/download/{{ item_version }}/{{ item_download_filename }}.zip
-        item_download_checksum: 7041d2c02d226c0c051cc9f6373d51ac9a2de00025e18582077c76e8ad68abe1
-        item_exe_path:          "{{ item_install_dir}}\\wezterm-gui.exe"
-        item_exe_checksum:      e3faa247d69a8a966302a2ab4e655b08b79548707db79a7b724cf18cccf5ae35
-        item_install_commands:
-          - "{{ zip7_install_dir }}\\7z.exe x {{ item_download_result.dest }} -o{{ item_install_dir }} -aoa -spe"
-          - "xcopy /Y /E /V /H {{ item_install_dir }}\\{{ item_download_filename }}\\* {{ item_install_dir }}"
-          - "cmd /c rmdir /S /Q {{ item_install_dir}}\\{{ item_download_filename }}"
+        app_label:             WezTerm
+        app_version:           20221119-145034-49b9839f
+        app_download_checksum: 7041d2c02d226c0c051cc9f6373d51ac9a2de00025e18582077c76e8ad68abe1
+        app_download_filename: WezTerm-windows-{{ app_version }}
+        app_download_url:      https://github.com/wez/wezterm/releases/download/{{ app_version }}/{{ app_download_filename }}.zip
+        app_exe_checksum:      e3faa247d69a8a966302a2ab4e655b08b79548707db79a7b724cf18cccf5ae35
+        app_exe_path:          "{{ app_install_dir}}\\wezterm-gui.exe"
+        app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
 
-            # - name: Install JetBrains Mono Font from archive
-            #   ansible.builtin.import_tasks: install_from_archive.yml
-            #   async: 45
-            #   poll: 0
-            #   vars:
-            #     item_label:             JetBrains Mono Font
-            #     item_version:           2.304
-            #     item_install_dir:       "{{ install_dir }}\\{{ item_label | replace(' ', '_') }}_win64\\{{ item_version }}"
-            #     item_checksum_type:     sha256
-            #     item_download_url:      https://download.jetbrains.com/fonts/JetBrainsMono-{{ item_version }}.zip
-            #     item_download_checksum: 6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf
-            #     item_exe_path:          "{{ item_install_dir }}\\fonts\\ttf\\JetBrainsMono-Regular.ttf"
-            #     item_exe_checksum:      a0bf60ef0f83c5ed4d7a75d45838548b1f6873372dfac88f71804491898d138f
-            #     item_install_commands:
-            #       - "{{ zip7_install_dir }}\\7z.exe x {{ item_download_result.dest }} -o{{ item_install_dir }} -aoa -spe"
+    - name: Install {{ app_label }} from archive
+      ansible.builtin.import_tasks: install_from_archive.yml
+      vars:
+        app_label:             JetBrains Mono Font
+        app_version:           2.304
+        app_download_checksum: 6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf
+        app_download_filename: JetBrainsMono-{{ app_version }}
+        app_download_url:      https://download.jetbrains.com/fonts/{{ app_download_filename }}.zip
+        app_exe_checksum:      a0bf60ef0f83c5ed4d7a75d45838548b1f6873372dfac88f71804491898d138f
+        app_exe_path:          "{{ app_install_dir }}\\fonts\\ttf\\JetBrainsMono-Regular.ttf"
+        app_install_commands:  "{{ default_unzip_install_commands }}"
 
-    - name: Install JetBrains Mono Font from archive
-      ansible.builtin.include_tasks: install_from_archive2.yml
+    - name: Install {{ app_label }} from archive
+      ansible.builtin.include_tasks: install_from_archive.yml
+      vars:
+        app_label:             CMake
+        app_download_filename: "{{ item.download_filename | replace('@VERSION@', app_version) }}"
+        app_download_url:      https://github.com/Kitware/CMake/releases/download/v{{ item.version }}/{{ app_download_filename }}.zip
+        app_exe_path:          "{{ app_install_dir }}\\bin\\cmake.exe"
+        app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
       loop:
-        - { app_label:             JetBrains Mono Font,
-            app_version:           2.304,
-            app_install_dir:       "{{ install_dir }}\\{{ app_label | replace(' ', '_') }}_win64\\{{ app_version }}",
-            app_checksum_type:     sha256,
-            app_download_url:      https://download.jetbrains.com/fonts/JetBrainsMono-{{ app_version }}.zip,
-            app_download_checksum: 6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf,
-            app_exe_path:          "{{ app_install_dir }}\\fonts\\ttf\\JetBrainsMono-Regular.ttf",
-            app_exe_checksum:      a0bf60ef0f83c5ed4d7a75d45838548b1f6873372dfac88f71804491898d138f,
-            app_install_commands:
-              - "{{ zip7_install_dir }}\\7z.exe x {{ app_download_result.dest }} -o{{ app_install_dir }} -aoa -spe"
-          }
+        - version:           3.23.1
+          download_filename: "cmake-@VERSION@-windows-x86_64"
+          download_checksum: 9b509cc4eb7191dc128cfa3f2170036f9cbc7d9d5f93ff7fafc5b2d77b3b40dc
+          exe_checksum:      326ae6ce4bd46c27f6ce46c95b48efc19848fd9fc24d71d2e8a226dadfef810c
+
+        - version:           3.22.2
+          download_filename: "cmake-@VERSION@-windows-x86_64"
+          download_checksum: 192d62eaecb0600e743f01058dfbd5b6bed91504fe8f56416febf54c38ce096e
+          exe_checksum:      cf1af65d22bd01bf1cf2db7ecefeb730ab147549755faa4357e5427e3175f638
+
+        - version:           3.10.3
+          download_filename: "cmake-@VERSION@-win64-x64"
+          download_checksum: 3bd57d1cfcf720a4cc72db77bda4c76a7b700fb0341821ad868963ad28856cd0
+          exe_checksum:      f2e3b486d87d2a6bc19b3a62c740028f3f8945875196ac7d3d0e69649e98730a
+
+    - name: Install {{ app_label }} from archive
+      ansible.builtin.import_tasks: install_from_archive.yml
+      vars:
+        app_label:             Doxygen
+        app_version:           1.9.4
+        app_download_checksum: 3b34098c5fb016baa1d29aba101fe9d6843213b966b92a6b12c8856c547ee0c4
+        app_download_filename: doxygen-{{ app_version }}.windows.x64.bin
+        app_download_url:      https://github.com/doxygen/doxygen/releases/download/Release_{{ app_version | replace('.', '_') }}/{{ app_download_filename }}.zip
+        app_exe_checksum:      3cb4d89f2b3db7eec2b6797dc6b49cdfe9adda954575898895260f66f312d730
+        app_exe_path:          "{{ app_install_dir }}\\doxygen.exe"
+        app_install_commands:  "{{ default_unzip_install_commands }}"
+
