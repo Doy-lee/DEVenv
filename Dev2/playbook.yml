@@ -1,8 +1,30 @@
 # ~/Developer/Tools/python_linux64_3.10.5/bin/ansible-playbook -vv playbook.yml
+# - No async would be nice and speed things up, *but* it seems to be buggy on
+#   Windows. I get missing a param _async_dir when I try to join on the task?
+#
+#   But also, we can't use async per import/include task, or even per block, so,
+#   you would have to async all the downloads, wait, then, async all the
+#   installations. If we were downloading from a slow server, that will still
+#   dominate the installation time as we have to join at the end of all the
+#   downloads to proceed onto the next stage.
+#
+# - No fancy loops! To reuse tasks (e.g. my install archive task) you must use
+#   include or import. Loops can only be used with includes which is dynamically
+#   evaluated. If you dynamically include tasks then you can not use ansible's
+#   --start-at-task which is very handy for testing ...
+
 ---
 - hosts: all
   connection: winrm
   gather_facts: no
+
+  vars_prompt:
+    - name: ansible_user
+      prompt: Windows username
+      private: false
+
+    - name: ansible_password
+      prompt: Windows password
 
   vars:
     backslash_char: '\'
@@ -21,13 +43,11 @@
     #   regex_replace(...) => c:/Home/Some/Path
     #   replace('/', '\')  => c:\Home\Some\Path
     #
-    root_dir:               "{{ playbook_dir[5:] | regex_replace('^([A-z])/(.*)$', '\\1:/\\2') | replace('/', backslash_char) }}"
-    download_dir:           "{{ root_dir }}\\Downloads"
-    internal_dir:           "{{ root_dir }}\\Internal"
-    install_dir:            "{{ root_dir }}\\Install"
-
-    zip7_version:           2201
-    zip7_install_dir:       "{{ install_dir }}\\7zip_win64\\2201"
+    root_dir:         "{{ playbook_dir[5:] | regex_replace('^([A-z])/(.*)$', '\\1:/\\2') | replace('/', backslash_char) }}"
+    download_dir:     "{{ root_dir }}\\Downloads"
+    internal_dir:     "{{ root_dir }}\\Internal"
+    install_dir:      "{{ root_dir }}\\Install"
+    zip7_install_dir: "{{ install_dir }}\\7zip_win64\\2201"
 
     default_unzip_install_command: "{{ zip7_install_dir }}\\7z.exe x {{ app_download_result.dest }} -o{{ app_install_dir }} -aoa -spe"
 
@@ -39,23 +59,6 @@
       - "xcopy /Y /E /V /H /Q {{ app_install_dir }}\\{{ app_download_filename }}\\* {{ app_install_dir }}"
       - "cmd /c rmdir /S /Q {{ app_install_dir}}\\{{ app_download_filename }}"
 
-    # Default values for installation
-    # --------------------------------------------------------------------------
-    app_checksum_type:      sha256
-    app_version:           "{{ item.version }}"
-    app_download_checksum: "{{ item.download_checksum }}"
-    app_exe_checksum:      "{{ item.exe_checksum }}"
-    app_install_dir:       "{{ install_dir }}\\{{ app_label | replace(' ', '_') }}_win64\\{{ app_version }}"
-    app_install_commands:  "{{ default_unzip_install_commands }}"
-
-  vars_prompt:
-    - name: ansible_user
-      prompt: Windows username
-      private: false
-
-    - name: ansible_password
-      prompt: Windows password
-
   tasks:
     - name: Setup root directories
       ansible.windows.win_file:
@@ -65,141 +68,205 @@
         - "{{ download_dir }}"
         - "{{ install_dir }}"
 
-    - name: Install {{ app_label }} from archive
-      ansible.builtin.import_tasks: install_from_archive.yml
-      tags: [&wezterm_label WezTerm, even]
+    # WezTerm
+    # --------------------------------------------------------------------------
+    - ansible.builtin.import_tasks: install_from_archive.yml
       vars:
-        app_label:             *wezterm_label
+        app_label:             WezTerm
         app_version:           20221119-145034-49b9839f
         app_download_checksum: 7041d2c02d226c0c051cc9f6373d51ac9a2de00025e18582077c76e8ad68abe1
         app_download_filename: WezTerm-windows-{{ app_version }}
         app_download_url:      https://github.com/wez/wezterm/releases/download/{{ app_version }}/{{ app_download_filename }}.zip
         app_exe_checksum:      e3faa247d69a8a966302a2ab4e655b08b79548707db79a7b724cf18cccf5ae35
-        app_exe_path:          "{{ app_install_dir}}\\wezterm-gui.exe"
+        app_exe_rel_path:      "wezterm-gui.exe"
         app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
 
-    - name: Install {{ app_label }} from archive
-      ansible.builtin.import_tasks: install_from_archive.yml
-      tags: [&jetbrains_label JetBrains Mono Font, odd]
+    # JetBrains Mono Font
+    # --------------------------------------------------------------------------
+    - ansible.builtin.import_tasks: install_from_archive.yml
       vars:
-        app_label:             *jetbrains_label
+        app_label:             JetBrains Mono Font
         app_version:           2.304
         app_download_checksum: 6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf
         app_download_filename: JetBrainsMono-{{ app_version }}
         app_download_url:      https://download.jetbrains.com/fonts/{{ app_download_filename }}.zip
         app_exe_checksum:      a0bf60ef0f83c5ed4d7a75d45838548b1f6873372dfac88f71804491898d138f
-        app_exe_path:          "{{ app_install_dir }}\\fonts\\ttf\\JetBrainsMono-Regular.ttf"
+        app_exe_rel_path:      "fonts\\ttf\\JetBrainsMono-Regular.ttf"
+        app_install_commands:  "{{ default_unzip_install_commands }}"
 
-    - name: Install {{ app_label }} from archive
-      ansible.builtin.include_tasks: install_from_archive.yml
-      tags: [&cmake_label CMake, even]
+    # CMake
+    # --------------------------------------------------------------------------
+    - ansible.builtin.import_tasks: install_from_archive.yml
       vars:
-        app_label:             *cmake_label
-        app_download_filename: "{{ item.download_filename | replace('@VERSION@', app_version) }}"
-        app_download_url:      https://github.com/Kitware/CMake/releases/download/v{{ item.version }}/{{ app_download_filename }}.zip
-        app_exe_path:          "{{ app_install_dir }}\\bin\\cmake.exe"
+        app_label:             CMake
+        app_version:           3.23.1
+        app_download_checksum: 9b509cc4eb7191dc128cfa3f2170036f9cbc7d9d5f93ff7fafc5b2d77b3b40dc
+        app_download_filename: "cmake-{{ app_version }}-windows-x86_64"
+        app_download_url:      https://github.com/Kitware/CMake/releases/download/v{{ app_version }}/{{ app_download_filename }}.zip
+        app_exe_checksum:      326ae6ce4bd46c27f6ce46c95b48efc19848fd9fc24d71d2e8a226dadfef810c
+        app_exe_rel_path:      "bin\\cmake.exe"
         app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
-      loop:
-        - version:           3.23.1
-          download_filename: "cmake-@VERSION@-windows-x86_64"
-          download_checksum: 9b509cc4eb7191dc128cfa3f2170036f9cbc7d9d5f93ff7fafc5b2d77b3b40dc
-          exe_checksum:      326ae6ce4bd46c27f6ce46c95b48efc19848fd9fc24d71d2e8a226dadfef810c
 
-        - version:           3.22.2
-          download_filename: "cmake-@VERSION@-windows-x86_64"
-          download_checksum: 192d62eaecb0600e743f01058dfbd5b6bed91504fe8f56416febf54c38ce096e
-          exe_checksum:      cf1af65d22bd01bf1cf2db7ecefeb730ab147549755faa4357e5427e3175f638
+    - ansible.builtin.import_tasks: install_from_archive.yml
+      vars:
+        app_label:             CMake
+        app_version:           3.22.2
+        app_download_checksum: 192d62eaecb0600e743f01058dfbd5b6bed91504fe8f56416febf54c38ce096e
+        app_download_filename: "cmake-{{ app_version }}-windows-x86_64"
+        app_download_url:      https://github.com/Kitware/CMake/releases/download/v{{ app_version }}/{{ app_download_filename }}.zip
+        app_exe_checksum:      cf1af65d22bd01bf1cf2db7ecefeb730ab147549755faa4357e5427e3175f638
+        app_exe_rel_path:      "bin\\cmake.exe"
+        app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
 
-        - version:           3.10.3
-          download_filename: "cmake-@VERSION@-win64-x64"
-          download_checksum: 3bd57d1cfcf720a4cc72db77bda4c76a7b700fb0341821ad868963ad28856cd0
-          exe_checksum:      f2e3b486d87d2a6bc19b3a62c740028f3f8945875196ac7d3d0e69649e98730a
+    - ansible.builtin.import_tasks: install_from_archive.yml
+      vars:
+        app_label:             CMake
+        app_version:           3.10.3
+        app_download_checksum: 3bd57d1cfcf720a4cc72db77bda4c76a7b700fb0341821ad868963ad28856cd0
+        app_download_filename: "cmake-{{ app_version }}-win64-x64"
+        app_download_url:      https://github.com/Kitware/CMake/releases/download/v{{ app_version }}/{{ app_download_filename }}.zip
+        app_exe_checksum:      f2e3b486d87d2a6bc19b3a62c740028f3f8945875196ac7d3d0e69649e98730a
+        app_exe_rel_path:      "bin\\cmake.exe"
+        app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
 
+    # Doxygen
+    # --------------------------------------------------------------------------
     - name: Install {{ app_label }} from archive
       ansible.builtin.import_tasks: install_from_archive.yml
-      tags: [&doxygen_label Doxygen, odd]
       vars:
-        app_label:             *doxygen_label
+        app_label:             Doxygen
         app_version:           1.9.4
         app_download_checksum: 3b34098c5fb016baa1d29aba101fe9d6843213b966b92a6b12c8856c547ee0c4
         app_download_filename: doxygen-{{ app_version }}.windows.x64.bin
         app_download_url:      https://github.com/doxygen/doxygen/releases/download/Release_{{ app_version | replace('.', '_') }}/{{ app_download_filename }}.zip
         app_exe_checksum:      3cb4d89f2b3db7eec2b6797dc6b49cdfe9adda954575898895260f66f312d730
-        app_exe_path:          "{{ app_install_dir }}\\doxygen.exe"
+        app_exe_rel_path:      "doxygen.exe"
+        app_install_commands:  "{{ default_unzip_install_commands }}"
 
-    - name: Install {{ app_label}} from archive
-      ansible.builtin.import_tasks: install_from_archive.yml
-      tags: [&git_label Git, even]
+    # Git
+    # --------------------------------------------------------------------------
+    - ansible.builtin.import_tasks: install_from_archive.yml
       vars:
-        app_label:             *git_label
+        arch:                  aarch64-none-elf
+        app_label:             Git
         app_version:           2.39.1
         app_download_checksum: b898306a44084b5fa13b9a52e06408d97234389d07ae41d9409bdf58cad3d227
         app_download_filename: PortableGit-{{ app_version }}-64-bit.7z.exe
         app_download_url:      https://github.com/git-for-windows/git/releases/download/v{{ app_version }}.windows.1/{{ app_download_filename }}
         app_exe_checksum:      2fc6d5be237efb6b429d8f40975f1a1cfe3bcac863d9335e24096c8b0ec38105
-        app_exe_path:          "{{ app_install_dir }}\\cmd\\git.exe"
+        app_exe_rel_path:      "cmd\\git.exe"
+        app_install_commands:  "{{ default_unzip_install_commands }}"
 
+    # GCC MinGW AArch64
+    # --------------------------------------------------------------------------
     - ansible.builtin.include_tasks: install_from_archive.yml
       vars:
-        app_label:             GCC MinGW ARM
-        app_version:           "{{ item.version }}"
-        app_download_filename: "gcc-v{{ app_version }}-{{ item.arch }}"
+        arch:                  aarch64-none-elf
+        app_label:             GCC MinGW AArch64
+        app_version:           12.2.0
+        app_download_checksum: 729e8af6aecd85cce63435b94c310c01983091b5db54842cd6604298f29d047f
+        app_download_filename: "gcc-v{{ app_version }}-{{ arch }}"
         app_download_url:      https://github.com/mmozeiko/build-gcc-arm/releases/download/gcc-v{{ app_version }}/{{ app_download_filename }}.7z
-        app_exe_path:          "{{ app_install_dir }}\\bin\\{{ item.arch }}-g++.exe"
+        app_exe_checksum:      a26baffa86bc3401790d682f13f9b321ea56153eae7dd4f332bde40a6b76fcb3
+        app_exe_rel_path:      "bin\\{{ arch }}-g++.exe"
         app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
-      loop:
-        - version:           12.2.0
-          arch:              aarch64-none-elf
-          download_checksum: 729e8af6aecd85cce63435b94c310c01983091b5db54842cd6604298f29d047f
-          exe_checksum:      a26baffa86bc3401790d682f13f9b321ea56153eae7dd4f332bde40a6b76fcb3
-
-        - version:           12.2.0
-          arch:              arm-none-eabi
-          download_checksum: aa581b3a5d446bb2d9827f2ea1f02b066b6713d4543d24abbd3181f626036c39
-          exe_checksum:      fa48985c43cf82b426c461381e4c50d0ac3e9425f7e97bf116e1bab4b3a2a388
-
-        - version:           11.3.0
-          arch:              aarch64-none-elf
-          download_checksum: a000bdeeb225145a1450c1b9b1094ef71c13fc4de2ab300a65acbf51cd107c7d
-          exe_checksum:      47eaef0e603c9fcae18f2efada305888503e878053119ede3a9e0b8b8beac2ee
-
-        - version:           11.3.0
-          arch:              arm-none-eabi
-          download_checksum: 797ed71f60fae386c8875bb4e75e244afb15ded9e00ac77b6670a62be7614cc6
-          exe_checksum:      a36f2ea6846badf7c91631f118e88967f25d6e479a9beea158445ce75403a655
-
-        - version:           10.3.0
-          arch:              aarch64-none-elf
-          download_checksum: 095ab5a12059fa5dc59f415c059eb577f443a766eb1dd312fbede0f59940f432
-          exe_checksum:      f2b2d3c6dab0f84a151835540f25e6d6f9442d00bf546bc4c709fad4b6fdda06
-
-        - version:           10.3.0
-          arch:              arm-none-eabi
-          download_checksum: af0fc2da062aa6423a91213e231ecc5981136b9b0655837ebdbbc5ad879d2d9e
-          exe_checksum:      c3dc49b561d177b3586992dfea86067eb8799e1586a7f26cea5b0ea97926632e
 
     - ansible.builtin.include_tasks: install_from_archive.yml
       vars:
-        app_label:             GCC MinGW
-        app_version:           "{{ item.version }}"
-        app_download_filename: "gcc-v{{ app_version }}-mingw-v{{ item.mingw_version }}-x86_64"
-        app_download_url:      https://github.com/mmozeiko/build-gcc/releases/download/gcc-v{{ app_version }}-mingw-v{{ item.mingw_version }}/{{ app_download_filename }}.7z
-        app_exe_path:          "{{ app_install_dir }}\\bin\\gcc.exe"
+        arch:                  aarch64-none-elf
+        app_label:             GCC MinGW AArch64
+        app_version:           11.3.0
+        app_download_checksum: a000bdeeb225145a1450c1b9b1094ef71c13fc4de2ab300a65acbf51cd107c7d
+        app_download_filename: "gcc-v{{ app_version }}-{{ arch }}"
+        app_download_url:      https://github.com/mmozeiko/build-gcc-arm/releases/download/gcc-v{{ app_version }}/{{ app_download_filename }}.7z
+        app_exe_checksum:      47eaef0e603c9fcae18f2efada305888503e878053119ede3a9e0b8b8beac2ee
+        app_exe_rel_path:      "bin\\{{ arch }}-g++.exe"
         app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
-      loop:
-        - version:           12.2.0
-          mingw_version:     10.0.0
-          download_checksum: 5cbe5ea7533f6d24af3a57fe7022032f420b15d7c4e38c0d16534a42d33213a4
-          exe_checksum:      886b0f25256ddbd0f4ad09e6e3b81279f9a8b6a1b5c32c714c9c201d802caa39
 
-        - version:           11.3.0
-          mingw_version:     10.0.0
-          download_checksum: e2c5c64659aeda77680c5eec80bbaa4db3f117b21febeb3f13fd76d580604fd0
-          exe_checksum:      e92ecfa0171f2ab0c3ca39f2121ab5e887b3a378399a4be7e056820f5841c7a5
+    - ansible.builtin.include_tasks: install_from_archive.yml
+      vars:
+        arch:                  aarch64-none-elf
+        app_label:             GCC MinGW AArch64
+        app_version:           10.3.0
+        app_download_checksum: 095ab5a12059fa5dc59f415c059eb577f443a766eb1dd312fbede0f59940f432
+        app_download_filename: "gcc-v{{ app_version }}-{{ arch }}"
+        app_download_url:      https://github.com/mmozeiko/build-gcc-arm/releases/download/gcc-v{{ app_version }}/{{ app_download_filename }}.7z
+        app_exe_checksum:      f2b2d3c6dab0f84a151835540f25e6d6f9442d00bf546bc4c709fad4b6fdda06
+        app_exe_rel_path:      "bin\\{{ arch }}-g++.exe"
+        app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
 
-        - version:           10.3.0
-          mingw_version:     8.0.0
-          download_checksum: c8f38f6b1d264d7e008009bd32a04ca71b4ee3a3113e67930ab31c2e06818317
-          exe_checksum:      5c93b6da129ea01ee5fc87d5c7db948fc3bc62bae261ded9a883f1fa543571d2
+    # GCC MinGW ARM
+    # --------------------------------------------------------------------------
+    - ansible.builtin.include_tasks: install_from_archive.yml
+      vars:
+        arch:                  arm-none-eabi
+        app_label:             GCC MinGW ARM
+        app_version:           12.2.0
+        app_download_checksum: aa581b3a5d446bb2d9827f2ea1f02b066b6713d4543d24abbd3181f626036c39
+        app_download_filename: "gcc-v{{ app_version }}-{{ arch }}"
+        app_download_url:      https://github.com/mmozeiko/build-gcc-arm/releases/download/gcc-v{{ app_version }}/{{ app_download_filename }}.7z
+        app_exe_checksum:      fa48985c43cf82b426c461381e4c50d0ac3e9425f7e97bf116e1bab4b3a2a388
+        app_exe_rel_path:      "bin\\{{ arch }}-g++.exe"
+        app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
 
+    - ansible.builtin.include_tasks: install_from_archive.yml
+      vars:
+        arch:                  arm-none-eabi
+        app_label:             GCC MinGW ARM
+        app_version:           11.3.0
+        app_download_checksum: 797ed71f60fae386c8875bb4e75e244afb15ded9e00ac77b6670a62be7614cc6
+        app_download_filename: "gcc-v{{ app_version }}-{{ arch }}"
+        app_download_url:      https://github.com/mmozeiko/build-gcc-arm/releases/download/gcc-v{{ app_version }}/{{ app_download_filename }}.7z
+        app_exe_checksum:      a36f2ea6846badf7c91631f118e88967f25d6e479a9beea158445ce75403a655
+        app_exe_rel_path:      "bin\\{{ arch }}-g++.exe"
+        app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
 
+    - ansible.builtin.include_tasks: install_from_archive.yml
+      vars:
+        arch:                  arm-none-eabi
+        app_label:             GCC MinGW ARM
+        app_version:           10.3.0
+        app_download_checksum: af0fc2da062aa6423a91213e231ecc5981136b9b0655837ebdbbc5ad879d2d9e
+        app_download_filename: "gcc-v{{ app_version }}-{{ arch }}"
+        app_download_url:      https://github.com/mmozeiko/build-gcc-arm/releases/download/gcc-v{{ app_version }}/{{ app_download_filename }}.7z
+        app_exe_checksum:      c3dc49b561d177b3586992dfea86067eb8799e1586a7f26cea5b0ea97926632e
+        app_exe_rel_path:      "bin\\{{ arch }}-g++.exe"
+        app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
+
+    # GCC MinGW
+    # --------------------------------------------------------------------------
+    - ansible.builtin.include_tasks: install_from_archive.yml
+      vars:
+        mingw_version:         10.0.0
+        app_label:             GCC MinGW
+        app_version:           12.2.0
+        app_download_checksum: 5cbe5ea7533f6d24af3a57fe7022032f420b15d7c4e38c0d16534a42d33213a4
+        app_download_filename: "gcc-v{{ app_version }}-mingw-v{{ mingw_version }}-x86_64"
+        app_download_url:      https://github.com/mmozeiko/build-gcc/releases/download/gcc-v{{ app_version }}-mingw-v{{ mingw_version }}/{{ app_download_filename }}.7z
+        app_exe_checksum:      886b0f25256ddbd0f4ad09e6e3b81279f9a8b6a1b5c32c714c9c201d802caa39
+        app_exe_rel_path:      "bin\\g++.exe"
+        app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
+
+    - ansible.builtin.include_tasks: install_from_archive.yml
+      vars:
+        mingw_version:         10.0.0
+        app_label:             GCC MinGW
+        app_version:           11.3.0
+        app_download_checksum: e2c5c64659aeda77680c5eec80bbaa4db3f117b21febeb3f13fd76d580604fd0
+        app_download_filename: "gcc-v{{ app_version }}-mingw-v{{ mingw_version }}-x86_64"
+        app_download_url:      https://github.com/mmozeiko/build-gcc/releases/download/gcc-v{{ app_version }}-mingw-v{{ mingw_version }}/{{ app_download_filename }}.7z
+        app_exe_checksum:      e92ecfa0171f2ab0c3ca39f2121ab5e887b3a378399a4be7e056820f5841c7a5
+        app_exe_rel_path:      "bin\\g++.exe"
+        app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
+
+    - ansible.builtin.include_tasks: install_from_archive.yml
+      vars:
+        mingw_version:         8.0.0
+        app_label:             GCC MinGW
+        app_version:           10.3.0
+        app_download_checksum: c8f38f6b1d264d7e008009bd32a04ca71b4ee3a3113e67930ab31c2e06818317
+        app_download_filename: "gcc-v{{ app_version }}-mingw-v{{ mingw_version }}-x86_64"
+        app_download_url:      https://github.com/mmozeiko/build-gcc/releases/download/gcc-v{{ app_version }}-mingw-v{{ mingw_version }}/{{ app_download_filename }}.7z
+        app_exe_checksum:      5c93b6da129ea01ee5fc87d5c7db948fc3bc62bae261ded9a883f1fa543571d2
+        app_exe_rel_path:      "bin\\g++.exe"
+        app_install_commands:  "{{ default_unzip_remove_dupe_root_install_commands }}"
