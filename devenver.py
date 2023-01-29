@@ -461,22 +461,26 @@ def download_and_install_archive(download_url,
         for symlink_entry in exe_dict["symlink"]:
             symlink_dest = symlink_dir / symlink_entry
             symlink_src = exe_path
+            skip_link = True;
             if os.path.exists(symlink_dest):
                 # Windows uses hardlinks because symlinks require you to enable "developer" mode
                 # Everyone else uses symlinks
                 if (IS_WINDOWS and not os.path.isfile(symlink_dest)) or (not IS_WINDOWS and not os.path.islink(symlink_dest)):
-                    lprint( "- Cannot create symlink! The destionation file to create the symlink at.", level=1)
+                    lprint( "- Cannot create symlink! The destination file to create the symlink at.", level=1)
                     lprint( "  already exists and is *not* a link. We cannot remove this safely as we", level=1)
                     lprint( "  don't know what it is, exiting.", level=1)
                     lprint(f"  Symlink Source: {symlink_src}", level=1)
                     lexit (f"  Symlink Dest: {symlink_dest}", level=1)
 
-                os.unlink(symlink_dest)
+                if not os.path.samefile(symlink_dest, symlink_src):
+                    skip_link = False
+                    os.unlink(symlink_dest)
 
-            if IS_WINDOWS == True:
-                os.link(src=symlink_src, dst=symlink_dest)
-            else:
-                os.symlink(src=symlink_src, dst=symlink_dest)
+            if not skip_link:
+                if IS_WINDOWS == True:
+                    os.link(src=symlink_src, dst=symlink_dest)
+                else:
+                    os.symlink(src=symlink_src, dst=symlink_dest)
 
         # Collect paths to add to the devenv script
         # ----------------------------------------------------------------------
