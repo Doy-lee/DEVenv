@@ -23,7 +23,7 @@ def git_clone(install_dir, git_exe, url, commit_hash):
     curr_commit_hash = result.stdout.decode("utf-8").strip()
 
     # Checkout correct target of Odin
-    if curr_commit_hash != commit_hash:
+    if not curr_commit_hash.startswith(commit_hash):
         subprocess.run(f"{git_exe} checkout master", cwd=install_dir)
         subprocess.run(f"{git_exe} pull origin master", cwd=install_dir)
         subprocess.run(f"{git_exe} checkout {commit_hash}", cwd=install_dir)
@@ -114,14 +114,26 @@ if msvc_installed == False or win10_sdk_installed == False:
 devenver.print_header("Install apps that rely on Git")
 git_exe = installed_apps["Git"][0]['exe_path']
 
-# Clink Completions
+# Clink
 # ------------------------------------------------------------------------------
-clink_git_hash   = "fa18736"
-clink_install_dir = pathlib.Path(devenver.base_install_dir, "clink-completions")
-git_clone(install_dir=clink_install_dir,
+clink_install_dir = installed_apps["clink"][0]['install_dir']
+clink_base_dir    = clink_install_dir.parent
+
+# Gizmos
+clink_gizmo_git_hash   = "fb2edd9"
+clink_gizmo_install_dir = clink_base_dir / "clink-gizmos"
+git_clone(install_dir=clink_gizmo_install_dir,
+          git_exe=git_exe,
+          url="https://github.com/chrisant996/clink-gizmos",
+          commit_hash=clink_gizmo_git_hash)
+
+# Completions
+clink_completions_git_hash   = "86b6f07"
+clink_completions_install_dir = clink_base_dir / "clink-completions"
+git_clone(install_dir=clink_completions_install_dir,
           git_exe=git_exe,
           url="https://github.com/vladimir-kotikov/clink-completions",
-          commit_hash=clink_git_hash)
+          commit_hash=clink_completions_git_hash)
 
 # Odin
 # ------------------------------------------------------------------------------
@@ -162,16 +174,65 @@ if not os.path.exists(nvim_plug_vim_path):
     urllib.request.urlretrieve("https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim",
                                nvim_plug_vim_path)
 
+# Install clink configuration
+# ------------------------------------------------------------------------------
+clink_profile_dir                         = clink_base_dir / "profile"
+
+clink_settings_path = clink_profile_dir / "clink_settings"
+clink_settings = f"""
+# When this file is named "default_settings" and is in the binaries
+# directory or profile directory, it provides enhanced default settings.
+
+# Override built-in default settings with ones that provide a more
+# enhanced Clink experience.
+
+autosuggest.enable                = True
+clink.default_bindings            = windows
+cmd.ctrld_exits                   = False
+color.arginfo                     = sgr 38;5;172
+color.argmatcher                  = sgr 1;38;5;40
+color.cmd                         = sgr 1;38;5;231
+color.cmdredir                    = sgr 38;5;172
+color.cmdsep                      = sgr 38;5;214
+color.comment_row                 = sgr 38;5;87;48;5;18
+color.description                 = sgr 38;5;39
+color.doskey                      = sgr 1;38;5;75
+color.executable                  = sgr 1;38;5;33
+color.filtered                    = sgr 38;5;231
+color.flag                        = sgr 38;5;117
+color.hidden                      = sgr 38;5;160
+color.histexpand                  = sgr 97;48;5;55
+color.horizscroll                 = sgr 38;5;16;48;5;30
+color.input                       = sgr 38;5;222
+color.readonly                    = sgr 38;5;28
+color.selected_completion         = sgr 38;5;16;48;5;254
+color.selection                   = sgr 38;5;16;48;5;179
+color.suggestion                  = sgr 38;5;239
+color.unrecognized                = sgr 38;5;203
+history.max_lines                 = 25000
+history.time_stamp                = show
+match.expand_envvars              = True
+match.substring                   = True
+
+clink.path                        = {clink_completions_install_dir};{clink_gizmo_install_dir}
+fzf.default_bindings              = True
+"""
+
+devenver.lprint("Installing clink_settings to: {clink_settings_path}")
+with open(clink_settings_path, "w+") as file:
+    file.write(clink_settings)
+
 # Install wezterm configuration
+# ------------------------------------------------------------------------------
 wezterm_install_dir      = installed_apps["WezTerm"][0]["install_dir"]
 wezterm_exe_path         = installed_apps["WezTerm"][0]["exe_path"]
 wezterm_config_dest_path = wezterm_install_dir / "wezterm.lua"
 
 devenver.lprint(f"Installing WezTerm config to {wezterm_config_dest_path}")
 
-clink_install_dir          = installed_apps["clink"][0]["install_dir"]
 clink_exe_path             = clink_install_dir.relative_to(devenver.base_install_dir) / "clink_x64.exe"
 clink_exe_path_for_wezterm = str(clink_exe_path).replace("\\", "\\\\")
+clink_profile_path_for_wezterm = str(clink_profile_dir.relative_to(devenver.base_install_dir)).replace("\\", "\\\\")
 
 wezterm_lua_buffer = f"""local wezterm = require 'wezterm';
 
@@ -180,20 +241,18 @@ local set_environment_variables = {{}}
 
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 
-  clink_exe  = string.format("%s\\\\..\\\\..\\\\{clink_exe_path_for_wezterm}", wezterm.executable_dir)
-  devenv_bat = string.format("%s\\\\..\\\\..\\\\devenv.bat", wezterm.executable_dir)
-  msvc_bat   = string.format("%s\\\\..\\\\..\\\\msvc\\\\setup.bat", wezterm.executable_dir)
+  clink_exe     = string.format("%s\\\\..\\\\..\\\\{clink_exe_path_for_wezterm}", wezterm.executable_dir)
+  devenv_bat    = string.format("%s\\\\..\\\\..\\\\devenv.bat", wezterm.executable_dir)
+  msvc_bat      = string.format("%s\\\\..\\\\..\\\\msvc\\\\setup.bat", wezterm.executable_dir)
+  clink_profile = string.format("%s\\\\..\\\\..\\\\{clink_profile_path_for_wezterm}", wezterm.executable_dir)
 
   -- Taken from: https://wezfurlong.org/wezterm/shell-integration.html
   -- Use OSC 7 as per the above example
   set_environment_variables['prompt'] =
     '$E]7;file://localhost/$P$E\\\\$E[32m$T$E[0m $E[35m$P$E[36m$_$G$E[0m '
 
-  -- use a more ls-like output format for dir
-  set_environment_variables['DIRCMD'] = '/d'
-
   default_prog = {{"cmd.exe", "/s", "/k",
-                  clink_exe, "inject", "-q",
+                  clink_exe, "inject", "--profile", clink_profile, "-q",
                   "&&", "call", devenv_bat,
                   "&&", "call", msvc_bat}}
 end
@@ -230,6 +289,7 @@ with open(wezterm_terminal_script_path, "w") as file:
     file.write(wezterm_terminal_script)
 
 # Create Odin work-around scripts
+# ------------------------------------------------------------------------------
 # Odin uses J. Blow's Microsoft craziness SDK locator which relies on the
 # registry. Here we inject the registry entry that the SDK locator checks for
 # finding our portable MSVC installation.
@@ -260,6 +320,7 @@ with open(odin_msvc_uninstall_script_path, "w") as file:
     file.write(odin_msvc_uninstall_script)
 
 # Add python-update bootstrap script
+# ------------------------------------------------------------------------------
 # TODO: If I'm using the terminal that this script generates it will lock the
 # executable and Python cannot open the file for verifying the SHA256.
 

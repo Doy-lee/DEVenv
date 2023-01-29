@@ -639,9 +639,7 @@ def get_manifest():
                         "checksum": "331266334f59f2c978ff8e13bbcadb218051e790b61d9cc69e85617276c51298",
                     }
                 ],
-                "add_to_devenv_script": [
-                    "set CLINK_PATH=%~dp0clink-completions"
-                ],
+                "add_to_devenv_script": [],
             }
         ],
     })
