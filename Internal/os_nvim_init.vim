@@ -293,15 +293,6 @@ let g:fzf_command_prefix = 'Fzf'
 " - down / up / left / right
 let g:fzf_layout = { 'down': '40%' }
 
-" Add "FzfCustomRG" command which reinitializes
-function! RipgrepFzf(query, fullscreen)
-  let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case -- %s || true'
-  let initial_command = printf(command_fmt, shellescape(a:query))
-  let reload_command = printf(command_fmt, '{q}')
-  let spec = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
-  call fzf#vim#grep(initial_command, 1, fzf#vim#with_preview(spec), a:fullscreen)
-endfunction
-
 command! -nargs=* -bang FzfCustomRG call RipgrepFzf(<q-args>, <bang>0)
 
 " Augment the "FzfCustomFiles" command
@@ -313,7 +304,7 @@ command! -bang -nargs=? -complete=dir FzfCustomFiles
 " Telescope Bindings
 nnoremap <leader>h  <cmd>FzfHistory<cr>
 nnoremap <leader>f  <cmd>FzfCustomFiles<cr>
-nnoremap <leader>g  <cmd>FzfCustomRG<cr>
+nnoremap <leader>g  <cmd>FzfRg<cr>
 nnoremap <leader>tt <cmd>FzfTags<cr>
 nnoremap <leader>tb <cmd>FzfBTags<cr>
 nnoremap <leader>cc <cmd>FzfCommits<cr>
