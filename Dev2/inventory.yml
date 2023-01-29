@@ -1,5 +1,0 @@
-# ~/Developer/Tools/python_linux64_3.10.5/bin/ansible all -i inventory.yml -m ping -u doylet
-all:
-  hosts:
-    temp:
-      ansible_host: 172.24.80.1
