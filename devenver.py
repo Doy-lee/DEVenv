@@ -461,7 +461,7 @@ def download_and_install_archive(download_url,
         for symlink_entry in exe_dict["symlink"]:
             symlink_dest = symlink_dir / symlink_entry
             symlink_src = exe_path
-            skip_link = True;
+            skip_link = False;
             if os.path.exists(symlink_dest):
                 # Windows uses hardlinks because symlinks require you to enable "developer" mode
                 # Everyone else uses symlinks
@@ -472,8 +472,9 @@ def download_and_install_archive(download_url,
                     lprint(f"  Symlink Source: {symlink_src}", level=1)
                     lexit (f"  Symlink Dest: {symlink_dest}", level=1)
 
-                if not os.path.samefile(symlink_dest, symlink_src):
-                    skip_link = False
+                if os.path.samefile(symlink_dest, symlink_src):
+                    skip_link = True
+                else:
                     os.unlink(symlink_dest)
 
             if not skip_link:
