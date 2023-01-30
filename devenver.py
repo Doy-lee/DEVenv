@@ -717,7 +717,7 @@ def run(user_app_list,
 
     # Write the devenv script with environment variables
     global devenv_script_buffer
-    devenv_script_buffer += "set PATH=\"%~dp0Symlinks\";%PATH%\n"
+    devenv_script_buffer += "set PATH=%~dp0Symlinks;%PATH%\n"
 
     devenv_script_name = "devenv.bat" if IS_WINDOWS else "devenv.sh"
     devenv_script_path = pathlib.Path(install_dir, devenv_script_name)

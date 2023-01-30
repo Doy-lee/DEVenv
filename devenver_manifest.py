@@ -129,8 +129,8 @@ def get_manifest():
                     }
                 ],
                 "add_to_devenv_script": [
-                    f"set PATH=\"%~dp0{label}\\{version}\\mingw64\\bin\";%PATH%",
-                    f"set PATH=\"%~dp0{label}\\{version}\\usr\\bin\";%PATH%",
+                    f"set PATH=%~dp0{label}\\{version}\\mingw64\\bin;%PATH%",
+                    f"set PATH=%~dp0{label}\\{version}\\usr\\bin;%PATH%",
                 ],
             }
         ],
@@ -545,7 +545,7 @@ def get_manifest():
                 ],
                 "add_to_devenv_script": [
                     f"set PYTHONHOME=%~dp0{label}\\{version}\\install",
-                    f"set PATH=\"%~dp0{label}\\{version}\\install\\Script\";%PATH%",
+                    f"set PATH=%~dp0{label}\\{version}\\install\\Script;%PATH%",
                 ],
             }
         ],
