@@ -187,7 +187,7 @@ def download_file_at_url(url, download_path, download_checksum, label):
     # Download the file from URL
     # --------------------------------------------------------------------------
     if file_already_downloaded == False:
-        lprint('Initiating download request ...', level=1)
+        lprint('Initiating download request ...', level=2)
         with urllib.request.urlopen(url) as response:
             temp_file        = tempfile.mkstemp(text=False)
             temp_file_handle = temp_file[0]
@@ -204,12 +204,12 @@ def download_file_at_url(url, download_path, download_checksum, label):
                     bytes_downloaded  += bytes_written
                     percent_downloaded = int(bytes_downloaded / total_download_size * 100)
 
-                    lprint(' ' * len(line), end='\r', level=1)
+                    lprint(' ' * len(line), end='\r', level=2)
                     line = f'Downloading {percent_downloaded:.2f}% ({bytes_downloaded}/{total_download_size})'
-                    lprint(line, end='\r', level=1)
+                    lprint(line, end='\r', level=2)
             except Exception as exception:
                 download_failed = True
-                lprint(f'Download {label} from {url} failed, {exception}', level=1)
+                lprint(f'Download {label} from {url} failed, {exception}', level=2)
             finally:
                 temp_file_io.close()
                 print()

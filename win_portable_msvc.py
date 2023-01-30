@@ -9,6 +9,10 @@
 # folders, skip the downloading of MSVC or the SDK if we only need one of them).
 #
 # Changelog
+# 2023-01-30
+# - Generate the short-hand version of the msvc-{version}.bat and
+#   win-sdk-{version}.bat using the versions passed as the argument parameter.
+#
 # 2023-01-28
 # - Inital revision from mmozeiko
 #   https://gist.github.com/mmozeiko/7f3162ec2988e81e56d5c4e22cde9977/6863f19cb98b933c7535acf3d59ac64268c6bd1b
@@ -352,6 +356,7 @@ set INCLUDE=%MSVC_ROOT%\\include;%INCLUDE%
 set LIB=%MSVC_ROOT%\\lib\\%MSVC_ARCH%;%LIB%
 """
     (OUTPUT / f"msvc-{msvcv}.bat").write_text(MSVC_SCRIPT)
+    (OUTPUT / f"msvc-{args.msvc_version}.bat").write_text(MSVC_SCRIPT)
 
 if install_sdk:
     WIN10_SDK_SCRIPT = f"""@echo off
@@ -366,6 +371,7 @@ set INCLUDE=%SDK_INCLUDE%\\ucrt;%SDK_INCLUDE%\\shared;%SDK_INCLUDE%\\um;%SDK_INC
 set LIB=%SDK_LIBS%\\ucrt\\%SDK_ARCH%;%SDK_LIBS%\\um\\%SDK_ARCH%
     """
     (OUTPUT / f"win-sdk-{sdkv}.bat").write_text(WIN10_SDK_SCRIPT)
+    (OUTPUT / f"win-sdk-{args.sdk_version}.bat").write_text(WIN10_SDK_SCRIPT)
 
 print(f"Total downloaded: {total_download>>20} MB")
 print("Done!")

@@ -715,20 +715,20 @@ def get_manifest():
 
     # --------------------------------------------------------------------------
 
-    version = "1.1.41.1"
+    version = "1.1.42"
     result.append({
         "label": "jpegview",
         "manifests": [
             {
                 "download_url": f"https://github.com/sylikc/jpegview/releases/download/v{version}/JPEGView_{version}.7z",
-                "download_checksum": "7dd4b4b34b14e5fae331c7f4ebfb658be6684c70ec055cb1964642a8b45e4886",
+                "download_checksum": "84b20a6f3ee5184176e46a6755a57147aba90984c2fbbee094e57af036859daf",
                 "version": version,
                 "executables": [
                     {
                         "path": "JPEGView64/JPEGView.exe",
                         "symlink": [],
                         "add_to_devenv_path": False,
-                        "checksum": "f4fe2308c932a5f4f41f67b0520fe1fe8a96c94169d98c83f9501e9dc84b56ad",
+                        "checksum": "cd7930d0242cbd8a0d0dc9861e48f6ebe4c2bfba33aafbcf8e0da497ab0eae54",
                     }
                 ],
                 "add_to_devenv_script": [],
@@ -743,7 +743,7 @@ def get_manifest():
         "label": "mpc-qt",
         "manifests": [
             {
-                "download_url": f"https://github.com/sylikc/jpegview/releases/download/v{version}/JPEGView_{version}.7z",
+                "download_url": f"https://github.com/mpc-qt/mpc-qt/releases/download/v{version}/mpc-qt-win-x64-{version.replace('.', '')}.zip",
                 "download_checksum": "2230c4f4de1a429ccc67e5c590efc0a86fbaffeb33a4dc5f391aa45e660b80c2",
                 "version": version,
                 "executables": [

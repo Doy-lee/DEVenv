@@ -74,7 +74,7 @@ if msvc_installed == False or win10_sdk_installed == False:
     with tempfile.TemporaryDirectory() as temp_dir:
 
         # Invoke the MSVC script to download MSVC to disk
-        command = f"'{sys.executable}' '{msvc_script}' --accept-license"
+        command = f"\"{sys.executable}\" \"{msvc_script}\" --accept-license"
         line    = "Invoking MSVC script to install"
         if msvc_installed:
             command += " --no-msvc"
@@ -218,7 +218,8 @@ clink.path                        = {clink_completions_install_dir};{clink_gizmo
 fzf.default_bindings              = True
 """
 
-devenver.lprint("Installing clink_settings to: {clink_settings_path}")
+devenver.lprint(f"Installing clink_settings to: {clink_settings_path}")
+clink_settings_path.parent.mkdir(exist_ok=True)
 with open(clink_settings_path, "w+") as file:
     file.write(clink_settings)
 
@@ -243,7 +244,8 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 
   clink_exe     = string.format("%s\\\\..\\\\..\\\\{clink_exe_path_for_wezterm}", wezterm.executable_dir)
   devenv_bat    = string.format("%s\\\\..\\\\..\\\\devenv.bat", wezterm.executable_dir)
-  msvc_bat      = string.format("%s\\\\..\\\\..\\\\msvc\\\\setup.bat", wezterm.executable_dir)
+  msvc_bat      = string.format("%s\\\\..\\\\..\\\\msvc\\\\msvc-{msvc_version}.bat", wezterm.executable_dir)
+  win10_sdk_bat = string.format("%s\\\\..\\\\..\\\\msvc\\\\win-sdk-{win10_sdk_version}.bat", wezterm.executable_dir)
   clink_profile = string.format("%s\\\\..\\\\..\\\\{clink_profile_path_for_wezterm}", wezterm.executable_dir)
 
   -- Taken from: https://wezfurlong.org/wezterm/shell-integration.html
@@ -254,7 +256,8 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
   default_prog = {{"cmd.exe", "/s", "/k",
                   clink_exe, "inject", "--profile", clink_profile, "-q",
                   "&&", "call", devenv_bat,
-                  "&&", "call", msvc_bat}}
+                  "&&", "call", msvc_bat,
+                  "&&", "call", win10_sdk_bat}}
 end
 
 return {{
@@ -279,6 +282,9 @@ if "%~1" neq "" (
     set working_dir=start --cwd "%~1"
     set working_dir=!working_dir:\=/!
 )
+
+call \"{msvc_install_dir}\\msvc-{msvc_version}.bat\"
+call \"{msvc_install_dir}\\win-sdk-{win10_sdk_version}.bat\"
 
 if exist "%~dp0win_terminal_user_config.bat" call "%~dp0win_terminal_user_config.bat"
 start "" /MAX "%~dp0{wezterm_exe_rel_path}" !working_dir!
