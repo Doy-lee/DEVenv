@@ -333,12 +333,11 @@ with open(odin_msvc_uninstall_script_path, "w") as file:
 python_exe            = pathlib.Path(installed_apps["Python"][0]['exe_path']).relative_to(devenver.base_install_dir)
 python_install_dir    = pathlib.Path(installed_apps["Python"][0]['exe_path']).parent.relative_to(devenver.base_install_dir)
 win_setup_script_path = pathlib.Path(devenver.script_dir, "win_setup.py")
-manifest_script_path  = pathlib.Path(devenver.script_dir, "devenver_manifest.py")
 
 bootstrap_setup_script = f"""@echo off
 setlocal EnableDelayedExpansion
 set PYTHONHOME=%~dp0{python_install_dir}
-%~dp0{python_exe} {win_setup_script_path} --manifest-file {manifest_script_path}
+%~dp0{python_exe} {win_setup_script_path}
 pause
 """
 

@@ -44,15 +44,9 @@ arg_parser.add_argument('--install-dir',
                         default=default_base_install_dir,
                         type=pathlib.Path)
 
-arg_parser.add_argument('--manifest-file',
-                        help=f'Python file that has a get_manifest() function returning a dictionary of applications to download & install (see manifest.py for starters)',
-                        required=True,
-                        type=pathlib.Path)
-
 arg_parser.add_argument('--version',
                         action='version',
                         version='DEVenver v1')
-
 
 args = arg_parser.parse_args()
 
