@@ -814,7 +814,7 @@ def get_manifest():
             {
                 "download_url": f"https://github.com/WerWolv/ImHex/releases/download/v{version}/imhex-{version}-Windows-Portable.zip",
                 "download_checksum": "4f58097c3ccee88d8dff0d48da0f239af8a9d444903cc19a3369f63caa8d77e6",
-                "version": f"version",
+                "version": f"{version}",
                 "executables": [
                     {
                         "path": "imhex.exe",

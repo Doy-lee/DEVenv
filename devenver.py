@@ -26,33 +26,6 @@ from enum import Enum
 DOWNLOAD_CHUNK_SIZE = 1 * 1024 * 1024 # 1 megabyte
 IS_WINDOWS          = os.name == "nt"
 
-script_dir                 = os.path.dirname(os.path.abspath(__file__))
-default_base_dir           = script_dir
-default_base_downloads_dir = os.path.join(default_base_dir, 'Downloads')
-default_base_install_dir   = os.path.join(default_base_dir, 'Install')
-
-# Arguments
-# ------------------------------------------------------------------------------
-arg_parser = argparse.ArgumentParser()
-arg_parser.add_argument('--downloads-dir',
-                        help=f'Set the directory where downloaded files are cached (default: {default_base_downloads_dir})',
-                        default=default_base_downloads_dir,
-                        type=pathlib.Path)
-
-arg_parser.add_argument('--install-dir',
-                        help=f'Set the directory where downloaded files are installed (default: {default_base_install_dir})',
-                        default=default_base_install_dir,
-                        type=pathlib.Path)
-
-arg_parser.add_argument('--version',
-                        action='version',
-                        version='DEVenver v1')
-
-args = arg_parser.parse_args()
-
-base_downloads_dir = args.downloads_dir
-base_install_dir   = args.install_dir
-
 # ------------------------------------------------------------------------------
 # This app list must always be installed, they provide the tools to install all
 # other archives. Upon installation, we will collect the installation executable
@@ -651,6 +624,14 @@ def install_app_list(app_list, download_dir, install_dir):
 
     return result
 
+script_dir                 = os.path.dirname(os.path.abspath(__file__))
+default_base_dir           = script_dir
+default_base_downloads_dir = os.path.join(default_base_dir, 'Downloads')
+default_base_install_dir   = os.path.join(default_base_dir, 'Install')
+
+base_downloads_dir = default_base_downloads_dir
+base_install_dir   = default_base_install_dir
+
 def run(user_app_list,
         download_dir=base_downloads_dir,
         install_dir=base_install_dir):
@@ -671,6 +652,10 @@ def run(user_app_list,
         result (list): A list of dictionaries containing the install locations
         of each app, e.g.
     """
+
+    base_downloads_dir = download_dir
+    base_install_dir = install_dir
+
     # Run
     # --------------------------------------------------------------------------
     # Create the starting directories and install the internal app list (e.g.
@@ -730,5 +715,28 @@ def run(user_app_list,
 
     return result
 
+
 if __name__ == '__main__':
+
+    # Arguments
+    # ------------------------------------------------------------------------------
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--downloads-dir',
+                            help=f'Set the directory where downloaded files are cached (default: {default_base_downloads_dir})',
+                            default=default_base_downloads_dir,
+                            type=pathlib.Path)
+
+    arg_parser.add_argument('--install-dir',
+                            help=f'Set the directory where downloaded files are installed (default: {default_base_install_dir})',
+                            default=default_base_install_dir,
+                            type=pathlib.Path)
+
+    arg_parser.add_argument('--version',
+                            action='version',
+                            version='DEVenver v1')
+
+    args = arg_parser.parse_args()
+    base_downloads_dir = args.base_install_dir
+    base_install_dir   = args.install_dir
+
     run()

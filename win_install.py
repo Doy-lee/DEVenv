@@ -6,7 +6,7 @@ import pathlib
 import os
 import shutil
 import tempfile
-import devenver_manifest
+import win_devenver_manifest
 import urllib.request
 
 def git_clone(install_dir, git_exe, url, commit_hash):
@@ -30,8 +30,13 @@ def git_clone(install_dir, git_exe, url, commit_hash):
 
 # Run DEVenver, installing the portable apps
 # ------------------------------------------------------------------------------
-user_app_list  = devenver_manifest.get_manifest()
-installed_apps = devenver.run(user_app_list)
+download_dir = pathlib.Path(os.path.join(devenver.script_dir, 'Downloads'))
+install_dir  = pathlib.Path(os.path.join(devenver.script_dir, 'Win'))
+
+user_app_list  = win_devenver_manifest.get_manifest()
+installed_apps = devenver.run(user_app_list=user_app_list,
+                              download_dir=download_dir,
+                              install_dir=install_dir)
 
 # Install MSVC
 # ------------------------------------------------------------------------------
@@ -40,7 +45,7 @@ msvc_script       = pathlib.Path(devenver.script_dir, "win_portable_msvc.py")
 msvc_version      = "14.34"
 win10_sdk_version = "22621"
 
-msvc_install_dir = devenver.base_install_dir / "msvc"
+msvc_install_dir  = install_dir / "msvc"
 
 # Basic heuristic to see if we"ve already installed the MSVC/SDK version
 msvc_installed      = False
@@ -138,7 +143,7 @@ git_clone(install_dir=clink_completions_install_dir,
 # Odin
 # ------------------------------------------------------------------------------
 odin_git_hash    = "9ae1bfb6"
-odin_install_dir = pathlib.Path(devenver.base_install_dir, "Odin")
+odin_install_dir = pathlib.Path(install_dir, "Odin")
 git_clone(install_dir=odin_install_dir,
           git_exe=git_exe,
           url="https://github.com/odin-lang/odin.git",
@@ -231,9 +236,9 @@ wezterm_config_dest_path = wezterm_install_dir / "wezterm.lua"
 
 devenver.lprint(f"Installing WezTerm config to {wezterm_config_dest_path}")
 
-clink_exe_path             = clink_install_dir.relative_to(devenver.base_install_dir) / "clink_x64.exe"
+clink_exe_path             = clink_install_dir.relative_to(install_dir) / "clink_x64.exe"
 clink_exe_path_for_wezterm = str(clink_exe_path).replace("\\", "\\\\")
-clink_profile_path_for_wezterm = str(clink_profile_dir.relative_to(devenver.base_install_dir)).replace("\\", "\\\\")
+clink_profile_path_for_wezterm = str(clink_profile_dir.relative_to(install_dir)).replace("\\", "\\\\")
 
 wezterm_lua_buffer = f"""local wezterm = require 'wezterm';
 
@@ -272,8 +277,8 @@ with open(wezterm_config_dest_path, "w") as file:
     file.write(wezterm_lua_buffer)
 
 # Wezterm super terminal
-wezterm_exe_rel_path         = pathlib.Path(wezterm_exe_path).relative_to(devenver.base_install_dir)
-wezterm_terminal_script_path = pathlib.Path(devenver.base_install_dir, "win_terminal.bat")
+wezterm_exe_rel_path         = pathlib.Path(wezterm_exe_path).relative_to(install_dir)
+wezterm_terminal_script_path = pathlib.Path(install_dir, "win_terminal.bat")
 wezterm_terminal_script      = f"""@echo off
 setlocal EnableDelayedExpansion
 
@@ -312,8 +317,8 @@ odin_msvc_uninstall_script = f"""Windows Registry Editor Version 5.00
 "KitsRoot10"=-
 """
 
-odin_msvc_install_script_path   = devenver.base_install_dir / "odin_msvc_install_workaround.reg"
-odin_msvc_uninstall_script_path = devenver.base_install_dir / "odin_msvc_uninstall_workaround.reg"
+odin_msvc_install_script_path   = install_dir / "odin_msvc_install_workaround.reg"
+odin_msvc_uninstall_script_path = install_dir / "odin_msvc_uninstall_workaround.reg"
 
 devenver.lprint(f"Installing Odin MSVC workaround scripts", level=0)
 devenver.lprint(f" - {odin_msvc_install_script_path}", level=1)
@@ -330,9 +335,9 @@ with open(odin_msvc_uninstall_script_path, "w") as file:
 # TODO: If I'm using the terminal that this script generates it will lock the
 # executable and Python cannot open the file for verifying the SHA256.
 
-python_exe            = pathlib.Path(installed_apps["Python"][0]['exe_path']).relative_to(devenver.base_install_dir)
-python_install_dir    = pathlib.Path(installed_apps["Python"][0]['exe_path']).parent.relative_to(devenver.base_install_dir)
-win_setup_script_path = pathlib.Path(devenver.script_dir, "win_setup.py")
+python_exe            = pathlib.Path(installed_apps["Python"][0]['exe_path']).relative_to(install_dir)
+python_install_dir    = pathlib.Path(installed_apps["Python"][0]['exe_path']).parent.relative_to(install_dir)
+win_setup_script_path = pathlib.Path(devenver.script_dir, "win_install.py")
 
 bootstrap_setup_script = f"""@echo off
 setlocal EnableDelayedExpansion
@@ -341,5 +346,5 @@ set PYTHONHOME=%~dp0{python_install_dir}
 pause
 """
 
-with open(devenver.base_install_dir / "upgrade_bootstrap.bat", "w") as file:
+with open(install_dir / "upgrade_bootstrap.bat", "w") as file:
     file.write(bootstrap_setup_script)
