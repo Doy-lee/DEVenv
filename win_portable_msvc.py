@@ -12,6 +12,8 @@
 # 2023-01-30
 # - Generate the short-hand version of the msvc-{version}.bat and
 #   win-sdk-{version}.bat using the versions passed as the argument parameter.
+# - Fix win-sdk-{version}.bat overwriting the INCLUDE and LIB environment
+#   variables instead of appending.
 #
 # 2023-01-28
 # - Inital revision from mmozeiko
@@ -367,9 +369,9 @@ set SDK_INCLUDE=%~dp0Windows Kits\\10\\Include\\%SDK_VERSION%
 set SDK_LIBS=%~dp0Windows Kits\\10\\Lib\\%SDK_VERSION%
 
 set PATH=%~dp0Windows Kits\\10\\bin\\%SDK_VERSION%\\%SDK_ARCH%;%~dp0Windows Kits\\10\\bin\\%SDK_VERSION%\\%SDK_ARCH%\\ucrt;%PATH%
-set INCLUDE=%SDK_INCLUDE%\\ucrt;%SDK_INCLUDE%\\shared;%SDK_INCLUDE%\\um;%SDK_INCLUDE%\\winrt;%SDK_INCLUDE%\\cppwinrt
-set LIB=%SDK_LIBS%\\ucrt\\%SDK_ARCH%;%SDK_LIBS%\\um\\%SDK_ARCH%
-    """
+set INCLUDE=%SDK_INCLUDE%\\ucrt;%SDK_INCLUDE%\\shared;%SDK_INCLUDE%\\um;%SDK_INCLUDE%\\winrt;%SDK_INCLUDE%\\cppwinrt;%INCLUDE%
+set LIB=%SDK_LIBS%\\ucrt\\%SDK_ARCH%;%SDK_LIBS%\\um\\%SDK_ARCH%;%LIB%
+"""
     (OUTPUT / f"win-sdk-{sdkv}.bat").write_text(WIN10_SDK_SCRIPT)
     (OUTPUT / f"win-sdk-{args.sdk_version}.bat").write_text(WIN10_SDK_SCRIPT)
 
