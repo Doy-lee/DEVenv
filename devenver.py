@@ -492,9 +492,9 @@ def download_and_install_archive(download_url,
     global devenv_script_buffer
     for path in paths_to_add_to_devenv_script:
         if IS_WINDOWS:
-            devenv_script_buffer += f"set PATH=\"%~dp0{path}\";%PATH%\n"
+            devenv_script_buffer += f"set PATH=%~dp0{path};%PATH%\n"
         else:
-            devenv_script_buffer += f"PATH=\"$( cd -- \"$( dirname -- \"${BASH_SOURCE[0]}\" )\" &> /dev/null && pwd ){path}\";%PATH%\n"
+            devenv_script_buffer += f"PATH=$( cd -- \"$( dirname -- \"${BASH_SOURCE[0]}\" ) &> /dev/null && pwd ){path}\";%PATH%\n"
 
 # Search the 2 dictionarries, 'first' and 'second' for the key. A matching key
 # in 'first' taking precedence over the 'second' dictionary. If no key is
