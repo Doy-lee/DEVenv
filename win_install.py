@@ -290,7 +290,11 @@ devenver.lprint(f"Installing run background script (helper) to {background_apps_
 
 background_apps_script_path.write_text(f"""@echo off
 start "" "%~dp0{installed_apps["Everything"][0]["exe_path"].relative_to(install_dir)}"
+
+REM Ensure that eyes-thanks creates their portable INI file in the correct directory
+pushd "%~dp0{installed_apps["Eyes-Thanks"][0]["install_dir"].parent.relative_to(install_dir)}"
 start "" "%~dp0{installed_apps["Eyes-Thanks"][0]["exe_path"].relative_to(install_dir)}"
+popd
 """)
 
 # Create Odin work-around scripts
