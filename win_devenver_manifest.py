@@ -1017,4 +1017,27 @@ def get_manifest():
 
     # --------------------------------------------------------------------------
 
+    version = "0.4.29"
+    result.append({
+        "label": "Ripcord",
+        "manifests": [
+            {
+                "download_url": f"https://cancel.fm/dl/Ripcord_Win_{version}.zip",
+                "download_checksum": "c7a393ac669d02c16828706521833df06b690554368049545e47a1420fa8f04f",
+                "version": version,
+                "executables": [
+                    {
+                        "path": "ripcord.exe",
+                        "symlink": [],
+                        "add_to_devenv_path": False,
+                        "checksum": "12d62abb9ad4db43c2b9b1398acae66857eb6e64205364631a3d3bda0ff17e2e",
+                    }
+                ],
+                "add_to_devenv_script": [],
+            }
+        ],
+    })
+
+    # --------------------------------------------------------------------------
+
     return result
