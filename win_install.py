@@ -121,11 +121,11 @@ git_exe = installed_apps["Git"][0]['exe_path']
 
 # Clink
 # ------------------------------------------------------------------------------
-clink_install_dir = installed_apps["clink"][0]['install_dir']
+clink_install_dir = installed_apps["Clink"][0]['install_dir']
 clink_base_dir    = clink_install_dir.parent
 
 # Gizmos
-clink_gizmo_git_hash   = "fb2edd9"
+clink_gizmo_git_hash    = "fb2edd9"
 clink_gizmo_install_dir = clink_base_dir / "clink-gizmos"
 git_clone(install_dir=clink_gizmo_install_dir,
           git_exe=git_exe,
@@ -133,7 +133,7 @@ git_clone(install_dir=clink_gizmo_install_dir,
           commit_hash=clink_gizmo_git_hash)
 
 # Completions
-clink_completions_git_hash   = "86b6f07"
+clink_completions_git_hash    = "86b6f07"
 clink_completions_install_dir = clink_base_dir / "clink-completions"
 git_clone(install_dir=clink_completions_install_dir,
           git_exe=git_exe,
@@ -161,8 +161,8 @@ git_clone(install_dir=odin_install_dir,
 devenver.print_header("Install configuration files")
 
 # Copy init.vim to NVIM directory
-internal_dir          = pathlib.Path(os.path.dirname(os.path.abspath(__file__)), "Internal")
-nvim_init_dir         = pathlib.Path(os.path.expanduser("~"), "AppData", "Local", "nvim")
+internal_dir          = pathlib.Path(os.path.dirname(os.path.abspath(__file__))) / "Internal"
+nvim_init_dir         = pathlib.Path(os.path.expanduser("~")) / "AppData" / "Local" / "nvim"
 nvim_config_dest_path = nvim_init_dir / "init.vim"
 nvim_config_src_path  = internal_dir  / "os_nvim_init.vim"
 
@@ -181,11 +181,12 @@ if not os.path.exists(nvim_plug_vim_path):
 
 # Install clink configuration
 # ------------------------------------------------------------------------------
-clink_profile_dir                         = clink_base_dir / "profile"
-
+clink_profile_dir   = clink_base_dir / "profile"
 clink_settings_path = clink_profile_dir / "clink_settings"
-clink_settings = f"""
-# When this file is named "default_settings" and is in the binaries
+devenver.lprint(f"Installing clink_settings to: {clink_settings_path}")
+
+clink_settings_path.parent.mkdir(exist_ok=True)
+clink_settings_path.write_text(f"""# When this file is named "default_settings" and is in the binaries
 # directory or profile directory, it provides enhanced default settings.
 
 # Override built-in default settings with ones that provide a more
@@ -221,26 +222,18 @@ match.substring                   = True
 
 clink.path                        = {clink_completions_install_dir};{clink_gizmo_install_dir}
 fzf.default_bindings              = True
-"""
-
-devenver.lprint(f"Installing clink_settings to: {clink_settings_path}")
-clink_settings_path.parent.mkdir(exist_ok=True)
-with open(clink_settings_path, "w+") as file:
-    file.write(clink_settings)
+""")
 
 # Install wezterm configuration
 # ------------------------------------------------------------------------------
-wezterm_install_dir      = installed_apps["WezTerm"][0]["install_dir"]
-wezterm_exe_path         = installed_apps["WezTerm"][0]["exe_path"]
-wezterm_config_dest_path = wezterm_install_dir / "wezterm.lua"
-
+wezterm_config_dest_path = installed_apps["WezTerm"][0]["install_dir"] / "wezterm.lua"
 devenver.lprint(f"Installing WezTerm config to {wezterm_config_dest_path}")
 
-clink_exe_path             = clink_install_dir.relative_to(install_dir) / "clink_x64.exe"
-clink_exe_path_for_wezterm = str(clink_exe_path).replace("\\", "\\\\")
+clink_exe_path                 = clink_install_dir.relative_to(install_dir) / "clink_x64.exe"
+clink_exe_path_for_wezterm     = str(clink_exe_path).replace("\\", "\\\\")
 clink_profile_path_for_wezterm = str(clink_profile_dir.relative_to(install_dir)).replace("\\", "\\\\")
 
-wezterm_lua_buffer = f"""local wezterm = require 'wezterm';
+wezterm_config_dest_path.write_text(f"""local wezterm = require 'wezterm';
 
 local default_prog
 local set_environment_variables = {{}}
@@ -248,7 +241,7 @@ local set_environment_variables = {{}}
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 
   clink_exe     = string.format("%s\\\\..\\\\..\\\\{clink_exe_path_for_wezterm}", wezterm.executable_dir)
-  devenv_bat    = string.format("%s\\\\..\\\\..\\\\devenv.bat", wezterm.executable_dir)
+  devenv_bat    = string.format("%s\\\\..\\\\..\\\\dev_env.bat", wezterm.executable_dir)
   msvc_bat      = string.format("%s\\\\..\\\\..\\\\msvc\\\\msvc-{msvc_version}.bat", wezterm.executable_dir)
   win10_sdk_bat = string.format("%s\\\\..\\\\..\\\\msvc\\\\win-sdk-{win10_sdk_version}.bat", wezterm.executable_dir)
   clink_profile = string.format("%s\\\\..\\\\..\\\\{clink_profile_path_for_wezterm}", wezterm.executable_dir)
@@ -271,15 +264,14 @@ return {{
   default_prog = default_prog,
   set_environment_variables = set_environment_variables,
 }}
-"""
-
-with open(wezterm_config_dest_path, "w") as file:
-    file.write(wezterm_lua_buffer)
+""")
 
 # Wezterm super terminal
-wezterm_exe_rel_path         = pathlib.Path(wezterm_exe_path).relative_to(install_dir)
-wezterm_terminal_script_path = pathlib.Path(install_dir, "win_terminal.bat")
-wezterm_terminal_script      = f"""@echo off
+# ------------------------------------------------------------------------------
+wezterm_terminal_script_path = install_dir / "dev_terminal.bat"
+devenver.lprint(f"Installing WezTerm terminal script to {wezterm_terminal_script_path}")
+
+wezterm_terminal_script_path.write_text(f"""@echo off
 setlocal EnableDelayedExpansion
 
 set working_dir=
@@ -288,16 +280,18 @@ if "%~1" neq "" (
     set working_dir=!working_dir:\=/!
 )
 
-call \"{msvc_install_dir}\\msvc-{msvc_version}.bat\"
-call \"{msvc_install_dir}\\win-sdk-{win10_sdk_version}.bat\"
+start "" /MAX "%~dp0{installed_apps["WezTerm"][0]["exe_path"].relative_to(install_dir)}" !working_dir!
+""")
 
-if exist "%~dp0win_terminal_user_config.bat" call "%~dp0win_terminal_user_config.bat"
-start "" /MAX "%~dp0{wezterm_exe_rel_path}" !working_dir!
-"""
+# Run background scripts helper
+# ------------------------------------------------------------------------------
+background_apps_script_path = pathlib.Path(install_dir, "dev_run_background_apps.bat")
+devenver.lprint(f"Installing run background script (helper) to {background_apps_script_path}")
 
-devenver.lprint(f"Installing WezTerm terminal script to {wezterm_terminal_script_path}")
-with open(wezterm_terminal_script_path, "w") as file:
-    file.write(wezterm_terminal_script)
+background_apps_script_path.write_text(f"""@echo off
+start "" "%~dp0{installed_apps["Everything"][0]["exe_path"].relative_to(install_dir)}"
+start "" "%~dp0{installed_apps["Eyes-Thanks"][0]["exe_path"].relative_to(install_dir)}"
+""")
 
 # Create Odin work-around scripts
 # ------------------------------------------------------------------------------
@@ -305,17 +299,6 @@ with open(wezterm_terminal_script_path, "w") as file:
 # registry. Here we inject the registry entry that the SDK locator checks for
 # finding our portable MSVC installation.
 win10_sdk_find_test_dir_reg_path = str(win10_sdk_find_test_dir).replace("\\", "\\\\")
-odin_msvc_install_script = f"""Windows Registry Editor Version 5.00
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots]
-"KitsRoot10"="{win10_sdk_find_test_dir_reg_path}"
-"""
-
-odin_msvc_uninstall_script = f"""Windows Registry Editor Version 5.00
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots]
-"KitsRoot10"=-
-"""
 
 odin_msvc_install_script_path   = install_dir / "odin_msvc_install_workaround.reg"
 odin_msvc_uninstall_script_path = install_dir / "odin_msvc_uninstall_workaround.reg"
@@ -324,27 +307,37 @@ devenver.lprint(f"Installing Odin MSVC workaround scripts", level=0)
 devenver.lprint(f" - {odin_msvc_install_script_path}", level=1)
 devenver.lprint(f" - {odin_msvc_uninstall_script_path}", level=1)
 
-with open(odin_msvc_install_script_path, "w") as file:
-    file.write(odin_msvc_install_script)
+odin_msvc_install_script_path.write_text(f"""Windows Registry Editor Version 5.00
 
-with open(odin_msvc_uninstall_script_path, "w") as file:
-    file.write(odin_msvc_uninstall_script)
+[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots]
+"KitsRoot10"="{win10_sdk_find_test_dir_reg_path}"
+""")
 
-# Add python-update bootstrap script
+odin_msvc_uninstall_script_path.write_text(f"""Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots]
+"KitsRoot10"=-
+""")
+
+# Python
 # ------------------------------------------------------------------------------
 # TODO: If I'm using the terminal that this script generates it will lock the
 # executable and Python cannot open the file for verifying the SHA256.
 
-python_exe            = pathlib.Path(installed_apps["Python"][0]['exe_path']).relative_to(install_dir)
-python_install_dir    = pathlib.Path(installed_apps["Python"][0]['exe_path']).parent.relative_to(install_dir)
+python_exe_path = pathlib.Path(installed_apps["Python"][0]['exe_path'])
+
+# PyNvim
+devenver.lprint(f"Installing PyNVIM")
+subprocess.run(f"{python_exe_path} -m pip install pynvim")
+
+# Add update script
+python_rel_exe_path   = pathlib.Path(python_exe_path).relative_to(install_dir)
+python_install_dir    = pathlib.Path(python_exe_path).parent.relative_to(install_dir)
 win_setup_script_path = pathlib.Path(devenver.script_dir, "win_install.py")
 
-bootstrap_setup_script = f"""@echo off
+(install_dir / "dev_env_update.bat").write_text(f"""@echo off
 setlocal EnableDelayedExpansion
 set PYTHONHOME=%~dp0{python_install_dir}
-%~dp0{python_exe} {win_setup_script_path}
+%~dp0{python_rel_exe_path} {win_setup_script_path}
 pause
-"""
-
-with open(install_dir / "upgrade_bootstrap.bat", "w") as file:
-    file.write(bootstrap_setup_script)
+""")

@@ -625,7 +625,7 @@ def get_manifest():
     version  = "1.4.13"
     git_hash = "0066c6"
     result.append({
-        "label": "clink",
+        "label": "Clink",
         "manifests": [
             {
                 "download_url": f"https://github.com/chrisant996/clink/releases/download/v{version}/clink.{version}.{git_hash}.zip",
@@ -694,7 +694,7 @@ def get_manifest():
 
     version = "0.37.0"
     result.append({
-        "label": "fzf",
+        "label": "FZF",
         "manifests": [
             {
                 "download_url": f"https://github.com/junegunn/fzf/releases/download/{version}/fzf-{version}-windows_amd64.zip",
@@ -703,8 +703,8 @@ def get_manifest():
                 "executables": [
                     {
                         "path": "fzf.exe",
-                        "symlink": [],
-                        "add_to_devenv_path": True,
+                        "symlink": ["fzf.exe"],
+                        "add_to_devenv_path": False,
                         "checksum": "c0f4b20d0602977ff3e592cac8eadf86473abed0d24e2def81239bd2e76047e8",
                     }
                 ],
@@ -717,7 +717,7 @@ def get_manifest():
 
     version = "1.1.42"
     result.append({
-        "label": "jpegview",
+        "label": "JPEGView",
         "manifests": [
             {
                 "download_url": f"https://github.com/sylikc/jpegview/releases/download/v{version}/JPEGView_{version}.7z",
@@ -740,7 +740,7 @@ def get_manifest():
 
     version = "22.02"
     result.append({
-        "label": "mpc-qt",
+        "label": "MPC-Qt",
         "manifests": [
             {
                 "download_url": f"https://github.com/mpc-qt/mpc-qt/releases/download/v{version}/mpc-qt-win-x64-{version.replace('.', '')}.zip",
@@ -763,7 +763,7 @@ def get_manifest():
 
     version = "0.8.2"
     result.append({
-        "label": "nvim",
+        "label": "NVim",
         "manifests": [
             {
                 "download_url": f"https://github.com/neovim/neovim/releases/download/v{version}/nvim-win64.zip",
@@ -786,7 +786,7 @@ def get_manifest():
 
     version = "0.10.3"
     result.append({
-        "label": "neovide",
+        "label": "Neovide",
         "manifests": [
             {
                 "download_url": f"https://github.com/neovide/neovide/releases/download/{version}/neovide-windows.zip",
@@ -878,7 +878,7 @@ def get_manifest():
 
     version = "13.0.0"
     result.append({
-        "label": "ripgrep",
+        "label": "Ripgrep",
         "manifests": [
             {
                 "download_url": f"https://github.com/BurntSushi/ripgrep/releases/download/{version}/ripgrep-{version}-x86_64-pc-windows-msvc.zip",
@@ -901,7 +901,7 @@ def get_manifest():
 
     version = "2.0.0"
     result.append({
-        "label": "sioyek",
+        "label": "Sioyek",
         "manifests": [
             {
                 "download_url": f"https://github.com/ahrm/sioyek/releases/download/v{version}/sioyek-release-windows-portable.zip",
@@ -924,7 +924,7 @@ def get_manifest():
 
     version = "8.6.0"
     result.append({
-        "label": "fd",
+        "label": "Fd",
         "manifests": [
             {
                 "download_url": f"https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-x86_64-pc-windows-msvc.zip",
@@ -962,6 +962,52 @@ def get_manifest():
                         "symlink": [],
                         "add_to_devenv_path": False,
                         "checksum": "e2157dc64629a29e1713a845e5a9e7cab89d79a7390820c1bfda05c7de989c3d",
+                    }
+                ],
+                "add_to_devenv_script": [],
+            }
+        ],
+    })
+
+    # --------------------------------------------------------------------------
+
+    version = "1.61.1"
+    result.append({
+        "label": "RClone",
+        "manifests": [
+            {
+                "download_url": f"https://github.com/rclone/rclone/releases/download/v{version}/rclone-v{version}-windows-amd64.zip",
+                "download_checksum": "99daaa95867cdf0758ec1d5d7f2ebdb3bf74c8c8602e2aaf888e637163d2ebdd",
+                "version": version,
+                "executables": [
+                    {
+                        "path": "rclone.exe",
+                        "symlink": [],
+                        "add_to_devenv_path": False,
+                        "checksum": "e94901809ff7cc5168c1e857d4ac9cbb339ca1f6e21dcce95dfb8e28df799961",
+                    }
+                ],
+                "add_to_devenv_script": [],
+            }
+        ],
+    })
+
+    # --------------------------------------------------------------------------
+
+    version = "1.5.3"
+    result.append({
+        "label": "Eyes-Thanks",
+        "manifests": [
+            {
+                "download_url": f"https://github.com/yalov/eyes-thanks/releases/download/{version}/EyesThanks_v{version}.zip",
+                "download_checksum": "6ab2b20730f56aa54263eb942be8849f52f9cba26438aee3c1b01103069411cc",
+                "version": version,
+                "executables": [
+                    {
+                        "path": "Eyes' Thanks.exe",
+                        "symlink": [],
+                        "add_to_devenv_path": False,
+                        "checksum": "48d232bd4a302b11378791eee844b42a2e30fe3553acf17a3b9e8ee0fcf27766",
                     }
                 ],
                 "add_to_devenv_script": [],

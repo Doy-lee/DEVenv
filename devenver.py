@@ -698,7 +698,7 @@ def run(user_app_list,
     global devenv_script_buffer
     devenv_script_buffer += "set PATH=%~dp0Symlinks;%PATH%\n"
 
-    devenv_script_name = "devenv.bat" if IS_WINDOWS else "devenv.sh"
+    devenv_script_name = "dev_env.bat" if IS_WINDOWS else "dev_env.sh"
     devenv_script_path = pathlib.Path(install_dir, devenv_script_name)
     lprint(f"Writing script to augment the environment with installed applications: {devenv_script_path}")
     with open(devenv_script_path, 'w') as file:
