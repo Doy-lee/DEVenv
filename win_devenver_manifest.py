@@ -1053,7 +1053,7 @@ def get_manifest():
                         "path": "sharex.exe",
                         "symlink": [],
                         "add_to_devenv_path": False,
-                        "checksum": "none",
+                        "checksum": "0b679c46c2940edc09cff8ae0b0f4578aeda0346b9c402276b166aee4ec864be",
                     }
                 ],
                 "add_to_devenv_script": [],
