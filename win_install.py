@@ -295,6 +295,8 @@ REM Ensure that eyes-thanks creates their portable INI file in the correct direc
 pushd "%~dp0{installed_apps["Eyes-Thanks"][0]["install_dir"].parent.relative_to(install_dir)}"
 start "" "%~dp0{installed_apps["Eyes-Thanks"][0]["exe_path"].relative_to(install_dir)}"
 popd
+
+start "" "%~dp0{installed_apps["ShareX"][0]["exe_path"].relative_to(install_dir)}"
 """)
 
 # Create Odin work-around scripts

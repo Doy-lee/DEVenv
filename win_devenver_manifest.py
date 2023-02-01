@@ -1040,4 +1040,27 @@ def get_manifest():
 
     # --------------------------------------------------------------------------
 
+    version = "15.0.0"
+    result.append({
+        "label": "ShareX",
+        "manifests": [
+            {
+                "download_url": f"https://github.com/ShareX/ShareX/releases/download/v{version}/ShareX-{version}-portable.zip",
+                "download_checksum": "c3bc97e9fb8d107e92cb494b50f842fccafbc9fd810588a1b635aee4dbe90bc1",
+                "version": version,
+                "executables": [
+                    {
+                        "path": "sharex.exe",
+                        "symlink": [],
+                        "add_to_devenv_path": False,
+                        "checksum": "none",
+                    }
+                ],
+                "add_to_devenv_script": [],
+            }
+        ],
+    })
+
+    # --------------------------------------------------------------------------
+
     return result
