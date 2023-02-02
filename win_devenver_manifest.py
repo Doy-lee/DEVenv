@@ -1063,4 +1063,27 @@ def get_manifest():
 
     # --------------------------------------------------------------------------
 
+    version = "2023.01.06"
+    result.append({
+        "label": "yt-dlp",
+        "manifests": [
+            {
+                "download_url": f"https://github.com/yt-dlp/yt-dlp/releases/download/{version}/yt-dlp.exe",
+                "download_checksum": "2ff706a386a6890d4fd6871609e99248402959b149781feaeb41fede1c5efea1",
+                "version": version,
+                "executables": [
+                    {
+                        "path": "yt-dlp.exe",
+                        "symlink": ["yt-dlp.exe"],
+                        "add_to_devenv_path": False,
+                        "checksum": "2ff706a386a6890d4fd6871609e99248402959b149781feaeb41fede1c5efea1",
+                    }
+                ],
+                "add_to_devenv_script": [],
+            }
+        ],
+    })
+
+    # --------------------------------------------------------------------------
+
     return result

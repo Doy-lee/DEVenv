@@ -301,50 +301,57 @@ def download_and_install_archive(download_url,
                 subprocess.run(command)
             else:
                 archive_path                    = download_path
-                intermediate_zip_file_extracted = False
 
-                # We could have a "app.zst" situation or an "app.tar.zst" situation
-                #
-                # "app.zst" only needs 1 extraction from the zstd tool
-                # "app.tar.zst" needs 1 zstd extract and then 1 7zip extract
-                #
-                # When we have "app.tar.zst" we extract to the install folder, e.g.
-                #
-                # "app/1.0/app.tar"
-                #
-                # We call this an intermediate zip file, we will extract that file
-                # with 7zip. After we're done, we will delete that _intermediate_
-                # file to cleanup our install directory.
-                if archive_path.suffix == '.zst':
+                if archive_path.suffix == '.exe':
+                    os.makedirs(exe_install_dir, exist_ok=True)
+                    shutil.copy(archive_path, exe_install_dir)
 
-                    archive_without_suffix = pathlib.Path(str(archive_path)[:-len(archive_path.suffix)]).name
-                    next_archive_path = pathlib.Path(exe_install_dir, archive_without_suffix)
+                else:
+                    intermediate_zip_file_extracted = False
 
-                    if os.path.exists(next_archive_path) == False:
-                        command = f'"{zstd_exe}" --output-dir-flat "{exe_install_dir}" -d "{archive_path}"'
-                        lprint(f'- zstd unzip {label} to: {exe_install_dir}', level=1)
+                    # We could have a "app.zst" situation or an "app.tar.zst" situation
+                    #
+                    # "app.zst" only needs 1 extraction from the zstd tool
+                    # "app.tar.zst" needs 1 zstd extract and then 1 7zip extract
+                    #
+                    # When we have "app.tar.zst" we extract to the install folder, e.g.
+                    #
+                    # "app/1.0/app.tar"
+                    #
+                    # We call this an intermediate zip file, we will extract that file
+                    # with 7zip. After we're done, we will delete that _intermediate_
+                    # file to cleanup our install directory.
+                    if archive_path.suffix == '.zst':
+
+                        archive_without_suffix = pathlib.Path(str(archive_path)[:-len(archive_path.suffix)]).name
+                        next_archive_path = pathlib.Path(exe_install_dir, archive_without_suffix)
+
+                        if os.path.exists(next_archive_path) == False:
+                            command = f'"{zstd_exe}" --output-dir-flat "{exe_install_dir}" -d "{archive_path}"'
+                            lprint(f'- zstd unzip {label} to: {exe_install_dir}', level=1)
+                            lprint(f'  Command: {command}', level=1)
+
+                            os.makedirs(exe_install_dir)
+                            subprocess.run(command)
+
+                        # Remove the extension from the file, we just extracted it
+                        archive_path = next_archive_path
+
+                        # If there's still a suffix after we removed the ".zst" we got
+                        # an additional archive to unzip, e.g. "app.tar" remaining.
+                        intermediate_zip_file_extracted = len(archive_path.suffix) > 0
+
+
+                    if len(archive_path.suffix) > 0:
+                        command = f'"{zip7_exe}" x -aoa -spe -bso0 "{archive_path}" -o"{exe_install_dir}"'
+                        command = command.replace('\\', '/')
+                        lprint(f'- 7z unzip install {label} to: {exe_install_dir}', level=1)
                         lprint(f'  Command: {command}', level=1)
-
-                        os.makedirs(exe_install_dir)
                         subprocess.run(command)
 
-                    # Remove the extension from the file, we just extracted it
-                    archive_path = next_archive_path
-
-                    # If there's still a suffix after we removed the ".zst" we got
-                    # an additional archive to unzip, e.g. "app.tar" remaining.
-                    intermediate_zip_file_extracted = len(archive_path.suffix) > 0
-
-                if len(archive_path.suffix) > 0:
-                    command = f'"{zip7_exe}" x -aoa -spe -bso0 "{archive_path}" -o"{exe_install_dir}"'
-                    command = command.replace('\\', '/')
-                    lprint(f'- 7z unzip install {label} to: {exe_install_dir}', level=1)
-                    lprint(f'  Command: {command}', level=1)
-                    subprocess.run(command)
-
-                if intermediate_zip_file_extracted:
-                    lprint(f'- Detected intermediate zip file in install root, removing: {archive_path}', level=1)
-                    os.remove(archive_path)
+                    if intermediate_zip_file_extracted:
+                        lprint(f'- Detected intermediate zip file in install root, removing: {archive_path}', level=1)
+                        os.remove(archive_path)
 
         # Remove duplicate root folder if detected
         # ----------------------------------------------------------------------
