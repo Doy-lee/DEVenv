@@ -1086,4 +1086,27 @@ def get_manifest():
 
     # --------------------------------------------------------------------------
 
+    version = "0.12"
+    result.append({
+        "label": "SpeedCrunch",
+        "manifests": [
+            {
+                "download_url": f"https://bitbucket.org/heldercorreia/speedcrunch/downloads/SpeedCrunch-{version}-win32.zip",
+                "download_checksum": "024362bccd7908b508192cd90c2f6a716b5aa4fa5c7ff2aea9a1bf49d6580175",
+                "version": version,
+                "executables": [
+                    {
+                        "path": "speedcrunch.exe",
+                        "symlink": [],
+                        "add_to_devenv_path": False,
+                        "checksum": "c80409586d6b36d315ce9462fd9020a12b07633a569d94a8ee057bcd18ee5647",
+                    }
+                ],
+                "add_to_devenv_script": [],
+            }
+        ],
+    })
+
+    # --------------------------------------------------------------------------
+
     return result

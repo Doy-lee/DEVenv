@@ -297,6 +297,7 @@ start "" "%~dp0{installed_apps["Eyes-Thanks"][0]["exe_path"].relative_to(install
 popd
 
 start "" "%~dp0{installed_apps["ShareX"][0]["exe_path"].relative_to(install_dir)}"
+start "" "%~dp0{installed_apps["SpeedCrunch"][0]["exe_path"].relative_to(install_dir)}"
 """)
 
 # Create Odin work-around scripts
