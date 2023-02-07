@@ -321,15 +321,21 @@ def download_and_install_archive(download_url,
                     # We call this an intermediate zip file, we will extract that file
                     # with 7zip. After we're done, we will delete that _intermediate_
                     # file to cleanup our install directory.
-                    if archive_path.suffix == '.zst':
+                    if archive_path.suffix == '.zst' or archive_path.suffix == '.xz':
 
                         archive_without_suffix = pathlib.Path(str(archive_path)[:-len(archive_path.suffix)]).name
                         next_archive_path = pathlib.Path(exe_install_dir, archive_without_suffix)
 
                         if os.path.exists(next_archive_path) == False:
-                            command = f'"{zstd_exe}" --output-dir-flat "{exe_install_dir}" -d "{archive_path}"'
-                            lprint(f'- zstd unzip {label} to: {exe_install_dir}', level=1)
-                            lprint(f'  Command: {command}', level=1)
+                            if archive_path.suffix == '.zst':
+                                command = f'"{zstd_exe}" --output-dir-flat "{exe_install_dir}" -d "{archive_path}"'
+                                lprint(f'- zstd unzip {label} to: {exe_install_dir}', level=1)
+                                lprint(f'  Command: {command}', level=1)
+                            else:
+                                command = f'"{zip7_exe}" x -aoa -spe -bso0 "{archive_path}" -o"{exe_install_dir}"'
+                                command = command.replace('\\', '/')
+                                lprint(f'- 7z unzip install {label} to: {exe_install_dir}', level=1)
+                                lprint(f'  Command: {command}', level=1)
 
                             os.makedirs(exe_install_dir)
                             subprocess.run(command)
@@ -541,9 +547,7 @@ def validate_app_list(app_list):
 
     return result
 
-devenv_script_buffer = """@echo off
-
-"""
+devenv_script_buffer = ""
 def install_app_list(app_list, download_dir, install_dir):
     title = "Internal Apps" if app_list is internal_app_list else "User Apps"
     print_header(title)
@@ -631,15 +635,16 @@ def install_app_list(app_list, download_dir, install_dir):
 
     return result
 
-script_dir                 = os.path.dirname(os.path.abspath(__file__))
+script_dir                 = pathlib.Path(os.path.dirname(os.path.abspath(__file__)))
 default_base_dir           = script_dir
-default_base_downloads_dir = os.path.join(default_base_dir, 'Downloads')
-default_base_install_dir   = os.path.join(default_base_dir, 'Install')
+default_base_downloads_dir = default_base_dir / 'Downloads'
+default_base_install_dir   = default_base_dir / 'Install'
 
 base_downloads_dir = default_base_downloads_dir
 base_install_dir   = default_base_install_dir
 
 def run(user_app_list,
+        devenv_script_name,
         download_dir=base_downloads_dir,
         install_dir=base_install_dir):
     """ Download and install the given user app list at the specified
@@ -688,6 +693,11 @@ def run(user_app_list,
         if not os.path.isdir(path):
             exit(f'Path "{path}" is not a directory, script can not proceed. Exiting.')
 
+    global devenv_script_buffer
+    devenv_script_buffer = """@echo off
+
+    """
+
     # Validate all the manifests before starting
     internal_app_validate_result = validate_app_list(internal_app_list)
     user_app_validate_result     = validate_app_list(user_app_list)
@@ -702,10 +712,9 @@ def run(user_app_list,
                                      install_dir=install_dir)
 
     # Write the devenv script with environment variables
-    global devenv_script_buffer
     devenv_script_buffer += "set PATH=%~dp0Symlinks;%PATH%\n"
 
-    devenv_script_name = "dev_env.bat" if IS_WINDOWS else "dev_env.sh"
+    devenv_script_name = f"{devenv_script_name}.bat" if IS_WINDOWS else f"{devenv_script_name}dev_env.sh"
     devenv_script_path = pathlib.Path(install_dir, devenv_script_name)
     lprint(f"Writing script to augment the environment with installed applications: {devenv_script_path}")
     with open(devenv_script_path, 'w') as file:
@@ -721,29 +730,3 @@ def run(user_app_list,
             result[key] += value
 
     return result
-
-
-if __name__ == '__main__':
-
-    # Arguments
-    # ------------------------------------------------------------------------------
-    arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--downloads-dir',
-                            help=f'Set the directory where downloaded files are cached (default: {default_base_downloads_dir})',
-                            default=default_base_downloads_dir,
-                            type=pathlib.Path)
-
-    arg_parser.add_argument('--install-dir',
-                            help=f'Set the directory where downloaded files are installed (default: {default_base_install_dir})',
-                            default=default_base_install_dir,
-                            type=pathlib.Path)
-
-    arg_parser.add_argument('--version',
-                            action='version',
-                            version='DEVenver v1')
-
-    args = arg_parser.parse_args()
-    base_downloads_dir = args.base_install_dir
-    base_install_dir   = args.install_dir
-
-    run()

@@ -1109,4 +1109,27 @@ def get_manifest():
 
     # --------------------------------------------------------------------------
 
+    version = "2.7.4"
+    result.append({
+        "label": "KeePassXC",
+        "manifests": [
+            {
+                "download_url": f"https://github.com/keepassxreboot/keepassxc/releases/download/{version}/KeePassXC-{version}-Win64.zip",
+                "download_checksum": "2ffb7a3289d008d3cd3ad0efffc3238d10a0ce176217d5e7bc34e1b59bcc644a",
+                "version": version,
+                "executables": [
+                    {
+                        "path": "KeePassXC.exe",
+                        "symlink": [],
+                        "add_to_devenv_path": False,
+                        "checksum": "3102bb194dbc60e9ab4ba6c0024129893c8d845c1acf576aab0c05e607ef47ad",
+                    }
+                ],
+                "add_to_devenv_script": [],
+            }
+        ],
+    })
+
+    # --------------------------------------------------------------------------
+
     return result
