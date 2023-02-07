@@ -8,3 +8,4 @@ start /B https://www.mozilla.org/en-US/firefox/new
 start /B https://obsidian.md/download
 start /B https://protonvpn.com/download
 start /B https://signal.org/download
+start /B https://safing.io
