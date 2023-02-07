@@ -24,74 +24,6 @@ from enum import Enum
 # Internal
 # ------------------------------------------------------------------------------
 DOWNLOAD_CHUNK_SIZE = 1 * 1024 * 1024 # 1 megabyte
-IS_WINDOWS          = os.name == "nt"
-
-# ------------------------------------------------------------------------------
-# This app list must always be installed, they provide the tools to install all
-# other archives. Upon installation, we will collect the installation executable
-# path and store them in global variables for the rest of the progam to use to
-# unzip the files.
-internal_app_list = []
-
-internal_app_list.append({
-    'label': '7zip',
-    'manifests': [],
-})
-
-version = "920"
-internal_app_list[-1]['manifests'].append({ # Download the bootstrap 7zip, this can be unzipped using shutils
-    'download_checksum': '2a3afe19c180f8373fa02ff00254d5394fec0349f5804e0ad2f6067854ff28ac',
-    'download_url': f'https://www.7-zip.org/a/7za{version}.zip',
-    'version': version,
-    'executables': [
-        {
-            'path': '7za.exe',
-            'symlink': [],
-            'add_to_devenv_path': False,
-            'checksum': 'c136b1467d669a725478a6110ebaaab3cb88a3d389dfa688e06173c066b76fcf'
-        }
-    ],
-    'add_to_devenv_script': [],
-})
-
-version = "2201"
-internal_app_list[-1]['manifests'].append({ # Download proper 7zip, extract this exe with the bootstrap 7zip
-    'download_checksum': 'b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4',
-    'download_url':      f'https://www.7-zip.org/a/7z{version}-x64.exe',
-    'version': version,
-    'executables': [
-        {
-            'path': '7z.exe',
-            'symlink': [],
-            'add_to_devenv_path': True,
-            'checksum': '254cf6411d38903b2440819f7e0a847f0cfee7f8096cfad9e90fea62f42b0c23'
-        }
-    ],
-    'add_to_devenv_script':  [],
-})
-
-# ------------------------------------------------------------------------------
-
-version = "1.5.2"
-internal_app_list.append({
-    "label": "zstd",
-    "manifests": [
-        {
-            "download_checksum": "68897cd037ee5e44c6d36b4dbbd04f1cc4202f9037415a3251951b953a257a09",
-            "download_url": f"https://github.com/facebook/zstd/releases/download/v{version}/zstd-v{version}-win64.zip",
-            "version": version,
-            "executables": [
-                {
-                    "path": "zstd.exe",
-                    "symlink": [],
-                    "add_to_devenv_path": True,
-                    "checksum": "f14e78c0651851a670f508561d2c5d647da0ba08e6b73231f2e7539812bae311",
-                },
-            ],
-            "add_to_devenv_script": [],
-        },
-    ],
-})
 
 # ------------------------------------------------------------------------------
 
@@ -100,7 +32,6 @@ internal_app_list.append({
 zstd_exe           = ""
 zip7_exe           = ""
 zip7_bootstrap_exe = ""
-
 
 # Functions
 # ------------------------------------------------------------------------------
@@ -216,7 +147,8 @@ def download_and_install_archive(download_url,
                                  label,
                                  unzip_method,
                                  download_dir,
-                                 install_dir):
+                                 install_dir,
+                                 is_windows):
 
     exe_install_dir  = get_exe_install_dir(install_dir=install_dir,
                                            label=label,
@@ -321,7 +253,7 @@ def download_and_install_archive(download_url,
                     # We call this an intermediate zip file, we will extract that file
                     # with 7zip. After we're done, we will delete that _intermediate_
                     # file to cleanup our install directory.
-                    if archive_path.suffix == '.zst' or archive_path.suffix == '.xz':
+                    if archive_path.suffix == '.zst' or archive_path.suffix == '.xz' or archive_path.suffix == '.gz':
 
                         archive_without_suffix = pathlib.Path(str(archive_path)[:-len(archive_path.suffix)]).name
                         next_archive_path = pathlib.Path(exe_install_dir, archive_without_suffix)
@@ -445,7 +377,7 @@ def download_and_install_archive(download_url,
             if os.path.exists(symlink_dest):
                 # Windows uses hardlinks because symlinks require you to enable "developer" mode
                 # Everyone else uses symlinks
-                if (IS_WINDOWS and not os.path.isfile(symlink_dest)) or (not IS_WINDOWS and not os.path.islink(symlink_dest)):
+                if (is_windows and not os.path.isfile(symlink_dest)) or (not is_windows and not os.path.islink(symlink_dest)):
                     lprint( "- Cannot create symlink! The destination file to create the symlink at.", level=1)
                     lprint( "  already exists and is *not* a link. We cannot remove this safely as we", level=1)
                     lprint( "  don't know what it is, exiting.", level=1)
@@ -458,7 +390,7 @@ def download_and_install_archive(download_url,
                     os.unlink(symlink_dest)
 
             if not skip_link:
-                if IS_WINDOWS == True:
+                if is_windows == True:
                     os.link(src=symlink_src, dst=symlink_dest)
                 else:
                     os.symlink(src=symlink_src, dst=symlink_dest)
@@ -471,7 +403,7 @@ def download_and_install_archive(download_url,
 
     global devenv_script_buffer
     for path in paths_to_add_to_devenv_script:
-        if IS_WINDOWS:
+        if is_windows:
             devenv_script_buffer += f"set PATH=%~dp0{path};%PATH%\n"
         else:
             devenv_script_buffer += f"PATH=$( cd -- \"$( dirname -- \"${BASH_SOURCE[0]}\" ) &> /dev/null && pwd ){path}\";%PATH%\n"
@@ -547,8 +479,10 @@ def validate_app_list(app_list):
 
     return result
 
+internal_app_list = []
 devenv_script_buffer = ""
-def install_app_list(app_list, download_dir, install_dir):
+
+def install_app_list(app_list, download_dir, install_dir, is_windows):
     title = "Internal Apps" if app_list is internal_app_list else "User Apps"
     print_header(title)
     result = {}
@@ -573,22 +507,24 @@ def install_app_list(app_list, download_dir, install_dir):
             # Bootstrapping code, when installing the internal app list, we will
             # assign the variables to point to our unarchiving tools.
             # ------------------------------------------------------------------
-            if app_list is internal_app_list:
-                global zip7_exe
-                global zip7_bootstrap_exe
-                global zstd_exe
-                exe_path = get_exe_install_path(install_dir, label, version, manifest['executables'][0]['path'])
-                if label == '7zip':
-                    if version == '920':
-                        unzip_method       = UnzipMethod.SHUTILS
-                        zip7_bootstrap_exe = exe_path
-                    else:
-                        unzip_method = UnzipMethod.ZIP7_BOOTSTRAP
-                        zip7_exe     = exe_path
+            if is_windows:
+                if app_list is internal_app_list:
+                    global zip7_exe
+                    global zip7_bootstrap_exe
+                    global zstd_exe
+                    exe_path = get_exe_install_path(install_dir, label, version, manifest['executables'][0]['path'])
+                    if label == '7zip':
+                        if version == '920':
+                            unzip_method       = UnzipMethod.SHUTILS
+                            zip7_bootstrap_exe = exe_path
+                        else:
+                            unzip_method = UnzipMethod.ZIP7_BOOTSTRAP
+                            zip7_exe     = exe_path
 
-                if label == 'zstd':
-                    zstd_exe = exe_path
-
+                    if label == 'zstd':
+                        zstd_exe = exe_path
+            else:
+                unzip_method = UnzipMethod.SHUTILS
 
             # Download and install
             # ------------------------------------------------------------------
@@ -600,7 +536,8 @@ def install_app_list(app_list, download_dir, install_dir):
                                          label=label,
                                          unzip_method=unzip_method,
                                          download_dir=download_dir,
-                                         install_dir=install_dir)
+                                         install_dir=install_dir,
+                                         is_windows=is_windows)
 
             # Post-installation
             # ------------------------------------------------------------------
@@ -645,6 +582,7 @@ base_install_dir   = default_base_install_dir
 
 def run(user_app_list,
         devenv_script_name,
+        is_windows,
         download_dir=base_downloads_dir,
         install_dir=base_install_dir):
     """ Download and install the given user app list at the specified
@@ -667,6 +605,75 @@ def run(user_app_list,
 
     base_downloads_dir = download_dir
     base_install_dir = install_dir
+
+    # --------------------------------------------------------------------------
+    # This app list must always be installed, they provide the tools to install all
+    # other archives. Upon installation, we will collect the installation executable
+    # path and store them in global variables for the rest of the progam to use to
+    # unzip the files.
+    global internal_app_list
+    internal_app_list = []
+
+    if is_windows:
+        internal_app_list.append({
+            'label': '7zip',
+            'manifests': [],
+        })
+
+        version = "920"
+        internal_app_list[-1]['manifests'].append({ # Download the bootstrap 7zip, this can be unzipped using shutils
+            'download_checksum': '2a3afe19c180f8373fa02ff00254d5394fec0349f5804e0ad2f6067854ff28ac',
+            'download_url': f'https://www.7-zip.org/a/7za{version}.zip',
+            'version': version,
+            'executables': [
+                {
+                    'path': '7za.exe',
+                    'symlink': [],
+                    'add_to_devenv_path': False,
+                    'checksum': 'c136b1467d669a725478a6110ebaaab3cb88a3d389dfa688e06173c066b76fcf'
+                }
+            ],
+            'add_to_devenv_script': [],
+        })
+
+        version = "2201"
+        internal_app_list[-1]['manifests'].append({ # Download proper 7zip, extract this exe with the bootstrap 7zip
+            'download_checksum': 'b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4',
+            'download_url':      f'https://www.7-zip.org/a/7z{version}-x64.exe',
+            'version': version,
+            'executables': [
+                {
+                    'path': '7z.exe',
+                    'symlink': [],
+                    'add_to_devenv_path': True,
+                    'checksum': '254cf6411d38903b2440819f7e0a847f0cfee7f8096cfad9e90fea62f42b0c23'
+                }
+            ],
+            'add_to_devenv_script':  [],
+        })
+
+        # ------------------------------------------------------------------------------
+
+        version = "1.5.2"
+        internal_app_list.append({
+            "label": "zstd",
+            "manifests": [
+                {
+                    "download_checksum": "68897cd037ee5e44c6d36b4dbbd04f1cc4202f9037415a3251951b953a257a09",
+                    "download_url": f"https://github.com/facebook/zstd/releases/download/v{version}/zstd-v{version}-win64.zip",
+                    "version": version,
+                    "executables": [
+                        {
+                            "path": "zstd.exe",
+                            "symlink": [],
+                            "add_to_devenv_path": True,
+                            "checksum": "f14e78c0651851a670f508561d2c5d647da0ba08e6b73231f2e7539812bae311",
+                        },
+                    ],
+                    "add_to_devenv_script": [],
+                },
+            ],
+        })
 
     # Run
     # --------------------------------------------------------------------------
@@ -705,16 +712,18 @@ def run(user_app_list,
     # Install apps
     internal_apps = install_app_list(app_list=internal_app_list,
                                      download_dir=download_dir,
-                                     install_dir=install_dir)
+                                     install_dir=install_dir,
+                                     is_windows=is_windows)
 
     user_apps     = install_app_list(app_list=user_app_list,
                                      download_dir=download_dir,
-                                     install_dir=install_dir)
+                                     install_dir=install_dir,
+                                     is_windows=is_windows)
 
     # Write the devenv script with environment variables
     devenv_script_buffer += "set PATH=%~dp0Symlinks;%PATH%\n"
 
-    devenv_script_name = f"{devenv_script_name}.bat" if IS_WINDOWS else f"{devenv_script_name}dev_env.sh"
+    devenv_script_name = f"{devenv_script_name}.bat" if is_windows else f"{devenv_script_name}dev_env.sh"
     devenv_script_path = pathlib.Path(install_dir, devenv_script_name)
     lprint(f"Writing script to augment the environment with installed applications: {devenv_script_path}")
     with open(devenv_script_path, 'w') as file:
