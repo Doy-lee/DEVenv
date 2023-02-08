@@ -585,7 +585,7 @@ def get_manifest(is_windows):
                 "add_to_devenv_path": False,
             },
             {
-                "path": f"bin/clang",
+                "path": f"bin/clang.exe",
                 "checksum": "9f0748de7f946c210a030452de226986bab46a0121d7236ea0e7b5079cb6dfef",
                 "symlink": [f"clang-{version}"],
                 "add_to_devenv_path": False,
