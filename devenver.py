@@ -126,6 +126,7 @@ class UnzipMethod(Enum):
     SHUTILS = 0
     ZIP7_BOOTSTRAP = 1
     DEFAULT = 2
+    NO_UNZIP = 3
 
 def get_exe_install_dir(install_dir, label, version_label):
     result = pathlib.Path(install_dir, label.replace(' ', '_'), version_label)
@@ -184,7 +185,7 @@ def download_and_install_archive(download_url,
             for exe_dict in exes_are_not_a_file:
                 lprint(f'    {exe_dict["path"]}', level=1)
             lprint(f'    Installation cannot proceed as unpacking would overwrite these paths', level=1)
-            return
+            exit()
 
         # Check if any files are missing
         # ----------------------------------------------------------------------
@@ -199,8 +200,7 @@ def download_and_install_archive(download_url,
             lprint(f'- {label} is installed but some of the expected executables are missing from the installation!', level=1)
             for exe_dict in exes_are_not_a_file:
                 lprint(f'    {exe_dict["path"]}', level=1)
-            lprint(f'    Installation cannot proceed as unpacking could delete ', level=1)
-            return
+            exit()
 
         assert(len(exes_missing) == len(exe_list))
         assert(len(exes_present) == 0)
@@ -221,75 +221,74 @@ def download_and_install_archive(download_url,
 
         # Install the archive by unpacking it
         # ----------------------------------------------------------------------
-        if unzip_method == UnzipMethod.SHUTILS:
+        archive_path = download_path
+        if unzip_method == UnzipMethod.DEFAULT:
+            if archive_path.suffix == '.exe' or archive_path.suffix == '.AppImage':
+                unzip_method = UnzipMethod.NO_UNZIP
+
+        if unzip_method == UnzipMethod.NO_UNZIP:
+            os.makedirs(exe_install_dir, exist_ok=True)
+            shutil.copy(archive_path, exe_install_dir)
+        elif unzip_method == UnzipMethod.SHUTILS:
             lprint(f'- SHUtils unzip install {label} to: {exe_install_dir}', level=1)
-            shutil.unpack_archive(download_path, exe_install_dir, 'zip')
-        else:
-            command = ''
-            if unzip_method == UnzipMethod.ZIP7_BOOTSTRAP:
-                command = f'"{zip7_bootstrap_exe}" x -bd "{download_path}" -o"{exe_install_dir}"'
-                lprint(f'- 7z (bootstrap) unzip {label} to: {exe_install_dir}', level=1)
-                lprint(f'  Command: {command}', level=1)
-                subprocess.run(command)
-            else:
-                archive_path                    = download_path
+            shutil.unpack_archive(download_path, exe_install_dir)
+        elif unzip_method == UnzipMethod.ZIP7_BOOTSTRAP:
+            command = f'"{zip7_bootstrap_exe}" x -bd "{download_path}" -o"{exe_install_dir}"'
+            lprint(f'- 7z (bootstrap) unzip {label} to: {exe_install_dir}', level=1)
+            lprint(f'  Command: {command}', level=1)
+            subprocess.run(command)
+        else: # Default
+            intermediate_zip_file_extracted = False
 
-                if archive_path.suffix == '.exe':
-                    os.makedirs(exe_install_dir, exist_ok=True)
-                    shutil.copy(archive_path, exe_install_dir)
+            # We could have a "app.zst" situation or an "app.tar.zst" situation
+            #
+            # "app.zst" only needs 1 extraction from the zstd tool
+            # "app.tar.zst" needs 1 zstd extract and then 1 7zip extract
+            #
+            # When we have "app.tar.zst" we extract to the install folder, e.g.
+            #
+            # "app/1.0/app.tar"
+            #
+            # We call this an intermediate zip file, we will extract that file
+            # with 7zip. After we're done, we will delete that _intermediate_
+            # file to cleanup our install directory.
+            if archive_path.suffix == '.zst' or archive_path.suffix == '.xz' or archive_path.suffix == '.gz':
 
-                else:
-                    intermediate_zip_file_extracted = False
+                archive_without_suffix = pathlib.Path(str(archive_path)[:-len(archive_path.suffix)]).name
+                next_archive_path = pathlib.Path(exe_install_dir, archive_without_suffix)
 
-                    # We could have a "app.zst" situation or an "app.tar.zst" situation
-                    #
-                    # "app.zst" only needs 1 extraction from the zstd tool
-                    # "app.tar.zst" needs 1 zstd extract and then 1 7zip extract
-                    #
-                    # When we have "app.tar.zst" we extract to the install folder, e.g.
-                    #
-                    # "app/1.0/app.tar"
-                    #
-                    # We call this an intermediate zip file, we will extract that file
-                    # with 7zip. After we're done, we will delete that _intermediate_
-                    # file to cleanup our install directory.
-                    if archive_path.suffix == '.zst' or archive_path.suffix == '.xz' or archive_path.suffix == '.gz':
-
-                        archive_without_suffix = pathlib.Path(str(archive_path)[:-len(archive_path.suffix)]).name
-                        next_archive_path = pathlib.Path(exe_install_dir, archive_without_suffix)
-
-                        if os.path.exists(next_archive_path) == False:
-                            if archive_path.suffix == '.zst':
-                                command = f'"{zstd_exe}" --output-dir-flat "{exe_install_dir}" -d "{archive_path}"'
-                                lprint(f'- zstd unzip {label} to: {exe_install_dir}', level=1)
-                                lprint(f'  Command: {command}', level=1)
-                            else:
-                                command = f'"{zip7_exe}" x -aoa -spe -bso0 "{archive_path}" -o"{exe_install_dir}"'
-                                command = command.replace('\\', '/')
-                                lprint(f'- 7z unzip install {label} to: {exe_install_dir}', level=1)
-                                lprint(f'  Command: {command}', level=1)
-
-                            os.makedirs(exe_install_dir)
-                            subprocess.run(command)
-
-                        # Remove the extension from the file, we just extracted it
-                        archive_path = next_archive_path
-
-                        # If there's still a suffix after we removed the ".zst" we got
-                        # an additional archive to unzip, e.g. "app.tar" remaining.
-                        intermediate_zip_file_extracted = len(archive_path.suffix) > 0
-
-
-                    if len(archive_path.suffix) > 0:
+                if os.path.exists(next_archive_path) == False:
+                    if archive_path.suffix == '.zst':
+                        command = f'"{zstd_exe}" --output-dir-flat "{exe_install_dir}" -d "{archive_path}"'
+                        lprint(f'- zstd unzip {label} to: {exe_install_dir}', level=1)
+                        lprint(f'  Command: {command}', level=1)
+                    else:
                         command = f'"{zip7_exe}" x -aoa -spe -bso0 "{archive_path}" -o"{exe_install_dir}"'
                         command = command.replace('\\', '/')
                         lprint(f'- 7z unzip install {label} to: {exe_install_dir}', level=1)
                         lprint(f'  Command: {command}', level=1)
-                        subprocess.run(command)
 
-                    if intermediate_zip_file_extracted:
-                        lprint(f'- Detected intermediate zip file in install root, removing: {archive_path}', level=1)
-                        os.remove(archive_path)
+                    os.makedirs(exe_install_dir)
+                    subprocess.run(command)
+
+                # Remove the extension from the file, we just extracted it
+                archive_path = next_archive_path
+
+                # If there's still a suffix after we removed the ".zst" we got
+                # an additional archive to unzip, e.g. "app.tar" remaining.
+                intermediate_zip_file_extracted = len(archive_path.suffix) > 0
+
+
+            if len(archive_path.suffix) > 0:
+                command = f'"{zip7_exe}" x -aoa -spe -bso0 "{archive_path}" -o"{exe_install_dir}"'
+                command = command.replace('\\', '/')
+                lprint(f'- 7z unzip install {label} to: {exe_install_dir}', level=1)
+                lprint(f'  Command: {command}', level=1)
+                subprocess.run(command)
+
+            if intermediate_zip_file_extracted:
+                lprint(f'- Detected intermediate zip file in install root, removing: {archive_path}', level=1)
+                os.remove(archive_path)
 
         # Remove duplicate root folder if detected
         # ----------------------------------------------------------------------
@@ -370,6 +369,14 @@ def download_and_install_archive(download_url,
                                         version_label=version_label,
                                         exe_rel_path=exe_rel_path)
 
+        # If you install the Linux manifest on Windows then we ensure we
+        # still call link (e.g. hardlink) because symlinks need special
+        # Windows 10 permissions to be set...
+        #
+        # It's weird that we install Linux manifest on Windows, yes, but
+        # I use it for testing without having to boot up a whole nother
+        # OS.
+        use_hardlink = is_windows or os.name == 'nt'
         for symlink_entry in exe_dict["symlink"]:
             symlink_dest = symlink_dir / symlink_entry
             symlink_src = exe_path
@@ -377,7 +384,7 @@ def download_and_install_archive(download_url,
             if os.path.exists(symlink_dest):
                 # Windows uses hardlinks because symlinks require you to enable "developer" mode
                 # Everyone else uses symlinks
-                if (is_windows and not os.path.isfile(symlink_dest)) or (not is_windows and not os.path.islink(symlink_dest)):
+                if (use_hardlink and not os.path.isfile(symlink_dest)) or (not use_hardlink and not os.path.islink(symlink_dest)):
                     lprint( "- Cannot create symlink! The destination file to create the symlink at.", level=1)
                     lprint( "  already exists and is *not* a link. We cannot remove this safely as we", level=1)
                     lprint( "  don't know what it is, exiting.", level=1)
@@ -390,7 +397,7 @@ def download_and_install_archive(download_url,
                     os.unlink(symlink_dest)
 
             if not skip_link:
-                if is_windows == True:
+                if use_hardlink:
                     os.link(src=symlink_src, dst=symlink_dest)
                 else:
                     os.symlink(src=symlink_src, dst=symlink_dest)
@@ -406,7 +413,7 @@ def download_and_install_archive(download_url,
         if is_windows:
             devenv_script_buffer += f"set PATH=%~dp0{path};%PATH%\n"
         else:
-            devenv_script_buffer += f"PATH=$( cd -- \"$( dirname -- \"${BASH_SOURCE[0]}\" ) &> /dev/null && pwd ){path}\";%PATH%\n"
+            devenv_script_buffer += f"PATH=$( cd -- \"$( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd ){path}\";%PATH%\n"
 
 # Search the 2 dictionarries, 'first' and 'second' for the key. A matching key
 # in 'first' taking precedence over the 'second' dictionary. If no key is
@@ -507,24 +514,25 @@ def install_app_list(app_list, download_dir, install_dir, is_windows):
             # Bootstrapping code, when installing the internal app list, we will
             # assign the variables to point to our unarchiving tools.
             # ------------------------------------------------------------------
-            if is_windows:
-                if app_list is internal_app_list:
-                    global zip7_exe
-                    global zip7_bootstrap_exe
-                    global zstd_exe
+            if app_list is internal_app_list:
+                global zip7_exe
+                global zip7_bootstrap_exe
+                global zstd_exe
+                if label == '7zip':
                     exe_path = get_exe_install_path(install_dir, label, version, manifest['executables'][0]['path'])
-                    if label == '7zip':
+                    if is_windows or os.name == 'nt':
                         if version == '920':
                             unzip_method       = UnzipMethod.SHUTILS
                             zip7_bootstrap_exe = exe_path
                         else:
                             unzip_method = UnzipMethod.ZIP7_BOOTSTRAP
                             zip7_exe     = exe_path
-
-                    if label == 'zstd':
-                        zstd_exe = exe_path
-            else:
-                unzip_method = UnzipMethod.SHUTILS
+                    else:
+                        unzip_method = UnzipMethod.ZIP7_SHUTILS
+                        zip7_exe           = exe_path
+                        zip7_bootstrap_exe = exe_path
+                elif label == 'zstd':
+                    zstd_exe = exe_path
 
             # Download and install
             # ------------------------------------------------------------------
@@ -614,66 +622,98 @@ def run(user_app_list,
     global internal_app_list
     internal_app_list = []
 
-    if is_windows:
-        internal_app_list.append({
-            'label': '7zip',
-            'manifests': [],
-        })
+    internal_app_list.append({
+        "label": "7zip",
+        "manifests": [],
+    })
 
+    if is_windows or os.name == "nt":
         version = "920"
-        internal_app_list[-1]['manifests'].append({ # Download the bootstrap 7zip, this can be unzipped using shutils
-            'download_checksum': '2a3afe19c180f8373fa02ff00254d5394fec0349f5804e0ad2f6067854ff28ac',
-            'download_url': f'https://www.7-zip.org/a/7za{version}.zip',
-            'version': version,
-            'executables': [
+        internal_app_list[-1]["manifests"].append({ # Download the bootstrap 7zip, this can be unzipped using shutils
+            "download_checksum": "2a3afe19c180f8373fa02ff00254d5394fec0349f5804e0ad2f6067854ff28ac",
+            "download_url": f"https://www.7-zip.org/a/7za{version}.zip",
+            "version": version,
+            "executables": [
                 {
-                    'path': '7za.exe',
-                    'symlink': [],
-                    'add_to_devenv_path': False,
-                    'checksum': 'c136b1467d669a725478a6110ebaaab3cb88a3d389dfa688e06173c066b76fcf'
+                    "path": "7za.exe",
+                    "symlink": [],
+                    "add_to_devenv_path": False,
+                    "checksum": "c136b1467d669a725478a6110ebaaab3cb88a3d389dfa688e06173c066b76fcf"
                 }
             ],
-            'add_to_devenv_script': [],
+            "add_to_devenv_script": [],
         })
 
-        version = "2201"
-        internal_app_list[-1]['manifests'].append({ # Download proper 7zip, extract this exe with the bootstrap 7zip
-            'download_checksum': 'b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4',
-            'download_url':      f'https://www.7-zip.org/a/7z{version}-x64.exe',
-            'version': version,
-            'executables': [
-                {
-                    'path': '7z.exe',
-                    'symlink': [],
-                    'add_to_devenv_path': True,
-                    'checksum': '254cf6411d38903b2440819f7e0a847f0cfee7f8096cfad9e90fea62f42b0c23'
-                }
-            ],
-            'add_to_devenv_script':  [],
-        })
+    version           = "2201"
+    download_url      = ""
+    download_checksum = ""
+    checksum          = ""
+    exe_path          = ""
 
-        # ------------------------------------------------------------------------------
+    if is_windows or os.name == "nt":
+        download_url      = f"https://www.7-zip.org/a/7z{version}-x64.exe"
+        download_checksum = "b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4"
+        checksum          = "254cf6411d38903b2440819f7e0a847f0cfee7f8096cfad9e90fea62f42b0c23"
+        exe_path          = "7z.exe"
+    else:
+        download_url      = f"https://www.7-zip.org/a/7z{version}-linux-x64.tar.xz"
+        download_checksum = "none"
+        checksum          = "none"
+        exe_path          = "7z"
 
-        version = "1.5.2"
-        internal_app_list.append({
-            "label": "zstd",
-            "manifests": [
-                {
-                    "download_checksum": "68897cd037ee5e44c6d36b4dbbd04f1cc4202f9037415a3251951b953a257a09",
-                    "download_url": f"https://github.com/facebook/zstd/releases/download/v{version}/zstd-v{version}-win64.zip",
-                    "version": version,
-                    "executables": [
-                        {
-                            "path": "zstd.exe",
-                            "symlink": [],
-                            "add_to_devenv_path": True,
-                            "checksum": "f14e78c0651851a670f508561d2c5d647da0ba08e6b73231f2e7539812bae311",
-                        },
-                    ],
-                    "add_to_devenv_script": [],
-                },
-            ],
-        })
+    internal_app_list[-1]["manifests"].append({ # Download proper 7zip, extract this exe with the bootstrap 7zip
+        "download_checksum": download_checksum,
+        "download_url":      download_url,
+        "version":           version,
+        "executables": [
+            {
+                "path": exe_path,
+                "symlink": [],
+                "add_to_devenv_path": True,
+                "checksum": checksum,
+            }
+        ],
+        "add_to_devenv_script":  [],
+    })
+
+    # ------------------------------------------------------------------------------
+
+    version           = "1.5.2"
+    download_url      = ""
+    download_checksum = ""
+    checksum          = ""
+    exe_path          = ""
+
+    if is_windows or os.name == 'nt':
+        download_url      = f"https://github.com/facebook/zstd/releases/download/v{version}/zstd-v{version}-win64.zip"
+        download_checksum = "68897cd037ee5e44c6d36b4dbbd04f1cc4202f9037415a3251951b953a257a09"
+        checksum          = "f14e78c0651851a670f508561d2c5d647da0ba08e6b73231f2e7539812bae311"
+        exe_path          = "zstd.exe"
+    else:
+        download_url      = f"https://github.com/facebook/zstd/releases/download/v{version}/zstd-{version}.tar.gz"
+        download_checksum = "none"
+        checksum          = "none"
+        exe_path          = "zstd"
+
+    internal_app_list.append({
+        "label": "zstd",
+        "manifests": [
+            {
+                "download_checksum": download_checksum,
+                "download_url": download_url,
+                "version": version,
+                "executables": [
+                    {
+                        "path": "zstd.exe",
+                        "symlink": [],
+                        "add_to_devenv_path": True,
+                        "checksum": checksum,
+                    },
+                ],
+                "add_to_devenv_script": [],
+            },
+        ],
+    })
 
     # Run
     # --------------------------------------------------------------------------
