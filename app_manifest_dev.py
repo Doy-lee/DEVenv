@@ -464,13 +464,13 @@ def get_manifest(is_windows):
         executables = [
             {
                 "path": f"bin/clang++",
-                "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "checksum": "388be41dc565a891ced9e78da2e89a249ca9b9a26f71a3c912e8ba89585be89c",
                 "symlink": [f"clang++-{version}"],
                 "add_to_devenv_path": True,
             },
             {
-                "path": f"bin/clang.exe",
-                "checksum": "none",
+                "path": f"bin/clang",
+                "checksum": "388be41dc565a891ced9e78da2e89a249ca9b9a26f71a3c912e8ba89585be89c",
                 "symlink": [f"clang-{version}"],
                 "add_to_devenv_path": True,
             }
@@ -505,17 +505,17 @@ def get_manifest(is_windows):
     else:
         version           = "14.0.0" # Only version with linux downloads
         download_url      = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/clang+llvm-{version}-x86_64-linux-gnu-ubuntu-18.04.tar.xz"
-        download_checksum = "none"
+        download_checksum = "61582215dafafb7b576ea30cc136be92c877ba1f1c31ddbbd372d6d65622fef5"
         executables = [
             {
                 "path": f"bin/clang++",
-                "checksum": "none",
+                "checksum": "3557c2deadae7e2bc3bffce4afd93ddab6ef50090971c8ce3bf15c80b27134a0",
                 "symlink": [f"clang++-{version}"],
                 "add_to_devenv_path": False,
             },
             {
-                "path": f"bin/clang.exe",
-                "checksum": "none",
+                "path": f"bin/clang",
+                "checksum": "3557c2deadae7e2bc3bffce4afd93ddab6ef50090971c8ce3bf15c80b27134a0",
                 "symlink": [f"clang-{version}"],
                 "add_to_devenv_path": False,
             }
@@ -548,18 +548,18 @@ def get_manifest(is_windows):
             }
         ]
     else:
-        download_checksum = "none"
+        download_checksum = "84a54c69781ad90615d1b0276a83ff87daaeded99fbc64457c350679df7b4ff0"
         download_url      = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/clang+llvm-{version}-x86_64-linux-gnu-ubuntu-18.04.tar.xz"
         executables = [
             {
                 "path": f"bin/clang++",
-                "checksum": "none",
+                "checksum": "ae47e6cc9f6d95f7a39e4800e511b7bdc3f55464ca79e45cd63cbd8a862a82a1",
                 "symlink": [f"clang++-{version}"],
                 "add_to_devenv_path": False,
             },
             {
-                "path": f"bin/clang.exe",
-                "checksum": "none",
+                "path": f"bin/clang",
+                "checksum": "ae47e6cc9f6d95f7a39e4800e511b7bdc3f55464ca79e45cd63cbd8a862a82a1",
                 "symlink": [f"clang-{version}"],
                 "add_to_devenv_path": False,
             }
@@ -585,25 +585,25 @@ def get_manifest(is_windows):
                 "add_to_devenv_path": False,
             },
             {
-                "path": f"bin/clang.exe",
+                "path": f"bin/clang",
                 "checksum": "9f0748de7f946c210a030452de226986bab46a0121d7236ea0e7b5079cb6dfef",
-                "symlink": [f"clang-{version}.exe"],
+                "symlink": [f"clang-{version}"],
                 "add_to_devenv_path": False,
             }
         ]
     else:
-        download_checksum = "none"
-        download_url      = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/clang+llvm-{version}-x86_64-linux-gnu-ubuntu-18.04.tar.xz"
+        download_checksum = "6b3cc55d3ef413be79785c4dc02828ab3bd6b887872b143e3091692fc6acefe7"
+        download_url      = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/clang+llvm-{version}-x86_64-linux-gnu-ubuntu-16.04.tar.xz"
         executables = [
             {
                 "path": f"bin/clang++",
-                "checksum": "none",
+                "checksum": "329bba976c0cef38863129233a4b0939688eae971c7a606d41dd0e5a53d53455",
                 "symlink": [f"clang++-{version}"],
                 "add_to_devenv_path": False,
             },
             {
-                "path": f"bin/clang.exe",
-                "checksum": "none",
+                "path": f"bin/clang",
+                "checksum": "329bba976c0cef38863129233a4b0939688eae971c7a606d41dd0e5a53d53455",
                 "symlink": [f"clang-{version}"],
                 "add_to_devenv_path": False,
             }
@@ -636,18 +636,18 @@ def get_manifest(is_windows):
             }
         ]
     else:
-        download_checksum = "none"
-        download_url      = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/clang+llvm-{version}-x86_64-linux-gnu-ubuntu-18.04.tar.xz"
+        download_checksum = "c691a558967fb7709fb81e0ed80d1f775f4502810236aa968b4406526b43bee1"
+        download_url      = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/clang+llvm-{version}-x86_64-linux-gnu-ubuntu-16.04.tar.xz"
         executables = [
             {
                 "path": f"bin/clang++",
-                "checksum": "none",
+                "checksum": "656bfde194276cee81dc8a7a08858313c5b5bdcfa18ac6cd6116297af2f65148",
                 "symlink": [f"clang++-{version}"],
                 "add_to_devenv_path": False,
             },
             {
-                "path": f"bin/clang.exe",
-                "checksum": "none",
+                "path": f"bin/clang",
+                "checksum": "656bfde194276cee81dc8a7a08858313c5b5bdcfa18ac6cd6116297af2f65148",
                 "symlink": [f"clang-{version}"],
                 "add_to_devenv_path": False,
             }
@@ -676,8 +676,8 @@ def get_manifest(is_windows):
         exe_path          = "ninja.exe"
     else:
         download_url      = f"https://github.com/ninja-build/ninja/releases/download/v{version}/ninja-linux.zip"
-        download_checksum = "none"
-        checksum          = "none"
+        download_checksum = "b901ba96e486dce377f9a070ed4ef3f79deb45f4ffe2938f8e7ddc69cfb3df77"
+        checksum          = "ac35c7992e95c5f2cadb44097d9988bcc71e5e39d9908ec312eb46872844f2e8"
         exe_path          = "ninja"
 
     result.append({
@@ -717,9 +717,9 @@ def get_manifest(is_windows):
         symlink           = [f"node-{version}.exe"]
     else:
         download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-linux-x64.tar.xz"
-        download_checksum = "none"
-        checksum          = "none"
-        exe_path          = "node"
+        download_checksum = "c88b52497ab38a3ddf526e5b46a41270320409109c3f74171b241132984fd08f"
+        checksum          = "45afcfc9a45df626e8aa2b883753d1cf7f222ad9243f3003d1aa372696120df6"
+        exe_path          = "bin/node"
         symlink           = [f"node-{version}"]
 
     result.append({
@@ -764,29 +764,31 @@ def get_manifest(is_windows):
         ]
     else:
         download_url      = f"https://github.com/indygreg/python-build-standalone/releases/download/{date}/cpython-{version}-x86_64_v2-unknown-linux-gnu-pgo+lto-full.tar.zst"
-        download_checksum = "none"
+        download_checksum = "49f4a8c02efff2debbb258973b1f6efbd568e4be2e5dca07c7dcd754a7bff9cf"
         checksum          = "none"
         exe_path          = "bin/python"
 
-    result.append({
-        "label": label,
-        "manifests": [
-            {
-                "download_checksum": download_checksum,
-                "download_url": download_url,
-                "version": version,
-                "executables": [
-                    {
-                        "path": exe_path,
-                        "symlink": [],
-                        "add_to_devenv_path": True,
-                        "checksum": checksum,
-                    }
-                ],
-                "add_to_devenv_script": add_to_devenv_script,
-            }
-        ],
-    })
+    # TODO: Get ZST somehow on linux
+    if is_windows:
+        result.append({
+            "label": label,
+            "manifests": [
+                {
+                    "download_checksum": download_checksum,
+                    "download_url": download_url,
+                    "version": version,
+                    "executables": [
+                        {
+                            "path": exe_path,
+                            "symlink": [],
+                            "add_to_devenv_path": True,
+                            "checksum": checksum,
+                        }
+                    ],
+                    "add_to_devenv_script": add_to_devenv_script,
+                }
+            ],
+        })
 
     # --------------------------------------------------------------------------
 
@@ -803,8 +805,8 @@ def get_manifest(is_windows):
         exe_path             = "qrenderdoc.exe"
     else:
         download_url      = f"https://renderdoc.org/stable/{version}/renderdoc_{version}.tar.gz"
-        download_checksum = "none"
-        checksum          = "none"
+        download_checksum = "fbdf67131ade655a7e635aa34e8b6fcd1aac9d88ebbe7d3da39fb075e05b1f41"
+        checksum          = "00508f6532f73a38873b92777fa8b7fb317c0b5f411fb50d2722823027993252"
         exe_path          = "bin/qrenderdoc"
 
     result.append({
@@ -867,9 +869,9 @@ def get_manifest(is_windows):
         exe_path          = "zig.exe"
         symlink           = [f"zig-{version}.exe"]
     else:
-        download_url      = f"https://ziglang.org/download/{version}/zig-linux-x86_64-{version}.zip"
-        download_checksum = "none"
-        checksum          = "none"
+        download_url      = f"https://ziglang.org/download/{version}/zig-linux-x86_64-{version}.tar.xz"
+        download_checksum = "6699f0e7293081b42428f32c9d9c983854094bd15fee5489f12c4cf4518cc380"
+        checksum          = "b298cd869e11709b9c7a1313315b5ea2a9d8a0718f555c6990ee209d7c533442"
         exe_path          = "zig"
         symlink           = [f"zig-{version}"]
 
@@ -983,8 +985,8 @@ def get_manifest(is_windows):
         symlink           = [f"fzf.exe"]
     else:
         download_url      = f"https://github.com/junegunn/fzf/releases/download/{version}/fzf-{version}-linux_amd64.tar.gz"
-        download_checksum = "none"
-        checksum          = "none"
+        download_checksum = "ffa3220089f2ed6ddbef2d54795e49f46467acfadd4ad0d22c5f07c52dc0d4ab"
+        checksum          = "6475c41e56d949da753782fef56017657b77846f23e71fca88378e3f55c1d6d0"
         exe_path          = "fzf"
         symlink           = [f"fzf"]
 
@@ -1073,7 +1075,7 @@ def get_manifest(is_windows):
         exe_path          = "nvim.appimage"
         download_url      = f"https://github.com/neovim/neovim/releases/download/v{version}/{exe_path}"
         download_checksum = "bb0d4599cb506fc6e29bf0e9cef3b52e06dcb4bb930b56d6eb88320f1d46a908"
-        checksum          = "none"
+        checksum          = download_checksum
 
     result.append({
         "label": "NVim",
@@ -1110,8 +1112,8 @@ def get_manifest(is_windows):
         exe_path          = "neovide.exe"
     else:
         download_url      = f"https://github.com/neovide/neovide/releases/download/{version}/neovide.tar.gz"
-        download_checksum = "fc0593a0f55e99fa8398e8137ac89632ea7fc97a90cbd32d8c2a69afc1eff6f"
-        checksum          = "none"
+        download_checksum = "0fc0593a0f55e99fa8398e8137ac89632ea7fc97a90cbd32d8c2a69afc1eff6f"
+        checksum          = "73c8dc6cb9840f568663d532d12ae54109af690866a51011cc1f874e2ae308e2"
         exe_path          = "neovide"
 
     result.append({
@@ -1148,10 +1150,10 @@ def get_manifest(is_windows):
         checksum          = "ddd448c0d8fe71295bbcc5b52c9e9f4b06956a79572b7d634436a49728f5f341"
         exe_path          = "imhex.exe"
     else:
-        download_url      = f"https://github.com/WerWolv/ImHex/releases/download/v{version}/imhex-{version}.AppImage"
-        download_checksum = "none"
-        checksum          = "none"
-        exe_path          = "imhex-{version}.AppImage"
+        exe_path          = f"imhex-{version}.AppImage"
+        download_url      = f"https://github.com/WerWolv/ImHex/releases/download/v{version}/{exe_path}"
+        download_checksum = "229d7f2f36dca0d4aa2eeb4f637114ffa94db7d67db74b34ed7eda34d72e4bed"
+        checksum          = download_checksum
 
     result.append({
         "label": "ImHex",
@@ -1237,7 +1239,7 @@ def get_manifest(is_windows):
     else:
         download_url      = f"https://github.com/BurntSushi/ripgrep/releases/download/{version}/ripgrep-{version}-x86_64-unknown-linux-musl.tar.gz"
         download_checksum = "ee4e0751ab108b6da4f47c52da187d5177dc371f0f512a7caaec5434e711c091"
-        checksum          = "none"
+        checksum          = "4ef156371199b3ddac1bf584e0e52b1828279af82e4ea864b4d9c816adb5db40"
         exe_path          = "rg"
 
     result.append({
@@ -1275,9 +1277,9 @@ def get_manifest(is_windows):
         exe_path          = "sioyek.exe"
     else:
         download_url      = f"https://github.com/ahrm/sioyek/releases/download/v{version}/sioyek-release-linux-portable.zip"
-        download_checksum = "none"
-        checksum          = "none"
-        exe_path          = "sioyek"
+        download_checksum = "3f90659c1f29705de680b3607ae247582eab8860015c208d364a0f3fc15d3222"
+        checksum          = "7abc12e8fe71b0285e067866bcea2ea0e025e37291f6bce450675a567172e44f"
+        exe_path          = "Sioyek-x86_64.AppImage"
 
     result.append({
         "label": "Sioyek",
@@ -1318,9 +1320,9 @@ def get_manifest(is_windows):
             "set FZF_DEFAULT_COMMAND=fd --type f --strip-cwd-prefix --hidden --follow --exclude .git --exclude .cache --exclude .vs",
         ]
     else:
-        download_url      = f"https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-x86_64-pc-unknown-linux-musl.tar.gz"
-        download_checksum = "none"
-        checksum          = "none"
+        download_url      = f"https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-x86_64-unknown-linux-musl.tar.gz"
+        download_checksum = "9fdb370648fb8256fc9a36355c652546bd4c62925babcad80f95f90f74fc81e7"
+        checksum          = "702eb951e6b37be64cca66da976e0fcb0be587121034c1d6f841ce7fad3bd8e3"
         exe_path          = "fd"
         add_to_devenv_script = [
             "FZF_DEFAULT_OPTS=--multi --layout=reverse",
@@ -1434,7 +1436,7 @@ def get_manifest(is_windows):
         checksum          = "12d62abb9ad4db43c2b9b1398acae66857eb6e64205364631a3d3bda0ff17e2e"
         exe_path          = "ripcord.exe"
     else:
-        exe_path          = "Ripcord-{version}-x86_64.AppImage"
+        exe_path          = f"Ripcord-{version}-x86_64.AppImage"
         download_url      = f"https://cancel.fm/dl/{exe_path}"
         download_checksum = "e320cb3c4043b0f296b4bc1da664b29776f95c2c0b02bdbf115b4d46b1669899"
         checksum          = download_checksum
@@ -1498,7 +1500,7 @@ def get_manifest(is_windows):
         exe_path             = "yt-dlp.exe"
     else:
         download_url      = f"https://github.com/yt-dlp/yt-dlp/releases/download/{version}/yt-dlp_linux"
-        download_checksum = "none"
+        download_checksum = "3b2d1bd378e08570b0fb5bee000cd6968563c4f47527197a5c57463bae8cb2ac"
         checksum          = download_checksum
         exe_path          = "yt-dlp_linux"
 
@@ -1538,7 +1540,7 @@ def get_manifest(is_windows):
     else:
         download_url      = f"https://bitbucket.org/heldercorreia/speedcrunch/downloads/SpeedCrunch-{version}-linux64.tar.bz2"
         download_checksum = "9347bef2068053ad15c5914ee147bf11a1ccb1d30cb18d63d0178380c327e8fc"
-        checksum          = "none"
+        checksum          = "06c7e7f68027f133dc7874f663873244b695c8a7d2aec9cde0e40b7a5b9a4db1"
         exe_path          = "speedcrunch"
 
     result.append({
@@ -1577,8 +1579,8 @@ def get_manifest(is_windows):
     else:
         exe_path          = f"KeePassXC-{version}-x86_64.AppImage"
         download_url      = f"https://github.com/keepassxreboot/keepassxc/releases/download/{version}/{exe_path}"
-        download_checksum = "none"
-        checksum          = "none"
+        download_checksum = "15fdc15f340e84e3b7a25a19bfb8c3b16f1e04685c07e5de1616b7cd6bcdded6"
+        checksum          = download_checksum
 
     result.append({
         "label": "KeePassXC",

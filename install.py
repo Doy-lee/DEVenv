@@ -9,8 +9,8 @@ import tempfile
 import argparse
 import urllib.request
 
-import win_app_manifest_dev
-import win_app_manifest_user
+import app_manifest_dev
+import app_manifest_user
 
 def git_clone(install_dir, git_exe, url, commit_hash):
     devenver.lprint(f"Git clone {url} to {install_dir}", level=0)
@@ -78,7 +78,7 @@ if args.with_dev_apps:
     # Run DEVenver, installing the portable apps
     # --------------------------------------------------------------------------
     dev_env_script_name = "dev_env"
-    app_list            = win_app_manifest_dev.get_manifest(is_windows=is_windows)
+    app_list            = app_manifest_dev.get_manifest(is_windows=is_windows)
     installed_dev_apps  = devenver.run(user_app_list=app_list,
                                        download_dir=download_dir,
                                        install_dir=install_dir,
@@ -375,12 +375,12 @@ set PYTHONHOME=%~dp0{python_install_dir}
 pause
 """)
 
-    (install_dir / "user_env_update.bat").write_text(f"""@echo off
-setlocal EnableDelayedExpansion
-set PYTHONHOME=%~dp0{python_install_dir}
-%~dp0{python_rel_exe_path} {win_setup_script_path} --with-user-apps
-pause
-""")
+        (install_dir / "user_env_update.bat").write_text(f"""@echo off
+    setlocal EnableDelayedExpansion
+    set PYTHONHOME=%~dp0{python_install_dir}
+    %~dp0{python_rel_exe_path} {win_setup_script_path} --with-user-apps
+    pause
+    """)
 
     # Install left-overs
     # --------------------------------------------------------------------------
@@ -411,13 +411,12 @@ pause
         urllib.request.urlretrieve("https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim",
                                    nvim_plug_vim_path)
 
-
 # Install user apps
 # ------------------------------------------------------------------------------
 if args.with_user_apps:
-    app_list            = win_app_manifest_user.get_manifest(is_windows=is_windows)
+    app_list            = app_manifest_user.get_manifest(is_windows=is_windows)
     installed_user_apps = devenver.run(user_app_list=app_list,
                                        download_dir=download_dir,
                                        install_dir=install_dir,
                                        devenv_script_name="user_env",
-                                       is_windows=True)
+                                       is_windows=is_windows)

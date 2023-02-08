@@ -222,18 +222,19 @@ def download_and_install_archive(download_url,
         # Install the archive by unpacking it
         # ----------------------------------------------------------------------
         archive_path = download_path
+        os.makedirs(exe_install_dir, exist_ok=True)
+
         if unzip_method == UnzipMethod.DEFAULT:
-            if archive_path.suffix == '.exe' or archive_path.suffix == '.AppImage':
+            if archive_path.suffix == '.exe' or archive_path.suffix.lower() == '.appimage' or len(archive_path.suffix) == 0:
                 unzip_method = UnzipMethod.NO_UNZIP
 
         if unzip_method == UnzipMethod.NO_UNZIP:
-            os.makedirs(exe_install_dir, exist_ok=True)
             shutil.copy(archive_path, exe_install_dir)
         elif unzip_method == UnzipMethod.SHUTILS:
             lprint(f'- SHUtils unzip install {label} to: {exe_install_dir}', level=1)
             shutil.unpack_archive(download_path, exe_install_dir)
         elif unzip_method == UnzipMethod.ZIP7_BOOTSTRAP:
-            command = f'"{zip7_bootstrap_exe}" x -bd "{download_path}" -o"{exe_install_dir}"'
+            command = [str(zip7_bootstrap_exe), "x", "-bd", str(download_path), "-o", str(exe_install_dir)]
             lprint(f'- 7z (bootstrap) unzip {label} to: {exe_install_dir}', level=1)
             lprint(f'  Command: {command}', level=1)
             subprocess.run(command)
@@ -252,37 +253,49 @@ def download_and_install_archive(download_url,
             # We call this an intermediate zip file, we will extract that file
             # with 7zip. After we're done, we will delete that _intermediate_
             # file to cleanup our install directory.
-            if archive_path.suffix == '.zst' or archive_path.suffix == '.xz' or archive_path.suffix == '.gz':
+            unzip_command = [str(zip7_exe), "x", "-aoa", "-spe", "-bso0", str(archive_path), f"-o{exe_install_dir}"]
 
+            linux_used_tar = False
+            if archive_path.suffix == '.zst' or archive_path.suffix == '.xz' or archive_path.suffix == '.gz' or archive_path.suffix == '.bz2':
                 archive_without_suffix = pathlib.Path(str(archive_path)[:-len(archive_path.suffix)]).name
-                next_archive_path = pathlib.Path(exe_install_dir, archive_without_suffix)
+                next_archive_path      = pathlib.Path(exe_install_dir, archive_without_suffix)
 
                 if os.path.exists(next_archive_path) == False:
+                    command = ""
                     if archive_path.suffix == '.zst':
-                        command = f'"{zstd_exe}" --output-dir-flat "{exe_install_dir}" -d "{archive_path}"'
+                        command = [str(zstd_exe), "--output-dir-flat", str(exe_install_dir), "-d", str(archive_path)]
                         lprint(f'- zstd unzip {label} to: {exe_install_dir}', level=1)
-                        lprint(f'  Command: {command}', level=1)
                     else:
-                        command = f'"{zip7_exe}" x -aoa -spe -bso0 "{archive_path}" -o"{exe_install_dir}"'
-                        command = command.replace('\\', '/')
-                        lprint(f'- 7z unzip install {label} to: {exe_install_dir}', level=1)
-                        lprint(f'  Command: {command}', level=1)
+                        if not is_windows:
+                            linux_used_tar = True
+                            unzip_command  = ["tar", "xf", str(archive_path), "--directory", str(exe_install_dir)]
 
-                    os.makedirs(exe_install_dir)
-                    subprocess.run(command)
+                        command = unzip_command
+                        for item in command:
+                            item = item.replace('\\', '/')
+                        lprint(f'- Unzip nested install {label} to: {exe_install_dir}', level=1)
+
+                    lprint(f'  Command: {command}', level=1)
+                    subprocess.run(args=command)
 
                 # Remove the extension from the file, we just extracted it
                 archive_path = next_archive_path
 
                 # If there's still a suffix after we removed the ".zst" we got
                 # an additional archive to unzip, e.g. "app.tar" remaining.
-                intermediate_zip_file_extracted = len(archive_path.suffix) > 0
+                if not linux_used_tar:
+                    intermediate_zip_file_extracted = len(archive_path.suffix) > 0
 
+            # \note On Linux using tar xf will unpack the archive entirely, e.g.
+            # unpack tar.gz both in one shot. So we do not need a further
+            # extract step.
+            if not linux_used_tar and len(archive_path.suffix) > 0:
+                unzip_command = [str(zip7_exe), "x", "-aoa", "-spe", "-bso0", str(archive_path), f"-o{exe_install_dir}"]
+                command = unzip_command
+                for item in command:
+                    item = item.replace('\\', '/')
 
-            if len(archive_path.suffix) > 0:
-                command = f'"{zip7_exe}" x -aoa -spe -bso0 "{archive_path}" -o"{exe_install_dir}"'
-                command = command.replace('\\', '/')
-                lprint(f'- 7z unzip install {label} to: {exe_install_dir}', level=1)
+                lprint(f'- Unzip install {label} to: {exe_install_dir}', level=1)
                 lprint(f'  Command: {command}', level=1)
                 subprocess.run(command)
 
@@ -528,7 +541,7 @@ def install_app_list(app_list, download_dir, install_dir, is_windows):
                             unzip_method = UnzipMethod.ZIP7_BOOTSTRAP
                             zip7_exe     = exe_path
                     else:
-                        unzip_method = UnzipMethod.ZIP7_SHUTILS
+                        unzip_method       = UnzipMethod.SHUTILS
                         zip7_exe           = exe_path
                         zip7_bootstrap_exe = exe_path
                 elif label == 'zstd':
@@ -571,7 +584,7 @@ def install_app_list(app_list, download_dir, install_dir, is_windows):
             for line in manifest['add_to_devenv_script']:
                 devenv_script_buffer += (line + '\n')
 
-    if app_list is internal_app_list:
+    if (is_windows or os.name == 'nt') and app_list is internal_app_list:
         if len(str(zip7_exe)) == 0 or len(str(zip7_bootstrap_exe)) == 0 or len(str(zstd_exe)) == 0:
             exit("Internal app list did not install 7zip bootstrap, 7zip or zstd, we are unable to install archives\n"
                  f" - zip7_bootstrap_exe: {zip7_bootstrap_exe}\n"
@@ -655,11 +668,12 @@ def run(user_app_list,
         download_checksum = "b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4"
         checksum          = "254cf6411d38903b2440819f7e0a847f0cfee7f8096cfad9e90fea62f42b0c23"
         exe_path          = "7z.exe"
+
     else:
         download_url      = f"https://www.7-zip.org/a/7z{version}-linux-x64.tar.xz"
-        download_checksum = "none"
-        checksum          = "none"
-        exe_path          = "7z"
+        download_checksum = "2c266f6794adec310c4631232c1d039f46988d51082fe5e80349c52ee7ed60bb"
+        checksum          = "0c771994a00ee96a0fc85902f66fbfd162c3090091e523bb828cdf4cd09a2e73"
+        exe_path          = "7zz"
 
     internal_app_list[-1]["manifests"].append({ # Download proper 7zip, extract this exe with the bootstrap 7zip
         "download_checksum": download_checksum,
@@ -689,31 +703,26 @@ def run(user_app_list,
         download_checksum = "68897cd037ee5e44c6d36b4dbbd04f1cc4202f9037415a3251951b953a257a09"
         checksum          = "f14e78c0651851a670f508561d2c5d647da0ba08e6b73231f2e7539812bae311"
         exe_path          = "zstd.exe"
-    else:
-        download_url      = f"https://github.com/facebook/zstd/releases/download/v{version}/zstd-{version}.tar.gz"
-        download_checksum = "none"
-        checksum          = "none"
-        exe_path          = "zstd"
 
-    internal_app_list.append({
-        "label": "zstd",
-        "manifests": [
-            {
-                "download_checksum": download_checksum,
-                "download_url": download_url,
-                "version": version,
-                "executables": [
-                    {
-                        "path": "zstd.exe",
-                        "symlink": [],
-                        "add_to_devenv_path": True,
-                        "checksum": checksum,
-                    },
-                ],
-                "add_to_devenv_script": [],
-            },
-        ],
-    })
+        internal_app_list.append({
+            "label": "zstd",
+            "manifests": [
+                {
+                    "download_checksum": download_checksum,
+                    "download_url": download_url,
+                    "version": version,
+                    "executables": [
+                        {
+                            "path": exe_path,
+                            "symlink": [],
+                            "add_to_devenv_path": True,
+                            "checksum": checksum,
+                        },
+                    ],
+                    "add_to_devenv_script": [],
+                },
+            ],
+        })
 
     # Run
     # --------------------------------------------------------------------------
@@ -763,7 +772,7 @@ def run(user_app_list,
     # Write the devenv script with environment variables
     devenv_script_buffer += "set PATH=%~dp0Symlinks;%PATH%\n"
 
-    devenv_script_name = f"{devenv_script_name}.bat" if is_windows else f"{devenv_script_name}dev_env.sh"
+    devenv_script_name = f"{devenv_script_name}.bat" if is_windows else f"{devenv_script_name}.sh"
     devenv_script_path = pathlib.Path(install_dir, devenv_script_name)
     lprint(f"Writing script to augment the environment with installed applications: {devenv_script_path}")
     with open(devenv_script_path, 'w') as file:
