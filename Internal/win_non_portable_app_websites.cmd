@@ -10,3 +10,4 @@ start /B https://protonvpn.com/download
 start /B https://signal.org/download
 start /B https://safing.io
 start /B https://spotify.com/us/download
+start /B https://discord.com/download
