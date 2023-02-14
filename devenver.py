@@ -381,6 +381,10 @@ def download_and_install_archive(download_url,
                                         label=label,
                                         version_label=version_label,
                                         exe_rel_path=exe_rel_path)
+        # Make them executable
+        # ----------------------------------------------------------------------
+        if not is_windows:
+            subprocess.run(args=["chmod", "+x", exe_path])
 
         # If you install the Linux manifest on Windows then we ensure we
         # still call link (e.g. hardlink) because symlinks need special
@@ -426,7 +430,7 @@ def download_and_install_archive(download_url,
         if is_windows:
             devenv_script_buffer += f"set PATH=%~dp0{path};%PATH%\n"
         else:
-            devenv_script_buffer += f"PATH=$( cd -- \"$( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd ){path}\";%PATH%\n"
+            devenv_script_buffer += f"PATH=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )/{path}\":$PATH\n"
 
 # Search the 2 dictionarries, 'first' and 'second' for the key. A matching key
 # in 'first' taking precedence over the 'second' dictionary. If no key is
@@ -750,9 +754,10 @@ def run(user_app_list,
             exit(f'Path "{path}" is not a directory, script can not proceed. Exiting.')
 
     global devenv_script_buffer
-    devenv_script_buffer = """@echo off
+    if is_windows:
+        devenv_script_buffer = """@echo off
 
-    """
+"""
 
     # Validate all the manifests before starting
     internal_app_validate_result = validate_app_list(internal_app_list)
@@ -770,7 +775,10 @@ def run(user_app_list,
                                      is_windows=is_windows)
 
     # Write the devenv script with environment variables
-    devenv_script_buffer += "set PATH=%~dp0Symlinks;%PATH%\n"
+    if is_windows:
+        devenv_script_buffer += "set PATH=%~dp0Symlinks;%PATH%\n"
+    else:
+        devenv_script_buffer += f"PATH=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )/Symlinks\":$PATH\n"
 
     devenv_script_name = f"{devenv_script_name}.bat" if is_windows else f"{devenv_script_name}.sh"
     devenv_script_path = pathlib.Path(install_dir, devenv_script_name)

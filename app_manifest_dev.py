@@ -1065,6 +1065,7 @@ def get_manifest(is_windows):
     download_checksum = ""
     exe_path          = ""
     checksum          = ""
+    symlink           = []
 
     if is_windows:
         download_url      = f"https://github.com/neovim/neovim/releases/download/v{version}/nvim-win64.zip"
@@ -1076,6 +1077,7 @@ def get_manifest(is_windows):
         download_url      = f"https://github.com/neovim/neovim/releases/download/v{version}/{exe_path}"
         download_checksum = "bb0d4599cb506fc6e29bf0e9cef3b52e06dcb4bb930b56d6eb88320f1d46a908"
         checksum          = download_checksum
+        symlink           = ["nvim", "vim"] # Usually use VM with no desktop-environment
 
     result.append({
         "label": "NVim",
@@ -1087,7 +1089,7 @@ def get_manifest(is_windows):
                 "executables": [
                     {
                         "path": exe_path,
-                        "symlink": [],
+                        "symlink": symlink,
                         "add_to_devenv_path": True,
                         "checksum": checksum,
                     }
@@ -1325,8 +1327,8 @@ def get_manifest(is_windows):
         checksum          = "702eb951e6b37be64cca66da976e0fcb0be587121034c1d6f841ce7fad3bd8e3"
         exe_path          = "fd"
         add_to_devenv_script = [
-            "FZF_DEFAULT_OPTS=--multi --layout=reverse",
-            "FZF_DEFAULT_COMMAND=fd --type f --strip-cwd-prefix --hidden --follow --exclude .git --exclude .cache --exclude .vs",
+            "FZF_DEFAULT_OPTS=\"--multi --layout=reverse\"",
+            "FZF_DEFAULT_COMMAND=\"fd --type f --strip-cwd-prefix --hidden --follow --exclude .git --exclude .cache --exclude .vs\"",
         ]
 
 
