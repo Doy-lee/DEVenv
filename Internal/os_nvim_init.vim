@@ -59,6 +59,19 @@ lua <<EOF
   -- ===========================================================================
   local lsp = require('lsp-zero')
   lsp.preset('recommended')
+
+  lsp.configure('clangd', {
+    cmd = {
+      "clangd",
+      "--background-index",
+      "--clang-tidy",
+      "--limit-references=1024",
+      "--limit-results=1024",
+      "--header-insertion=iwyu",
+      "--header-insertion-decorators",
+    }
+  })
+
   lsp.setup()
 
   -- Treesitter
@@ -305,8 +318,7 @@ command! -bang -nargs=? -complete=dir FzfCustomFiles
 nnoremap <leader>h  <cmd>FzfHistory<cr>
 nnoremap <leader>f  <cmd>FzfCustomFiles<cr>
 nnoremap <leader>g  <cmd>FzfRg<cr>
-nnoremap <leader>tt <cmd>FzfTags<cr>
-nnoremap <leader>tb <cmd>FzfBTags<cr>
+nnoremap <leader>t  :FzfWorkspaceSymbols<space>
 nnoremap <leader>cc <cmd>FzfCommits<cr>
 nnoremap <leader>cb <cmd>FzfBCommits<cr>
 nnoremap <leader>b  <cmd>FzfBuffers<cr>
