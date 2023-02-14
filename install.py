@@ -86,6 +86,7 @@ if args.with_dev_apps:
                                        is_windows=is_windows)
 
 
+    install_script_path = pathlib.Path(devenver.script_dir, "install.py")
     if is_windows:
         # Install MSVC
         # --------------------------------------------------------------------------
@@ -364,23 +365,30 @@ start "" "%~dp0{installed_dev_apps["SpeedCrunch"][0]["exe_path"].relative_to(ins
         subprocess.run(f"{python_exe_path} -m pip install pynvim")
 
         # Add update script
-        python_rel_exe_path   = pathlib.Path(python_exe_path).relative_to(install_dir)
-        python_install_dir    = pathlib.Path(python_exe_path).parent.relative_to(install_dir)
-        win_setup_script_path = pathlib.Path(devenver.script_dir, "win_install.py")
+        python_rel_exe_path = pathlib.Path(python_exe_path).relative_to(install_dir)
+        python_install_dir  = pathlib.Path(python_exe_path).parent.relative_to(install_dir)
 
         (install_dir / "dev_env_update.bat").write_text(f"""@echo off
 setlocal EnableDelayedExpansion
 set PYTHONHOME=%~dp0{python_install_dir}
-%~dp0{python_rel_exe_path} {win_setup_script_path} --with-dev-apps
+%~dp0{python_rel_exe_path} {install_script_path} --with-dev-apps win
 pause
 """)
 
         (install_dir / "user_env_update.bat").write_text(f"""@echo off
-    setlocal EnableDelayedExpansion
-    set PYTHONHOME=%~dp0{python_install_dir}
-    %~dp0{python_rel_exe_path} {win_setup_script_path} --with-user-apps
-    pause
-    """)
+setlocal EnableDelayedExpansion
+set PYTHONHOME=%~dp0{python_install_dir}
+%~dp0{python_rel_exe_path} {install_script_path} --with-user-apps win
+pause
+""")
+
+    else:
+        dev_env_script_path = (install_dir / "dev_env_update.sh")
+        user_env_script_path = (install_dir / "user_env_update.sh")
+        dev_env_script_path.write_text(f"{sys.executable} {install_script_path} --with-dev-apps linux\n")
+        user_env_script_path.write_text(f"{sys.executable} {install_script_path} --with-user-apps linux\n")
+        subprocess.run(args=["chmod", "+x", dev_env_script_path])
+        subprocess.run(args=["chmod", "+x", user_env_script_path])
 
     # Install left-overs
     # --------------------------------------------------------------------------

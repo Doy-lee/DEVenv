@@ -782,9 +782,12 @@ def run(user_app_list,
 
     devenv_script_name = f"{devenv_script_name}.bat" if is_windows else f"{devenv_script_name}.sh"
     devenv_script_path = pathlib.Path(install_dir, devenv_script_name)
+
     lprint(f"Writing script to augment the environment with installed applications: {devenv_script_path}")
-    with open(devenv_script_path, 'w') as file:
-        file.write(devenv_script_buffer)
+    devenv_script_path.write_text(devenv_script_buffer)
+
+    if not is_windows:
+        subprocess.run(args=["chmod", "+x", devenv_script_path])
 
     # Merge the install dictionaries, this dictionary contains
     # (app label) -> [array of installed versions]
