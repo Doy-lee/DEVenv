@@ -71,7 +71,7 @@ def get_manifest(is_windows):
         "manifests": [],
     })
 
-    version           = "3.23.4"
+    version           = "3.24.3"
     download_url      = ""
     exe_path          = ""
     download_checksum = ""
@@ -81,13 +81,14 @@ def get_manifest(is_windows):
     if is_windows:
         exe_path          = f"bin/cmake.exe"
         download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-windows-x86_64.zip"
-        download_checksum = "df15113aaab9e5f8cac254e02cf23f70d02407c9bf2983c82a9fe0d35bd20682"
-        checksum          = "426074cd812586551fbab2bde67377113e2085c78c2e9a887748e85b4dc3dda5"
+        download_checksum = "86c605507e4175d1e1cd2fd9098d6a5b6bf6ff7f885f4b75ddfc9ac3dc1d4452"
+        checksum          = "f96ba3c14b0a73fe1ddd8e9a14f084d1ab23a507bb30c3480b2c2f47aef58cbe"
+        symlink           = [f"cmake-{version}.exe"]
     else:
         exe_path          = f"bin/cmake"
         download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-linux-x86_64.tar.gz"
-        download_checksum = "3fbcbff85043d63a8a83c8bdf8bd5b1b2fd5768f922de7dc4443de7805a2670d"
-        checksum          = "0f2d7256be13a5955af1462d6dd40e1f0c0ce9fa822953f31ae27aa78da73440"
+        download_checksum = "8e3d048c7fb26767b00db6a55025aa380d91f45d8f3749e9b9961ef25744b102"
+        symlink           = [f"cmake-{version}"]
 
     result[-1]['manifests'].append({
         "download_checksum": download_checksum,
@@ -104,16 +105,47 @@ def get_manifest(is_windows):
         "add_to_devenv_script": [],
     })
 
+    version = "3.23.4"
+    if is_windows:
+        exe_path          = f"bin/cmake.exe"
+        download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-windows-x86_64.zip"
+        download_checksum = "df15113aaab9e5f8cac254e02cf23f70d02407c9bf2983c82a9fe0d35bd20682"
+        checksum          = "426074cd812586551fbab2bde67377113e2085c78c2e9a887748e85b4dc3dda5"
+        symlink           = [f"cmake-{version}.exe"]
+    else:
+        exe_path          = f"bin/cmake"
+        download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-linux-x86_64.tar.gz"
+        download_checksum = "3fbcbff85043d63a8a83c8bdf8bd5b1b2fd5768f922de7dc4443de7805a2670d"
+        checksum          = "0f2d7256be13a5955af1462d6dd40e1f0c0ce9fa822953f31ae27aa78da73440"
+        symlink           = [f"cmake-{version}"]
+
+    result[-1]['manifests'].append({
+        "download_checksum": download_checksum,
+        "download_url": download_url,
+        "version": version,
+        "executables": [
+            {
+                "path": exe_path,
+                "symlink": symlink,
+                "add_to_devenv_path": False,
+                "checksum": checksum,
+            }
+        ],
+        "add_to_devenv_script": [],
+    })
+
     version = "3.10.3"
 
     if is_windows:
         download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-win64-x86_64.zip"
         download_checksum = "3bd57d1cfcf720a4cc72db77bda4c76a7b700fb0341821ad868963ad28856cd0"
         checksum          = "f2e3b486d87d2a6bc19b3a62c740028f3f8945875196ac7d3d0e69649e98730a"
+        symlink           = [f"cmake-{version}.exe"]
     else:
         download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-Linux-x86_64.tar.gz"
         download_checksum = "9e7c48b797484f74c5ee3ae55132b40b16ed8e81ee762402da8971205b0a896b"
         checksum          = "f12fbb91b198738cd0ade85ab1aa3f65964579a850042de3d2385cc0d593ad46"
+        symlink           = [f"cmake-{version}"]
 
     result[-1]['manifests'].append({
         "download_checksum": download_checksum,
