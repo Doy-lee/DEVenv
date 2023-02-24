@@ -1821,4 +1821,46 @@ def get_manifest(is_windows):
         ],
     })
 
+    # --------------------------------------------------------------------------
+
+    version           = "1.20.1"
+    download_url      = ""
+    download_checksum = ""
+    exe_path          = ""
+    checksum          = ""
+
+    if is_windows:
+        exe_path          = "bin/go.exe"
+        download_url      = f"https://go.dev/dl/go{version}.windows-amd64.zip"
+        download_checksum = "3b493969196a6de8d9762d09f5bc5ae7a3e5814b0cfbf9cc26838c2bc1314f9c"
+        checksum          = "89fc8e2c47f2a2a9138e60159781ce377167cf61e30d8136fbad0d77ac9303ed"
+        symlink           = [f"go-{version}.exe"]
+    else:
+        exe_path          = f"bin/go"
+        download_url      = f"https://go.dev/dl/go{version}.linux-amd64.tar.gz"
+        download_checksum = "000a5b1fca4f75895f78befeb2eecf10bfff3c428597f3f1e69133b63b911b02"
+        checksum          = ""
+        symlink           = [f"go-{version}"]
+
+    result.append({
+        "label": "Go",
+        "manifests": [
+            {
+                "download_url": download_url,
+                "download_checksum": download_checksum,
+                "version": version,
+                "unzip_method": 'default',
+                "executables": [
+                    {
+                        "path": exe_path,
+                        "symlink": symlink,
+                        "add_to_devenv_path": True,
+                        "checksum": checksum,
+                    }
+                ],
+                "add_to_devenv_script": [],
+            }
+        ],
+    })
+
     return result
