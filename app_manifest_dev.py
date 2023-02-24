@@ -1379,6 +1379,85 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
+    version = "3.52.0"
+    symlink = []
+
+    if is_windows:
+        exe_path          = "losslesscut.exe"
+        download_url      = f"https://github.com/mifi/lossless-cut/releases/download/v{version}/LosslessCut-win-x64.7z"
+        download_checksum = "fa554d5f63f7287d6b4b6bf19ac5916c99cabfe9ac22248e7a3c39898c5b56ff"
+        checksum          = "3cae40fa13523e9dfe760521d167174ddfc21105eb20466e905eb39b74e8ed70"
+    else:
+        exe_path          = f"LosslessCut-linux-x86_64.AppImage"
+        download_url      = f"https://github.com/mifi/lossless-cut/releases/download/v{version}/{exe_path}"
+        download_checksum = "28daafe9fcd07473f460c0a903164efe93d4e5ce7e682b6f318a5550c34bdb99"
+        checksum          = download_checksum
+
+    result.append({
+        "label": "LosslessCut",
+        "manifests": [
+            {
+                "download_url": download_url,
+                "download_checksum": download_checksum,
+                "version": version,
+                "unzip_method": 'default',
+                "executables": [
+                    {
+                        "path": exe_path,
+                        "symlink": symlink,
+                        "add_to_devenv_path": False,
+                        "checksum": checksum,
+                    }
+                ],
+                "add_to_devenv_script": [],
+            }
+        ],
+    })
+
+    # --------------------------------------------------------------------------
+
+    version           = "1.20.1"
+    download_url      = ""
+    download_checksum = ""
+    exe_path          = ""
+    checksum          = ""
+
+    if is_windows:
+        exe_path          = "bin/go.exe"
+        download_url      = f"https://go.dev/dl/go{version}.windows-amd64.zip"
+        download_checksum = "3b493969196a6de8d9762d09f5bc5ae7a3e5814b0cfbf9cc26838c2bc1314f9c"
+        checksum          = "89fc8e2c47f2a2a9138e60159781ce377167cf61e30d8136fbad0d77ac9303ed"
+        symlink           = [f"go-{version}.exe"]
+    else:
+        exe_path          = f"bin/go"
+        download_url      = f"https://go.dev/dl/go{version}.linux-amd64.tar.gz"
+        download_checksum = "000a5b1fca4f75895f78befeb2eecf10bfff3c428597f3f1e69133b63b911b02"
+        checksum          = ""
+        symlink           = [f"go-{version}"]
+
+    result.append({
+        "label": "Go",
+        "manifests": [
+            {
+                "download_url": download_url,
+                "download_checksum": download_checksum,
+                "version": version,
+                "unzip_method": 'default',
+                "executables": [
+                    {
+                        "path": exe_path,
+                        "symlink": symlink,
+                        "add_to_devenv_path": True,
+                        "checksum": checksum,
+                    }
+                ],
+                "add_to_devenv_script": [],
+            }
+        ],
+    })
+
+    # --------------------------------------------------------------------------
+
     if is_windows:
         version           = "1.7"
         exe_path          = "jq-windows-amd64.exe"
