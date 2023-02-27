@@ -88,6 +88,7 @@ def get_manifest(is_windows):
         exe_path          = f"bin/cmake"
         download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-linux-x86_64.tar.gz"
         download_checksum = "8e3d048c7fb26767b00db6a55025aa380d91f45d8f3749e9b9961ef25744b102"
+        checksum          = "4c310327482e09db8bfafd64b50cfa898a986f9fa757b82e21dcbafb2d9accce"
         symlink           = [f"cmake-{version}"]
 
     result[-1]['manifests'].append({
