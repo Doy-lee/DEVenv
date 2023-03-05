@@ -392,13 +392,30 @@ pause
         subprocess.run(args=["chmod", "+x", dev_env_script_path])
         subprocess.run(args=["chmod", "+x", user_env_script_path])
 
+    # Use LLVM script to fix up bloated installation
+    # --------------------------------------------------------------------------
+    # See: https://github.com/zufuliu/llvm-utils/blob/main/llvm/llvm-link.bat
+    internal_dir  = pathlib.Path(os.path.dirname(os.path.abspath(__file__))) / "Internal"
+    if is_windows:
+        devenver.print_header("Use LLVM utils script to slim installation size")
+        install_dir_set = set()
+        for entry in installed_dev_apps["LLVM"]:
+            install_dir = entry['install_dir']
+            install_dir_set.add(install_dir)
+
+        llvm_script_src_path = internal_dir / "win_llvm-link-ad01970-2022-08-29.bat"
+        for install_dir in install_dir_set:
+            llvm_script_dest_path = install_dir / "llvm-link.bat"
+            shutil.copy(llvm_script_src_path, llvm_script_dest_path)
+            subprocess.run(llvm_script_dest_path, cwd=install_dir)
+            os.remove(llvm_script_dest_path)
+
     # Install left-overs
     # --------------------------------------------------------------------------
     devenver.print_header("Install configuration files")
 
     # Copy init.vim to NVIM directory
-    internal_dir          = pathlib.Path(os.path.dirname(os.path.abspath(__file__))) / "Internal"
-    nvim_init_dir         = ""
+    nvim_init_dir = ""
 
     if is_windows:
         nvim_init_dir = pathlib.Path(os.path.expanduser("~")) / "AppData" / "Local" / "nvim"

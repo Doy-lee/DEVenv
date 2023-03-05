@@ -1687,4 +1687,32 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
+    if is_windows:
+        version           = "2.16.01"
+        exe_path          = "nasm.exe"
+        download_url      = f"https://www.nasm.us/pub/nasm/releasebuilds/{version}/win64/nasm-{version}-win64.zip"
+        download_checksum = "029eed31faf0d2c5f95783294432cbea6c15bf633430f254bb3c1f195c67ca3a"
+        checksum          = "edd81d22451246758450f1d5bd7f4c64937ed6cee06f3c2bbbba82401b32c6d4"
+        symlink           = [f"nasm-{version}"]
+
+        result.append({
+            "label": "NASM",
+            "manifests": [
+                {
+                    "download_url": download_url,
+                    "download_checksum": download_checksum,
+                    "version": version,
+                    "executables": [
+                        {
+                            "path": exe_path,
+                            "symlink": symlink,
+                            "add_to_devenv_path": False,
+                            "checksum": checksum,
+                        }
+                    ],
+                    "add_to_devenv_script": [],
+                }
+            ],
+        })
+
     return result
