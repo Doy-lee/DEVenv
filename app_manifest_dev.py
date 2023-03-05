@@ -28,6 +28,7 @@ def get_manifest(is_windows):
                 "version": version,
                 "download_checksum": download_checksum,
                 "download_url": download_url,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -51,6 +52,7 @@ def get_manifest(is_windows):
                 "download_checksum": "6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf",
                 "version": "2.304",
                 "download_url": f"https://download.jetbrains.com/fonts/JetBrainsMono-{version}.zip",
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": "fonts/ttf/JetBrainsMono-Regular.ttf",
@@ -136,9 +138,8 @@ def get_manifest(is_windows):
     })
 
     version = "3.10.3"
-
     if is_windows:
-        download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-win64-x86_64.zip"
+        download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-win64-x64.zip"
         download_checksum = "3bd57d1cfcf720a4cc72db77bda4c76a7b700fb0341821ad868963ad28856cd0"
         checksum          = "f2e3b486d87d2a6bc19b3a62c740028f3f8945875196ac7d3d0e69649e98730a"
         symlink           = [f"cmake-{version}.exe"]
@@ -152,6 +153,7 @@ def get_manifest(is_windows):
         "download_checksum": download_checksum,
         "download_url": download_url,
         "version": version,
+        "unzip_method": 'default',
         "executables": [
             {
                 "path": exe_path,
@@ -192,6 +194,7 @@ def get_manifest(is_windows):
                 "download_checksum": download_checksum,
                 "download_url": download_url,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -217,6 +220,7 @@ def get_manifest(is_windows):
                     "download_checksum": "b898306a44084b5fa13b9a52e06408d97234389d07ae41d9409bdf58cad3d227",
                     "download_url": f"https://github.com/git-for-windows/git/releases/download/v{version}.windows.1/PortableGit-{version}-64-bit.7z.exe",
                     "version": version,
+                    "unzip_method": '7zip',
                     "executables": [
                         {
                             "path": "cmd/git.exe",
@@ -248,6 +252,7 @@ def get_manifest(is_windows):
             "download_checksum": "729e8af6aecd85cce63435b94c310c01983091b5db54842cd6604298f29d047f",
             "download_url": f"https://github.com/mmozeiko/build-gcc-arm/releases/download/gcc-v{version}/gcc-v{version}-{arch}.7z",
             "version": version,
+            "unzip_method": 'default',
             "executables": [
                 {
                     "path": f"bin/{arch}-g++.exe",
@@ -270,6 +275,7 @@ def get_manifest(is_windows):
             "download_checksum": "a000bdeeb225145a1450c1b9b1094ef71c13fc4de2ab300a65acbf51cd107c7d",
             "download_url": f"https://github.com/mmozeiko/build-gcc-arm/releases/download/gcc-v{version}/gcc-v{version}-{arch}.7z",
             "version": version,
+            "unzip_method": 'default',
             "executables": [
                 {
                     "path": f"bin/{arch}-g++.exe",
@@ -292,6 +298,7 @@ def get_manifest(is_windows):
             "download_checksum": "095ab5a12059fa5dc59f415c059eb577f443a766eb1dd312fbede0f59940f432",
             "download_url": f"https://github.com/mmozeiko/build-gcc-arm/releases/download/gcc-v{version}/gcc-v{version}-{arch}.7z",
             "version": version,
+            "unzip_method": 'default',
             "executables": [
                 {
                     "path": f"bin/{arch}-g++.exe",
@@ -323,6 +330,7 @@ def get_manifest(is_windows):
             "download_checksum": "aa581b3a5d446bb2d9827f2ea1f02b066b6713d4543d24abbd3181f626036c39",
             "download_url": f"https://github.com/mmozeiko/build-gcc-arm/releases/download/gcc-v{version}/gcc-v{version}-{arch}.7z",
             "version": version,
+            "unzip_method": 'default',
             "executables": [
                 {
                     "path": f"bin/{arch}-g++.exe",
@@ -345,6 +353,7 @@ def get_manifest(is_windows):
             "download_checksum": "797ed71f60fae386c8875bb4e75e244afb15ded9e00ac77b6670a62be7614cc6",
             "download_url": f"https://github.com/mmozeiko/build-gcc-arm/releases/download/gcc-v{version}/gcc-v{version}-{arch}.7z",
             "version": version,
+            "unzip_method": 'default',
             "executables": [
                 {
                     "path": f"bin/{arch}-g++.exe",
@@ -367,6 +376,7 @@ def get_manifest(is_windows):
             "download_checksum": "af0fc2da062aa6423a91213e231ecc5981136b9b0655837ebdbbc5ad879d2d9e",
             "download_url": f"https://github.com/mmozeiko/build-gcc-arm/releases/download/gcc-v{version}/gcc-v{version}-{arch}.7z",
             "version": version,
+            "unzip_method": 'default',
             "executables": [
                 {
                     "path": f"bin/{arch}-g++.exe",
@@ -398,6 +408,7 @@ def get_manifest(is_windows):
             "download_checksum": "5cbe5ea7533f6d24af3a57fe7022032f420b15d7c4e38c0d16534a42d33213a4",
             "download_url": f"https://github.com/mmozeiko/build-gcc/releases/download/gcc-v{version}-mingw-v{mingw_version}/gcc-v{version}-mingw-v{mingw_version}-x86_64.7z",
             "version": version,
+            "unzip_method": 'default',
             "executables": [
                 {
                     "path": f"bin/g++.exe",
@@ -420,6 +431,7 @@ def get_manifest(is_windows):
             "download_checksum": "e2c5c64659aeda77680c5eec80bbaa4db3f117b21febeb3f13fd76d580604fd0",
             "download_url": f"https://github.com/mmozeiko/build-gcc/releases/download/gcc-v{version}-mingw-v{mingw_version}/gcc-v{version}-mingw-v{mingw_version}-x86_64.7z",
             "version": version,
+            "unzip_method": 'default',
             "executables": [
                 {
                     "path": f"bin/g++.exe",
@@ -443,6 +455,7 @@ def get_manifest(is_windows):
             "download_checksum": "c8f38f6b1d264d7e008009bd32a04ca71b4ee3a3113e67930ab31c2e06818317",
             "download_url": f"https://github.com/mmozeiko/build-gcc/releases/download/gcc-v{version}-mingw-v{mingw_version}/gcc-v{version}-mingw-v{mingw_version}-x86_64.7z",
             "version": version,
+            "unzip_method": 'default',
             "executables": [
                 {
                     "path": f"bin/g++.exe",
@@ -471,11 +484,13 @@ def get_manifest(is_windows):
     download_url      = ""
     download_checksum = ""
     executables       = []
+    unzip_method      = "default"
 
     if is_windows:
         version           = "15.0.7"
         download_url      = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/LLVM-{version}-win64.exe"
-        download_checksum = "7041d2c02d226c0c051cc9f6373d51ac9a2de00025e18582077c76e8ad68abe1"
+        download_checksum = "5428cb72acf63ce3bc4328e546a36674c9736ec040ecc176d362201c6548e6a8"
+        unzip_method      = '7zip'
         executables = [
             {
                 "path": f"bin/clang++.exe",
@@ -513,6 +528,7 @@ def get_manifest(is_windows):
         "download_checksum": download_checksum,
         "download_url": download_url,
         "version": version,
+        "unzip_method": unzip_method,
         "executables": executables,
         "add_to_devenv_script": [],
     })
@@ -558,6 +574,7 @@ def get_manifest(is_windows):
         "download_checksum": download_checksum,
         "download_url": download_url,
         "version": version,
+        "unzip_method": unzip_method,
         "executables": executables,
         "add_to_devenv_script": [],
     })
@@ -602,6 +619,7 @@ def get_manifest(is_windows):
         "download_checksum": download_checksum,
         "download_url": download_url,
         "version": version,
+        "unzip_method": unzip_method,
         "executables": executables,
         "add_to_devenv_script": [],
     })
@@ -646,6 +664,7 @@ def get_manifest(is_windows):
         "download_checksum": download_checksum,
         "download_url": download_url,
         "version": version,
+        "unzip_method": unzip_method,
         "executables": executables,
         "add_to_devenv_script": [],
     })
@@ -690,6 +709,7 @@ def get_manifest(is_windows):
         "download_checksum": download_checksum,
         "download_url": download_url,
         "version": version,
+        "unzip_method": unzip_method,
         "executables": executables,
         "add_to_devenv_script": [],
     })
@@ -720,6 +740,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -762,6 +783,7 @@ def get_manifest(is_windows):
                 "download_checksum": download_checksum,
                 "download_url": download_url,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -810,6 +832,7 @@ def get_manifest(is_windows):
                     "download_checksum": download_checksum,
                     "download_url": download_url,
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": exe_path,
@@ -849,6 +872,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -873,6 +897,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://github.com/zealdocs/zeal/releases/download/v{version}/zeal-portable-{version}-windows-x64.7z",
                     "download_checksum": "08e9992f620ba0a5ea348471d8ac9c85059e95eedd950118928be639746e3f94",
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": "zeal.exe",
@@ -915,6 +940,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -940,6 +966,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://github.com/chrisant996/clink/releases/download/v{version}/clink.{version}.{git_hash}.zip",
                     "download_checksum": "800f7657d73a00dad40d46c9317bd418172ee40cc8b3958e32fba1f0b596e829",
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": "clink_x64.exe",
@@ -964,6 +991,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://github.com/lucasg/Dependencies/releases/download/v{version}/Dependencies_x64_Release.zip",
                     "download_checksum": "7d22dc00f1c09fd4415d48ad74d1cf801893e83b9a39944b0fce6dea7ceaea99",
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": "DependenciesGui.exe",
@@ -988,6 +1016,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://www.voidtools.com/Everything-{version}.x64.zip",
                     "download_checksum": "c718bcd73d341e64c8cb47e97eb0c45d010fdcc45c2488d4a3a3c51acc775889",
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": "Everything.exe",
@@ -1030,6 +1059,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -1054,6 +1084,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://github.com/sylikc/jpegview/releases/download/v{version}/JPEGView_{version}.7z",
                     "download_checksum": "84b20a6f3ee5184176e46a6755a57147aba90984c2fbbee094e57af036859daf",
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": "JPEGView64/JPEGView.exe",
@@ -1078,6 +1109,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://github.com/mpc-qt/mpc-qt/releases/download/v{version}/mpc-qt-win-x64-{version.replace('.', '')}.zip",
                     "download_checksum": "2230c4f4de1a429ccc67e5c590efc0a86fbaffeb33a4dc5f391aa45e660b80c2",
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": "mpc-qt.exe",
@@ -1119,6 +1151,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -1158,6 +1191,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -1197,6 +1231,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -1221,6 +1256,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://download.mobatek.net/2232022120824733/MobaXterm_Portable_v{version}.zip",
                     "download_checksum": "c8de508d6731f31a73f061e58942691466d1d24cfa941e642e16e0930be2fad9",
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": f"MobaXTerm_Personal_{version}.exe",
@@ -1245,6 +1281,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://github.com/winsiderss/si-builds/releases/download/{version}/systeminformer-{version}-bin.zip",
                     "download_checksum": "4557e58f698048e882515faac89c9c7f654247dbf4bd656ceed5c3f97afef77d",
                     "version": "3.0.5847",
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": "amd64/SystemInformer.exe",
@@ -1284,6 +1321,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -1323,6 +1361,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -1372,6 +1411,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -1396,6 +1436,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://www.diskanalyzer.com/files/wiztree_{version}_portable.zip",
                     "download_checksum": "f6b71fc54a9bb3f277efdf8afcd45df8ddc1759533f3236437309dae7778b168",
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": "wiztree64.exe",
@@ -1420,6 +1461,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://github.com/rclone/rclone/releases/download/v{version}/rclone-v{version}-windows-amd64.zip",
                     "download_checksum": "99daaa95867cdf0758ec1d5d7f2ebdb3bf74c8c8602e2aaf888e637163d2ebdd",
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": "rclone.exe",
@@ -1444,6 +1486,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://github.com/yalov/eyes-thanks/releases/download/{version}/EyesThanks_v{version}.zip",
                     "download_checksum": "6ab2b20730f56aa54263eb942be8849f52f9cba26438aee3c1b01103069411cc",
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": "Eyes' Thanks.exe",
@@ -1483,6 +1526,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -1507,6 +1551,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://github.com/ShareX/ShareX/releases/download/v{version}/ShareX-{version}-portable.zip",
                     "download_checksum": "c3bc97e9fb8d107e92cb494b50f842fccafbc9fd810588a1b635aee4dbe90bc1",
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": "sharex.exe",
@@ -1546,6 +1591,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -1585,6 +1631,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,
@@ -1624,6 +1671,7 @@ def get_manifest(is_windows):
                 "download_url": download_url,
                 "download_checksum": download_checksum,
                 "version": version,
+                "unzip_method": 'default',
                 "executables": [
                     {
                         "path": exe_path,

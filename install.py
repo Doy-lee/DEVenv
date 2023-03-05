@@ -14,10 +14,12 @@ import app_manifest_user
 
 def git_clone(install_dir, git_exe, url, commit_hash):
     devenver.lprint(f"Git clone {url} to {install_dir}", level=0)
+
     # Clone repository if it does not exist
     if not os.path.exists(install_dir):
-        devenver.lprint(f"Cloning to {install_dir}")
-        subprocess.run(f"{git_exe} clone {url} {install_dir}")
+        clone_cmd = [git_exe, "clone", url, install_dir]
+        devenver.lprint(f"Cloning command: {clone_cmd}")
+        subprocess.run(clone_cmd)
 
     # Determine current git hash
     result = subprocess.run(f"{git_exe} rev-parse --short HEAD",

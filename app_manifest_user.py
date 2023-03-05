@@ -12,6 +12,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://download.kde.org/stable/digikam/{version}/digiKam-{version}-Win64.tar.xz",
                     "download_checksum": "810476996461dc9275e97f1aa0438c77d0fe49f6ae5f6ae36fca983022dafe71",
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": "digikam.exe",
@@ -36,6 +37,7 @@ def get_manifest(is_windows):
                     "download_url": f"https://github.com/picotorrent/picotorrent/releases/download/v{version}/PicoTorrent-{version}-x64.zip",
                     "download_checksum": "375c2445db76b7d51b7cd351b1c5b40f895fb15b502da6073e19aaf6cb08cd76",
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": "picotorrent.exe",

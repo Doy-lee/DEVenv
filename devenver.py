@@ -116,6 +116,11 @@ def download_file_at_url(url, download_path, download_checksum, label):
                 os.remove(temp_file_path)
                 exit()
 
+            # If file already exists then we have a hash mismatch, delete it
+            # then rename the new item ontop of it
+            if os.path.isfile(download_path):
+                os.unlink(download_path)
+
             os.rename(temp_file_path, download_path)
 
     if file_already_downloaded == False:
@@ -126,7 +131,8 @@ class UnzipMethod(Enum):
     SHUTILS = 0
     ZIP7_BOOTSTRAP = 1
     DEFAULT = 2
-    NO_UNZIP = 3
+    ZIP7 = 3
+    NO_UNZIP = 4
 
 def get_exe_install_dir(install_dir, label, version_label):
     result = pathlib.Path(install_dir, label.replace(' ', '_'), version_label)
@@ -234,11 +240,11 @@ def download_and_install_archive(download_url,
             lprint(f'- SHUtils unzip install {label} to: {exe_install_dir}', level=1)
             shutil.unpack_archive(download_path, exe_install_dir)
         elif unzip_method == UnzipMethod.ZIP7_BOOTSTRAP:
-            command = [str(zip7_bootstrap_exe), "x", "-bd", str(download_path), "-o", str(exe_install_dir)]
+            command = [str(zip7_bootstrap_exe), "x", "-bd", str(download_path), f"-o{exe_install_dir}"]
             lprint(f'- 7z (bootstrap) unzip {label} to: {exe_install_dir}', level=1)
             lprint(f'  Command: {command}', level=1)
             subprocess.run(command)
-        else: # Default
+        else: # Default or 7ZIP
             intermediate_zip_file_extracted = False
 
             # We could have a "app.zst" situation or an "app.tar.zst" situation
@@ -526,7 +532,19 @@ def install_app_list(app_list, download_dir, install_dir, is_windows):
             version           = manifest["version"]
             download_url      = manifest["download_url"]
             exe_list          = manifest['executables']
-            unzip_method      = UnzipMethod.DEFAULT
+
+            unzip_method        = UnzipMethod.DEFAULT
+            unzip_method_string = manifest.get("unzip_method", "").lower()
+            if unzip_method_string == 'shutils':
+                unzip_method    = UnzipMethod.SHUTILS
+            elif unzip_method_string == '7zip bootstrap':
+                unzip_method    = UnzipMethod.ZIP7_BOOTSTRAP
+            elif unzip_method_string == 'default':
+                unzip_method    = UnzipMethod.DEFAULT
+            elif unzip_method_string == '7zip':
+                unzip_method    = UnzipMethod.ZIP7
+            elif unzip_method_string == 'no unzip':
+                unzip_method    = UnzipMethod.NO_UNZIP
 
             # Bootstrapping code, when installing the internal app list, we will
             # assign the variables to point to our unarchiving tools.
@@ -535,8 +553,8 @@ def install_app_list(app_list, download_dir, install_dir, is_windows):
                 global zip7_exe
                 global zip7_bootstrap_exe
                 global zstd_exe
+                exe_path = get_exe_install_path(install_dir, label, version, manifest['executables'][0]['path'])
                 if label == '7zip':
-                    exe_path = get_exe_install_path(install_dir, label, version, manifest['executables'][0]['path'])
                     if is_windows or os.name == 'nt':
                         if version == '920':
                             unzip_method       = UnzipMethod.SHUTILS
