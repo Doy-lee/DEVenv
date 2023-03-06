@@ -1693,7 +1693,7 @@ def get_manifest(is_windows):
         download_url      = f"https://www.nasm.us/pub/nasm/releasebuilds/{version}/win64/nasm-{version}-win64.zip"
         download_checksum = "029eed31faf0d2c5f95783294432cbea6c15bf633430f254bb3c1f195c67ca3a"
         checksum          = "edd81d22451246758450f1d5bd7f4c64937ed6cee06f3c2bbbba82401b32c6d4"
-        symlink           = [f"nasm-{version}"]
+        symlink           = [f"nasm-{version}.exe"]
 
         result.append({
             "label": "NASM",
@@ -1702,11 +1702,12 @@ def get_manifest(is_windows):
                     "download_url": download_url,
                     "download_checksum": download_checksum,
                     "version": version,
+                    "unzip_method": 'default',
                     "executables": [
                         {
                             "path": exe_path,
                             "symlink": symlink,
-                            "add_to_devenv_path": False,
+                            "add_to_devenv_path": True,
                             "checksum": checksum,
                         }
                     ],
@@ -1714,5 +1715,42 @@ def get_manifest(is_windows):
                 }
             ],
         })
+
+    # --------------------------------------------------------------------------
+
+    version = "3.52.0"
+    symlink = []
+
+    if is_windows:
+        exe_path          = "losslesscut.exe"
+        download_url      = f"https://github.com/mifi/lossless-cut/releases/download/v{version}/LosslessCut-win-x64.7z"
+        download_checksum = "fa554d5f63f7287d6b4b6bf19ac5916c99cabfe9ac22248e7a3c39898c5b56ff"
+        checksum          = "3cae40fa13523e9dfe760521d167174ddfc21105eb20466e905eb39b74e8ed70"
+    else:
+        exe_path          = f"LosslessCut-linux-x86_64.AppImage"
+        download_url      = f"https://github.com/mifi/lossless-cut/releases/download/v{version}/{exe_path}"
+        download_checksum = "abc"
+        checksum          = download_checksum
+
+    result.append({
+        "label": "LosslessCut",
+        "manifests": [
+            {
+                "download_url": download_url,
+                "download_checksum": download_checksum,
+                "version": version,
+                "unzip_method": 'default',
+                "executables": [
+                    {
+                        "path": exe_path,
+                        "symlink": symlink,
+                        "add_to_devenv_path": True,
+                        "checksum": checksum,
+                    }
+                ],
+                "add_to_devenv_script": [],
+            }
+        ],
+    })
 
     return result
