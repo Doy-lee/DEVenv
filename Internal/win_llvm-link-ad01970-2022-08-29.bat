@@ -18,34 +18,34 @@ DEL vcruntime140*.dll
 
 @rem make symbolic link
 DEL clang++.exe
-MKLINK clang++.exe clang-cl.exe
+MKLINK /H clang++.exe clang-cl.exe
 
 DEL clang.exe
-MKLINK clang.exe clang-cl.exe
+MKLINK /H clang.exe clang-cl.exe
 
 DEL clang-cpp.exe
-MKLINK clang-cpp.exe clang-cl.exe
+MKLINK /H clang-cpp.exe clang-cl.exe
 
 DEL lld-link.exe
-MKLINK lld-link.exe lld.exe
+MKLINK /H lld-link.exe lld.exe
 
 DEL ld.lld.exe
-MKLINK ld.lld.exe lld.exe
+MKLINK /H ld.lld.exe lld.exe
 
 DEL ld64.lld.exe
-MKLINK ld64.lld.exe lld.exe
+MKLINK /H ld64.lld.exe lld.exe
 
 DEL wasm-ld.exe
-MKLINK wasm-ld.exe lld.exe
+MKLINK /H wasm-ld.exe lld.exe
 
 DEL llvm-lib.exe
-MKLINK llvm-lib.exe llvm-ar.exe
+MKLINK /H llvm-lib.exe llvm-ar.exe
 
 DEL llvm-ranlib.exe
-MKLINK llvm-ranlib.exe llvm-ar.exe
+MKLINK /H llvm-ranlib.exe llvm-ar.exe
 
 @rem DEL libiomp5md.dll
-@rem MKLINK libiomp5md.dll libomp.dll
+@rem MKLINK /H libiomp5md.dll libomp.dll
 
 POPD
 
@@ -54,20 +54,20 @@ PUSHD lib\site-packages\lldb
 
 IF EXIST _lldb.pyd (
 	DEL _lldb.pyd
-	MKLINK _lldb.pyd ..\..\..\bin\liblldb.dll
+	MKLINK /H _lldb.pyd ..\..\..\bin\liblldb.dll
 )
 @rem LLVM 14.0.0
 IF EXIST _lldb.cp310-win_amd64.pyd (
 	DEL _lldb.cp310-win_amd64.pyd
-	MKLINK _lldb.cp310-win_amd64.pyd ..\..\..\bin\liblldb.dll
+	MKLINK /H _lldb.cp310-win_amd64.pyd ..\..\..\bin\liblldb.dll
 )
 IF EXIST _lldb.cp310-win32.pyd (
 	DEL _lldb.cp310-win32.pyd
-	MKLINK _lldb.cp310-win32.pyd ..\..\..\bin\liblldb.dll
+	MKLINK /H _lldb.cp310-win32.pyd ..\..\..\bin\liblldb.dll
 )
 
 DEL lldb-argdumper.exe
-MKLINK lldb-argdumper.exe ..\..\..\bin\lldb-argdumper.exe
+MKLINK /H lldb-argdumper.exe ..\..\..\bin\lldb-argdumper.exe
 
 POPD
 
@@ -76,5 +76,5 @@ POPD
 @rem PUSHD msbuild-bin
 @rem
 @rem DEL cl.exe
-@rem MKLINK cl.exe ..\bin\clang.exe
+@rem MKLINK /H cl.exe ..\bin\clang.exe
 @rem POPD
