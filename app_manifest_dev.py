@@ -797,11 +797,11 @@ def get_manifest(is_windows):
         ],
     })
 
-    version = "18.5.0"
+    version = "18.15.0"
     if is_windows:
         download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-win-x64.7z"
-        download_checksum = "d27c6f1a4c9a3bc84e867421f9c8d86746ed560e81e274b92ce54c7df9bdac63"
-        checksum          = "49838cdda5df3faf26dae0056af451957d0f04d414fbbba64bddea7ba955efb3"
+        download_checksum = "cad3cc0910dc216e8b6dcfc3c5b3be0a619c2d4a4b29f2e674820b70e4f374dd"
+        checksum          = "17fd75d8a41bf9b4c475143e19ff2808afa7a92f7502ede731537d9da674d5e8"
         symlink           = [f"node-{version}.exe"]
     else:
         download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-linux-x64.tar.xz"
