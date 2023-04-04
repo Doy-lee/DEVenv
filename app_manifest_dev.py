@@ -788,6 +788,40 @@ def get_manifest(is_windows):
                     {
                         "path": exe_path,
                         "symlink": symlink,
+                        "add_to_devenv_path": False,
+                        "checksum": checksum,
+                    }
+                ],
+                "add_to_devenv_script": [],
+            }
+        ],
+    })
+
+    version = "18.5.0"
+    if is_windows:
+        download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-win-x64.7z"
+        download_checksum = "d27c6f1a4c9a3bc84e867421f9c8d86746ed560e81e274b92ce54c7df9bdac63"
+        checksum          = "49838cdda5df3faf26dae0056af451957d0f04d414fbbba64bddea7ba955efb3"
+        symlink           = [f"node-{version}.exe"]
+    else:
+        download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-linux-x64.tar.xz"
+        download_checksum = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        checksum          = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        symlink           = [f"node-{version}"]
+
+
+    result.append({
+        "label": "NodeJS",
+        "manifests": [
+            {
+                "download_checksum": download_checksum,
+                "download_url": download_url,
+                "version": version,
+                "unzip_method": 'default',
+                "executables": [
+                    {
+                        "path": exe_path,
+                        "symlink": symlink,
                         "add_to_devenv_path": True,
                         "checksum": checksum,
                     }
