@@ -303,13 +303,11 @@ command RemedyBGOpenFile call RemedyBGOpenFile()
 
 function! RemedyBGStartDebugging()
     execute("!start remedybg start-debugging " . expand("%:p") . " " . line("."))
-    execute("!powershell -Command Add-Type -AssemblyName Microsoft.VisualBasic; [Microsoft.VisualBasic.Interaction]::AppActivate(' - RemedyBG')")
 endfunction
 command RemedyBGStartDebugging call RemedyBGStartDebugging()
 
 function! RemedyBGStopDebugging()
     execute("!start remedybg stop-debugging " . expand("%:p") . " " . line("."))
-    execute("!powershell -Command Add-Type -AssemblyName Microsoft.VisualBasic; [Microsoft.VisualBasic.Interaction]::AppActivate(' - RemedyBG')")
 endfunction
 command RemedyBGStopDebugging call RemedyBGStopDebugging()
 
@@ -409,10 +407,10 @@ set errorformat+=%\\%%(CTIME%\\)%\\@=%m                        " ctime.exe -stat
 let s:running_windows = has("win16") || has("win32") || has("win64")
 if s:running_windows
     set makeprg=build
-    nnoremap <f5> :Make ./build.bat<cr>
+    nnoremap <C-b> :Make ./build.bat<cr>
 else
     " Set vim terminal to enter normal mode using escape like normal vim behaviour
     tnoremap <Esc> <C-\><C-n>
-    nnoremap <f5> :Make ./build.sh<cr>
+    nnoremap <C-b> :Make ./build.sh<cr>
     set makeprg=./build.sh
 endif
