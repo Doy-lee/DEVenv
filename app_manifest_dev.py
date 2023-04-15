@@ -785,12 +785,14 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    version           = "16.19.0"
-    download_url      = ""
-    download_checksum = ""
-    exe_path          = ""
-    checksum          = ""
-    symlink           = []
+    label                = "NodeJS"
+    version              = "16.19.0"
+    download_url         = ""
+    download_checksum    = ""
+    exe_path             = ""
+    checksum             = ""
+    symlink              = []
+    add_to_devenv_script = []
 
     if is_windows:
         download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-win-x64.7z"
@@ -821,7 +823,7 @@ def get_manifest(is_windows):
                         "checksum": checksum,
                     }
                 ],
-                "add_to_devenv_script": [],
+                "add_to_devenv_script": add_to_devenv_script,
             }
         ],
     })
@@ -832,6 +834,9 @@ def get_manifest(is_windows):
         download_checksum = "cad3cc0910dc216e8b6dcfc3c5b3be0a619c2d4a4b29f2e674820b70e4f374dd"
         checksum          = "17fd75d8a41bf9b4c475143e19ff2808afa7a92f7502ede731537d9da674d5e8"
         symlink           = [f"node-{version}.exe"]
+        add_to_devenv_script = [
+            f"set PATH=%~dp0{label}\\{version}\\node_modules\\corepack\\shims;%PATH%",
+        ]
     else:
         download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-linux-x64.tar.xz"
         download_checksum = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -855,7 +860,7 @@ def get_manifest(is_windows):
                         "checksum": checksum,
                     }
                 ],
-                "add_to_devenv_script": [],
+                "add_to_devenv_script": add_to_devenv_script,
             }
         ],
     })
@@ -1807,7 +1812,7 @@ def get_manifest(is_windows):
                     {
                         "path": exe_path,
                         "symlink": symlink,
-                        "add_to_devenv_path": True,
+                        "add_to_devenv_path": False,
                         "checksum": checksum,
                     }
                 ],

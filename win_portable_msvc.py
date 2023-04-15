@@ -9,6 +9,10 @@
 # folders, skip the downloading of MSVC or the SDK if we only need one of them).
 #
 # Changelog
+# 2023-04-15
+# - Fix "msvc-{version}.bat" script generating trailing "\;" on
+#   VCToolsInstallDir environment variable
+#
 # 2023-01-30
 # - Generate the short-hand version of the msvc-{version}.bat and
 #   win-sdk-{version}.bat using the versions passed as the argument parameter.
@@ -352,7 +356,7 @@ set MSVC_HOST=Host{HOST}
 set MSVC_ARCH={TARGET}
 set MSVC_ROOT=%~dp0VC\\Tools\\MSVC\\%MSVC_VERSION%
 
-set VCToolsInstallDir=%MSVC_ROOT%\\;%VCToolsInstallDir%
+set VCToolsInstallDir=%MSVC_ROOT%
 set PATH=%MSVC_ROOT%\\bin\\%MSVC_HOST%\\%MSVC_ARCH%;%PATH%
 set INCLUDE=%MSVC_ROOT%\\include;%INCLUDE%
 set LIB=%MSVC_ROOT%\\lib\\%MSVC_ARCH%;%LIB%
