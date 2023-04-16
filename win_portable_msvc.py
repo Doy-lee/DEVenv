@@ -11,7 +11,9 @@
 # Changelog
 # 2023-04-15
 # - Fix "msvc-{version}.bat" script generating trailing "\;" on
-#   VCToolsInstallDir environment variable
+#   VCToolsInstallDir environment variable. clang-cl relies on this variable to
+#   identify the location of the Visual Studio toolchain or otherwise reports a
+#   program invocation error during the linking stage.
 #
 # 2023-01-30
 # - Generate the short-hand version of the msvc-{version}.bat and
