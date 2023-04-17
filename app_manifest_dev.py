@@ -1193,7 +1193,7 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    version           = "0.8.2"
+    version           = "0.9.0"
     download_url      = ""
     download_checksum = ""
     exe_path          = ""
@@ -1202,12 +1202,12 @@ def get_manifest(is_windows):
 
     if is_windows:
         download_url      = f"https://github.com/neovim/neovim/releases/download/v{version}/nvim-win64.zip"
-        download_checksum = "e2d53c6fd4a3caefbff47765d63d1640a5a134de46623ed8e3f9bf547791c26f"
-        checksum          = "dd8b045e9a76bea6add3e7a727387aef6996846907e061df07971329b9464faf"
+        download_checksum = "9efe2ff55a13edf32afcfe51194d8e85bb62be7f09ff86384ffb0b8eed2bf716"
+        checksum          = "bbaf0b37c0d6df1fb35b9504b518fdb961b69acac67a0de732281e5df359a3b0"
         exe_path          = "bin/nvim.exe"
     else:
         exe_path          = "nvim.appimage"
-        download_url      = f"https://github.com/neovim/neovim/releases/download/v{version}/{exe_path}"
+        download_url      = f"0e1e6d53c6c8055de23bdb33f60bb64af0baf11390669c1b40ecbbf2c7a34547"
         download_checksum = "bb0d4599cb506fc6e29bf0e9cef3b52e06dcb4bb930b56d6eb88320f1d46a908"
         checksum          = download_checksum
         symlink           = ["nvim", "vim"] # Usually use VM with no desktop-environment
@@ -1235,21 +1235,21 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    version           = "0.10.3"
+    version           = "0.10.4"
     download_url      = ""
     download_checksum = ""
     exe_path          = ""
     checksum          = ""
 
     if is_windows:
-        download_url      = f"https://github.com/neovide/neovide/releases/download/{version}/neovide-windows.zip"
-        download_checksum = "ec54f811e5cb271102751694124380f4a58ae5edf99a1a267e8b070a362f8297"
-        checksum          = "2c1df8ec7287f927554ebd9ad5cd0da34d7e72c3384fe266080ddf612adf6e5a"
+        download_url      = f"https://github.com/neovide/neovide/releases/download/{version}/neovide.exe.zip"
+        download_checksum = "23b6c3a77e0aacd7178baad41a10220b10028af4bddfa0d7fe9000d76ef54018"
+        checksum          = "4fcb79478c9b03cb6706336e95e25468c38d11938f26dd3f18b30f51aaf6e09b"
         exe_path          = "neovide.exe"
     else:
-        download_url      = f"https://github.com/neovide/neovide/releases/download/{version}/neovide.tar.gz"
-        download_checksum = "0fc0593a0f55e99fa8398e8137ac89632ea7fc97a90cbd32d8c2a69afc1eff6f"
-        checksum          = "73c8dc6cb9840f568663d532d12ae54109af690866a51011cc1f874e2ae308e2"
+        download_url      = f"https://github.com/neovide/neovide/releases/download/{version}/neovide.AppImage.zip"
+        download_checksum = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        checksum          = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         exe_path          = "neovide"
 
     result.append({
@@ -1521,13 +1521,13 @@ def get_manifest(is_windows):
     # --------------------------------------------------------------------------
 
     if is_windows:
-        version = "1.61.1"
+        version = "1.62.2"
         result.append({
             "label": "RClone",
             "manifests": [
                 {
                     "download_url": f"https://github.com/rclone/rclone/releases/download/v{version}/rclone-v{version}-windows-amd64.zip",
-                    "download_checksum": "99daaa95867cdf0758ec1d5d7f2ebdb3bf74c8c8602e2aaf888e637163d2ebdd",
+                    "download_checksum": "85c623d7808f9d2cf51945e02e98d02b94f9f32ea892237f9a58b544c7a4f4f9",
                     "version": version,
                     "unzip_method": 'default',
                     "executables": [
@@ -1535,7 +1535,7 @@ def get_manifest(is_windows):
                             "path": "rclone.exe",
                             "symlink": [],
                             "add_to_devenv_path": False,
-                            "checksum": "e94901809ff7cc5168c1e857d4ac9cbb339ca1f6e21dcce95dfb8e28df799961",
+                            "checksum": "b75516a7ff3096b2a15c5897779a75e625f7539d6a333f359ec8b17a18d01340",
                         }
                     ],
                     "add_to_devenv_script": [],
