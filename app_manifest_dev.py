@@ -1445,7 +1445,7 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    version              = "8.6.0"
+    version              = "8.7.0"
     download_url         = ""
     download_checksum    = ""
     exe_path             = ""
@@ -1454,8 +1454,8 @@ def get_manifest(is_windows):
 
     if is_windows:
         download_url         = f"https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-x86_64-pc-windows-msvc.zip"
-        download_checksum    = "9cff97eb1c024ed94cc76a4b2d924ab3df04b37e7430c282b8188a13f1653ebe"
-        checksum             = "a93ab08528896556ba3a6c262c8d73b275df2ce7a4138f5323f3eff414403f33"
+        download_checksum    = "657cf430a1b349ce2b9cceeaed0b14220a417bbf24a85995aa6fbf8f746f4e03"
+        checksum             = "0fd887ffa5b2f36cb77934072ca60d86c42e5afda90ac7005d7f1ef076ca70c6"
         exe_path             = "fd.exe"
         add_to_devenv_script = [
             "set FZF_DEFAULT_OPTS=--multi --layout=reverse",
@@ -1463,8 +1463,8 @@ def get_manifest(is_windows):
         ]
     else:
         download_url      = f"https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-x86_64-unknown-linux-musl.tar.gz"
-        download_checksum = "9fdb370648fb8256fc9a36355c652546bd4c62925babcad80f95f90f74fc81e7"
-        checksum          = "702eb951e6b37be64cca66da976e0fcb0be587121034c1d6f841ce7fad3bd8e3"
+        download_checksum = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        checksum          = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         exe_path          = "fd"
         add_to_devenv_script = [
             "FZF_DEFAULT_OPTS=\"--multi --layout=reverse\"",
