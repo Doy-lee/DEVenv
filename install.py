@@ -195,7 +195,7 @@ if args.with_dev_apps:
         # Odin
         # --------------------------------------------------------------------------
         odin_git_hash    = "9ae1bfb6"
-        odin_install_dir = install_dir / "Odin"
+        odin_install_dir = pathlib.Path(install_dir) / "Odin"
         git_clone(install_dir=odin_install_dir,
                   git_exe=git_exe,
                   url="https://github.com/odin-lang/odin.git",
