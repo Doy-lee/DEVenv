@@ -73,13 +73,42 @@ def get_manifest(is_windows):
         "manifests": [],
     })
 
-    version           = "3.24.3"
     download_url      = ""
     exe_path          = ""
     download_checksum = ""
     checksum          = ""
     symlink           = []
 
+    version = "3.26.4"
+    if is_windows:
+        exe_path          = f"bin/cmake.exe"
+        download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-windows-x86_64.zip"
+        download_checksum = "62c35427104a4f8205226f72708d71334bd36a72cf72c60d0e3a766d71dcc78a"
+        checksum          = "c582c73e5c3d9c7f619a1df47bf5eddfd37cef831a4558707f01eb2b455a997a"
+        symlink           = [f"cmake-{version}.exe"]
+    else:
+        exe_path          = f"bin/cmake"
+        download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-linux-x86_64.tar.gz"
+        download_checksum = "ba1e0dcc710e2f92be6263f9617510b3660fa9dc409ad2fb8190299563f952a0"
+        checksum          = ""
+        symlink           = [f"cmake-{version}"]
+
+    result[-1]['manifests'].append({
+        "download_checksum": download_checksum,
+        "download_url": download_url,
+        "version": version,
+        "executables": [
+            {
+                "path": exe_path,
+                "symlink": symlink,
+                "add_to_devenv_path": False,
+                "checksum": checksum,
+            }
+        ],
+        "add_to_devenv_script": [],
+    })
+
+    version = "3.24.3"
     if is_windows:
         exe_path          = f"bin/cmake.exe"
         download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-windows-x86_64.zip"
@@ -160,35 +189,6 @@ def get_manifest(is_windows):
                 "symlink": symlink,
                 "add_to_devenv_path": False,
                 "checksum": checksum
-            }
-        ],
-        "add_to_devenv_script": [],
-    })
-
-    version = "3.26.1"
-    if is_windows:
-        exe_path          = f"bin/cmake.exe"
-        download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-windows-x86_64.zip"
-        download_checksum = "a2cefff35caa91e55716f1951ed82db928fc24f14d61641b21851dcddb81a21e"
-        checksum          = "2256fbdd018ecd621d462c9a06d9d7a7b0fb9a279e9feead9e6315735a46f175"
-        symlink           = [f"cmake-{version}.exe"]
-    else:
-        exe_path          = f"bin/cmake"
-        download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-linux-x86_64.tar.gz"
-        download_checksum = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-        checksum          = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-        symlink           = [f"cmake-{version}"]
-
-    result[-1]['manifests'].append({
-        "download_checksum": download_checksum,
-        "download_url": download_url,
-        "version": version,
-        "executables": [
-            {
-                "path": exe_path,
-                "symlink": symlink,
-                "add_to_devenv_path": True,
-                "checksum": checksum,
             }
         ],
         "add_to_devenv_script": [],
@@ -1193,7 +1193,7 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    version           = "0.9.0"
+    version           = "0.9.1"
     download_url      = ""
     download_checksum = ""
     exe_path          = ""
@@ -1202,13 +1202,13 @@ def get_manifest(is_windows):
 
     if is_windows:
         download_url      = f"https://github.com/neovim/neovim/releases/download/v{version}/nvim-win64.zip"
-        download_checksum = "9efe2ff55a13edf32afcfe51194d8e85bb62be7f09ff86384ffb0b8eed2bf716"
-        checksum          = "bbaf0b37c0d6df1fb35b9504b518fdb961b69acac67a0de732281e5df359a3b0"
+        download_checksum = "af41890b8c14d4ed214a2ef6c1ab8e0be004eac7094d5df1cc4bc17ccf0a13ef"
+        checksum          = "53d68005bbbf974fe89bf74f14d926d27a7ac29d008c9a5182da82a8b9817719"
         exe_path          = "bin/nvim.exe"
     else:
         exe_path          = "nvim.appimage"
-        download_url      = f"0e1e6d53c6c8055de23bdb33f60bb64af0baf11390669c1b40ecbbf2c7a34547"
-        download_checksum = "bb0d4599cb506fc6e29bf0e9cef3b52e06dcb4bb930b56d6eb88320f1d46a908"
+        download_url      = "262892176e21da0902c4f0b1e027d54d21b4bcae6b0397afccd8a81b476c3055"
+        download_checksum = "262892176e21da0902c4f0b1e027d54d21b4bcae6b0397afccd8a81b476c3055"
         checksum          = download_checksum
         symlink           = ["nvim", "vim"] # Usually use VM with no desktop-environment
 
@@ -1715,7 +1715,7 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    version           = "2.7.4"
+    version           = "2.7.5"
     download_url      = ""
     download_checksum = ""
     exe_path          = ""
@@ -1723,13 +1723,13 @@ def get_manifest(is_windows):
 
     if is_windows:
         download_url      = f"https://github.com/keepassxreboot/keepassxc/releases/download/{version}/KeePassXC-{version}-Win64.zip"
-        download_checksum = "2ffb7a3289d008d3cd3ad0efffc3238d10a0ce176217d5e7bc34e1b59bcc644a"
-        checksum          = "3102bb194dbc60e9ab4ba6c0024129893c8d845c1acf576aab0c05e607ef47ad"
+        download_checksum = "660bb7e0c2e8fb67be9e64f08603a3e3c9e1ea6aef95b8f945a30a2732008a59"
+        checksum          = "181f16c1f85d746d30df9beab3e9de3b45c9835bfcb369d83c550d284c3a7db6"
         exe_path          = "KeePassXC.exe"
     else:
         exe_path          = f"KeePassXC-{version}-x86_64.AppImage"
         download_url      = f"https://github.com/keepassxreboot/keepassxc/releases/download/{version}/{exe_path}"
-        download_checksum = "15fdc15f340e84e3b7a25a19bfb8c3b16f1e04685c07e5de1616b7cd6bcdded6"
+        download_checksum = "3d1404e3c62aba20232f31e619df6689ba1d949829a4c89465f9a0cfb0232475"
         checksum          = download_checksum
 
     result.append({
