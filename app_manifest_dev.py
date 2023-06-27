@@ -90,7 +90,7 @@ def get_manifest(is_windows):
         exe_path          = f"bin/cmake"
         download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-linux-x86_64.tar.gz"
         download_checksum = "ba1e0dcc710e2f92be6263f9617510b3660fa9dc409ad2fb8190299563f952a0"
-        checksum          = ""
+        checksum          = "f9145454fdcbf2bb6518db2f93a1594fd778500b8c31cba9ecc66e4547e11f51"
         symlink           = [f"cmake-{version}"]
 
     result[-1]['manifests'].append({
@@ -101,7 +101,7 @@ def get_manifest(is_windows):
             {
                 "path": exe_path,
                 "symlink": symlink,
-                "add_to_devenv_path": False,
+                "add_to_devenv_path": True,
                 "checksum": checksum,
             }
         ],
@@ -839,8 +839,8 @@ def get_manifest(is_windows):
         ]
     else:
         download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-linux-x64.tar.xz"
-        download_checksum = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-        checksum          = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        download_checksum = "c8c5fa53ce0c0f248e45983e86368e0b1daf84b77e88b310f769c3cfc12682ef"
+        checksum          = "a2a40807f57c1c215ddb996e71e4f30b93e375cab2bfb725287b8a1f51fd1e7a"
         symlink           = [f"node-{version}"]
 
 
@@ -1207,7 +1207,7 @@ def get_manifest(is_windows):
         exe_path          = "bin/nvim.exe"
     else:
         exe_path          = "nvim.appimage"
-        download_url      = "262892176e21da0902c4f0b1e027d54d21b4bcae6b0397afccd8a81b476c3055"
+        download_url      = f"https://github.com/neovim/neovim/releases/download/v{version}/nvim.appimage"
         download_checksum = "262892176e21da0902c4f0b1e027d54d21b4bcae6b0397afccd8a81b476c3055"
         checksum          = download_checksum
         symlink           = ["nvim", "vim"] # Usually use VM with no desktop-environment
@@ -1248,9 +1248,9 @@ def get_manifest(is_windows):
         exe_path          = "neovide.exe"
     else:
         download_url      = f"https://github.com/neovide/neovide/releases/download/{version}/neovide.AppImage.zip"
-        download_checksum = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-        checksum          = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-        exe_path          = "neovide"
+        download_checksum = "15149f698db2f05589f4a8a60ca0d5fcaec3ad817eb6bdd186c37d1fa5f79140"
+        checksum          = "0c9fb692837a05d2e4e014c4ab8491197cebf7bcafd238105a8183f3f8b9b161"
+        exe_path          = "neovide.AppImage"
 
     result.append({
         "label": "Neovide",
@@ -1463,8 +1463,8 @@ def get_manifest(is_windows):
         ]
     else:
         download_url      = f"https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-x86_64-unknown-linux-musl.tar.gz"
-        download_checksum = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-        checksum          = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        download_checksum = "ced2541984b765994446958206b3411f3dea761a5e618cb18b4724c523727d68"
+        checksum          = "3533a356ff5dac034b6b37ef72f61a0132ffcd54c1d321bf2676d78c3cb499d8"
         exe_path          = "fd"
         add_to_devenv_script = [
             "FZF_DEFAULT_OPTS=\"--multi --layout=reverse\"",
@@ -1797,7 +1797,7 @@ def get_manifest(is_windows):
     else:
         exe_path          = f"LosslessCut-linux-x86_64.AppImage"
         download_url      = f"https://github.com/mifi/lossless-cut/releases/download/v{version}/{exe_path}"
-        download_checksum = "abc"
+        download_checksum = "28daafe9fcd07473f460c0a903164efe93d4e5ce7e682b6f318a5550c34bdb99"
         checksum          = download_checksum
 
     result.append({
