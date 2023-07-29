@@ -223,6 +223,17 @@ lua <<EOF
     })
   end
 
+  -- Adjust the quick fix window that pops-up on build to size the buffer with
+  -- the size of the output and at most 10 lines.
+  function AdjustQuickfixHeight()
+    local num_lines = vim.fn.line('$')
+    local max_height = 10
+    local height = math.min(num_lines, max_height)
+    vim.cmd(height .. 'wincmd _')
+  end
+  vim.cmd[[
+    autocmd BufWinEnter quickfix lua AdjustQuickfixHeight()
+  ]]
 EOF
 
 " Theme
