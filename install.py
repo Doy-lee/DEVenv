@@ -327,6 +327,7 @@ popd
 
 start "" "%~dp0{installed_dev_apps["ShareX"][0]["exe_path"].relative_to(install_dir)}"
 start "" "%~dp0{installed_dev_apps["SpeedCrunch"][0]["exe_path"].relative_to(install_dir)}"
+start "" "%~dp0{installed_dev_apps["Zeal"][0]["exe_path"].relative_to(install_dir)}"
 """)
 
         # Create Odin work-around scripts
