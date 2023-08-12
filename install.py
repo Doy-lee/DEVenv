@@ -147,22 +147,22 @@ if args.with_dev_apps:
 
                 devenver.lprint(line)
                 devenver.lprint(f"Command: {command}")
-                subprocess.run(command, cwd=temp_dir)
+                run_result = subprocess.run(command, cwd=temp_dir, check=True)
 
                 # Merge the download MSVC installation to our unified install dir
                 temp_msvc_dir = pathlib.Path(temp_dir, "msvc")
                 for src_dir, dirs, files in os.walk(temp_msvc_dir):
-                    install_dir = src_dir.replace(str(temp_msvc_dir), str(msvc_install_dir), 1)
-                    if not os.path.exists(install_dir):
-                        os.makedirs(install_dir)
+                    msvc_working_dir = src_dir.replace(str(temp_msvc_dir), str(msvc_install_dir), 1)
+                    if not os.path.exists(msvc_working_dir):
+                        os.makedirs(msvc_working_dir)
                     for file_ in files:
                         src  = os.path.join(src_dir, file_)
-                        dest = os.path.join(install_dir, file_)
+                        dest = os.path.join(msvc_working_dir, file_)
                         if os.path.exists(dest):
                             if os.path.samefile(src, dest):
                                 continue
                             os.remove(dest)
-                        shutil.move(src, install_dir)
+                        shutil.move(src, msvc_working_dir)
 
                 devenver.lprint(f"MSVC {msvc_version} Windows 10 SDK {win10_sdk_version} installed: {msvc_install_dir}")
 
@@ -194,12 +194,12 @@ if args.with_dev_apps:
 
         # Odin
         # --------------------------------------------------------------------------
-        odin_git_hash    = "9ae1bfb6"
-        odin_install_dir = pathlib.Path(install_dir) / "Odin"
-        git_clone(install_dir=odin_install_dir,
-                  git_exe=git_exe,
-                  url="https://github.com/odin-lang/odin.git",
-                  commit_hash=odin_git_hash)
+        # odin_git_hash    = "9ae1bfb6"
+        # odin_install_dir = install_dir / "Odin"
+        # git_clone(install_dir=odin_install_dir,
+        #           git_exe=git_exe,
+        #          url="https://github.com/odin-lang/odin.git",
+        #          commit_hash=odin_git_hash)
 
         # TODO: We can't do this yet because the odin build requires a registry hack so
         # that it knows where to find MSVC.
