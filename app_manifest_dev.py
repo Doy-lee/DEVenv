@@ -196,7 +196,7 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    version           = "1.9.4"
+    version           = "1.9.7"
     download_url      = ""
     exe_path          = ""
     download_checksum = ""
@@ -206,14 +206,14 @@ def get_manifest(is_windows):
     if is_windows:
         exe_path          = f"doxygen.exe"
         download_url      = f"https://github.com/doxygen/doxygen/releases/download/Release_{version.replace('.', '_')}/doxygen-{version}.windows.x64.bin.zip"
-        download_checksum = "3b34098c5fb016baa1d29aba101fe9d6843213b966b92a6b12c8856c547ee0c4"
-        checksum          = "3cb4d89f2b3db7eec2b6797dc6b49cdfe9adda954575898895260f66f312d730"
+        download_checksum = "d0c0c4c2b707582d57a9ed51253a638069c91427b0e569dedd963fdd01bf1136"
+        checksum          = "b6d7dd978386919f6303e8cac271fc5648c4aa3def5023fc6dc49df58274eb7e"
         symlink           = [f"doxygen-{version}.exe"]
     else:
         exe_path          = f"bin/doxygen"
         download_url      = f"https://github.com/doxygen/doxygen/releases/download/Release_{version.replace('.', '_')}/doxygen-{version}.linux.bin.tar.gz"
-        download_checksum = "d157f247d579d0c976bb2595e7806bc4d0ffad105cbe0406b243afa1dc686a32"
-        checksum          = "0f03e67bfdc61c6c9dd4ad1412ac2d90b478bfa7ddbd513c3faa9615b5d80c17"
+        download_checksum = "8bcb7cbdb9d8ae78d0bf65a383bc533db5232e2527ab10743f1e58cba92a7d43"
+        checksum          = ""
         symlink           = [f"doxygen-{version}"]
 
     result.append({
@@ -1235,7 +1235,7 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    version           = "0.10.4"
+    version           = "0.11.0"
     download_url      = ""
     download_checksum = ""
     exe_path          = ""
@@ -1243,13 +1243,13 @@ def get_manifest(is_windows):
 
     if is_windows:
         download_url      = f"https://github.com/neovide/neovide/releases/download/{version}/neovide.exe.zip"
-        download_checksum = "23b6c3a77e0aacd7178baad41a10220b10028af4bddfa0d7fe9000d76ef54018"
-        checksum          = "4fcb79478c9b03cb6706336e95e25468c38d11938f26dd3f18b30f51aaf6e09b"
+        download_checksum = "68c431b4f97e56bc27d937e29a46fb7a677f18645635944c5cef2a7c9b013b45"
+        checksum          = "dc48fc61c65e74ca16e389ac35c524650c3a949e695f91ae4cb9e8b813b07384"
         exe_path          = "neovide.exe"
     else:
-        download_url      = f"https://github.com/neovide/neovide/releases/download/{version}/neovide.AppImage.zip"
-        download_checksum = "15149f698db2f05589f4a8a60ca0d5fcaec3ad817eb6bdd186c37d1fa5f79140"
-        checksum          = "0c9fb692837a05d2e4e014c4ab8491197cebf7bcafd238105a8183f3f8b9b161"
+        download_url      = f"https://github.com/neovide/neovide/releases/download/{version}/neovide.AppImage"
+        download_checksum = "9eb3afd5c6abc84cf200219ff494f2a49c5ed0d0366fd510b4aa91d7412a8a50"
+        checksum          = "9eb3afd5c6abc84cf200219ff494f2a49c5ed0d0366fd510b4aa91d7412a8a50"
         exe_path          = "neovide.AppImage"
 
     result.append({
@@ -1715,7 +1715,7 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    version           = "2.7.5"
+    version           = "2.7.6"
     download_url      = ""
     download_checksum = ""
     exe_path          = ""
@@ -1723,13 +1723,13 @@ def get_manifest(is_windows):
 
     if is_windows:
         download_url      = f"https://github.com/keepassxreboot/keepassxc/releases/download/{version}/KeePassXC-{version}-Win64.zip"
-        download_checksum = "660bb7e0c2e8fb67be9e64f08603a3e3c9e1ea6aef95b8f945a30a2732008a59"
-        checksum          = "181f16c1f85d746d30df9beab3e9de3b45c9835bfcb369d83c550d284c3a7db6"
+        download_checksum = "42aed8fee2b5fbc7ecae4494c274aece35f3de57c4370c1cd0eb365e501fb4c6"
+        checksum          = "915f6879ca20fc7ffd196402e301676c3bd04419ee90486cbd56662dbb7d0b77"
         exe_path          = "KeePassXC.exe"
     else:
         exe_path          = f"KeePassXC-{version}-x86_64.AppImage"
         download_url      = f"https://github.com/keepassxreboot/keepassxc/releases/download/{version}/{exe_path}"
-        download_checksum = "3d1404e3c62aba20232f31e619df6689ba1d949829a4c89465f9a0cfb0232475"
+        download_checksum = "f32f7e7ab4bca789b24bd6a420c1d87dff40982646abef58fca481a7c56ace48"
         checksum          = download_checksum
 
     result.append({
