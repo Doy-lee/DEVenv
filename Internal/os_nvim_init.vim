@@ -63,10 +63,12 @@ lua <<EOF
   lsp.configure('clangd', {
     cmd = {
       "clangd",
+      "-j",
+      "1",
       "--background-index",
+      "--background-index-priority=background",
+      "--pch-storage=memory",
       "--clang-tidy",
-      "--limit-references=1024",
-      "--limit-results=1024",
       "--header-insertion=iwyu",
       "--header-insertion-decorators",
     }
@@ -363,6 +365,22 @@ nnoremap <leader>t  :FzfWorkspaceSymbols<space>
 nnoremap <leader>cc <cmd>FzfCommits<cr>
 nnoremap <leader>cb <cmd>FzfBCommits<cr>
 nnoremap <leader>b  <cmd>FzfBuffers<cr>
+
+function! PadAndTruncateLineTo80Function()
+    let line = getline('.')
+    let line_length = strlen(line)
+    let padding = 80 - line_length
+    let padding = max([padding, 0])
+
+    let existing_space = line_length == 80 || match(line, ' $') != -1
+
+    " Construct the new line with padding and a space before the padding
+    let new_line = line . (existing_space ? '' : ' ') . repeat('=', padding - 1)
+
+    call setline(line('.'), new_line)
+endfunction
+command! PadAndTruncateLineTo80 :call PadAndTruncateLineTo80Function()<CR>
+nnoremap <silent> <F3> :PadAndTruncateLineTo80<cr>
 
 nnoremap <silent> <F6> <cmd>RemedyBGOpenFile<cr><cr>
 nnoremap <silent> <F5> <cmd>RemedyBGStartDebugging<cr><cr>
