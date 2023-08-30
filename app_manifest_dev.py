@@ -213,7 +213,7 @@ def get_manifest(is_windows):
         exe_path          = f"bin/doxygen"
         download_url      = f"https://github.com/doxygen/doxygen/releases/download/Release_{version.replace('.', '_')}/doxygen-{version}.linux.bin.tar.gz"
         download_checksum = "8bcb7cbdb9d8ae78d0bf65a383bc533db5232e2527ab10743f1e58cba92a7d43"
-        checksum          = ""
+        checksum          = "230cc485bff7535c1a39addcc8c9893615092cfbb46a4a134510d41deb53807c"
         symlink           = [f"doxygen-{version}"]
 
     result.append({

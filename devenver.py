@@ -693,8 +693,8 @@ def run(user_app_list,
 
     else:
         download_url      = f"https://www.7-zip.org/a/7z{version}-linux-x64.tar.xz"
-        download_checksum = "a"
-        checksum          = "a"
+        download_checksum = "23babcab045b78016e443f862363e4ab63c77d75bc715c0b3463f6134cbcf318"
+        checksum          = "c7f8769e2bc8df6bcbfba34571ee0340670a52dec824dbac844dd3b5bd1a69e1"
         exe_path          = "7zz"
 
     internal_app_list[-1]["manifests"].append({ # Download proper 7zip, extract this exe with the bootstrap 7zip
