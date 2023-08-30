@@ -1432,7 +1432,7 @@ def get_manifest(is_windows):
         exe_path          = f"bin/go"
         download_url      = f"https://go.dev/dl/go{version}.linux-amd64.tar.gz"
         download_checksum = "000a5b1fca4f75895f78befeb2eecf10bfff3c428597f3f1e69133b63b911b02"
-        checksum          = ""
+        checksum          = "dfaaf2d9212757e0c305c9554f616cac6744de646ef6ef20f5eaf9d9634771c3"
         symlink           = [f"go-{version}"]
 
     result.append({
