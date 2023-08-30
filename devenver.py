@@ -679,7 +679,7 @@ def run(user_app_list,
             "add_to_devenv_script": [],
         })
 
-    version           = "2201"
+    version           = "2301"
     download_url      = ""
     download_checksum = ""
     checksum          = ""
@@ -687,14 +687,14 @@ def run(user_app_list,
 
     if is_windows or os.name == "nt":
         download_url      = f"https://www.7-zip.org/a/7z{version}-x64.exe"
-        download_checksum = "b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4"
-        checksum          = "254cf6411d38903b2440819f7e0a847f0cfee7f8096cfad9e90fea62f42b0c23"
+        download_checksum = "26cb6e9f56333682122fafe79dbcdfd51e9f47cc7217dccd29ac6fc33b5598cd"
+        checksum          = "8cebb25e240db3b6986fcaed6bc0b900fa09dad763a56fb71273529266c5c525"
         exe_path          = "7z.exe"
 
     else:
         download_url      = f"https://www.7-zip.org/a/7z{version}-linux-x64.tar.xz"
-        download_checksum = "2c266f6794adec310c4631232c1d039f46988d51082fe5e80349c52ee7ed60bb"
-        checksum          = "0c771994a00ee96a0fc85902f66fbfd162c3090091e523bb828cdf4cd09a2e73"
+        download_checksum = "a"
+        checksum          = "a"
         exe_path          = "7zz"
 
     internal_app_list[-1]["manifests"].append({ # Download proper 7zip, extract this exe with the bootstrap 7zip
