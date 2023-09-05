@@ -435,11 +435,11 @@ set errorformat+=%\\%%(CTIME%\\)%\\@=%m                        " ctime.exe -stat
 " ==============================================================================
 let s:running_windows = has("win16") || has("win32") || has("win64")
 if s:running_windows
-    set makeprg=build
-    nnoremap <C-b> :Make ./build.bat<cr>
+    set makeprg=./build.bat
 else
     " Set vim terminal to enter normal mode using escape like normal vim behaviour
     tnoremap <Esc> <C-\><C-n>
-    nnoremap <C-b> :Make ./build.sh<cr>
     set makeprg=./build.sh
 endif
+
+nnoremap <C-b> :Make<cr>

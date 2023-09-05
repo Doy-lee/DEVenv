@@ -802,8 +802,8 @@ def run(user_app_list,
         devenv_script_buffer += "set path=%~dp0Scripts;%PATH%\n"
     else:
         devenv_script_buffer += f"devenver_root=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )\":$PATH\n"
-        devenv_script_buffer += f"path=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )/Scripts\":$PATH\n"
-        devenv_script_buffer += f"path=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )/Symlinks\":$PATH\n"
+        devenv_script_buffer += f"PATH=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )/Scripts\":$PATH\n"
+        devenv_script_buffer += f"PATH=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )/Symlinks\":$PATH\n"
 
     devenv_script_name = f"{devenv_script_name}.bat" if is_windows else f"{devenv_script_name}.sh"
     devenv_script_path = pathlib.Path(install_dir, devenv_script_name)
