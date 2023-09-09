@@ -1143,56 +1143,6 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    if is_windows:
-        version = "1.1.42"
-        result.append({
-            "label": "JPEGView",
-            "manifests": [
-                {
-                    "download_url": f"https://github.com/sylikc/jpegview/releases/download/v{version}/JPEGView_{version}.7z",
-                    "download_checksum": "84b20a6f3ee5184176e46a6755a57147aba90984c2fbbee094e57af036859daf",
-                    "version": version,
-                    "unzip_method": 'default',
-                    "executables": [
-                        {
-                            "path": "JPEGView64/JPEGView.exe",
-                            "symlink": [],
-                            "add_to_devenv_path": False,
-                            "checksum": "cd7930d0242cbd8a0d0dc9861e48f6ebe4c2bfba33aafbcf8e0da497ab0eae54",
-                        }
-                    ],
-                    "add_to_devenv_script": [],
-                }
-            ],
-        })
-
-    # --------------------------------------------------------------------------
-
-    if is_windows:
-        version = "22.02"
-        result.append({
-            "label": "MPC-Qt",
-            "manifests": [
-                {
-                    "download_url": f"https://github.com/mpc-qt/mpc-qt/releases/download/v{version}/mpc-qt-win-x64-{version.replace('.', '')}.zip",
-                    "download_checksum": "2230c4f4de1a429ccc67e5c590efc0a86fbaffeb33a4dc5f391aa45e660b80c2",
-                    "version": version,
-                    "unzip_method": 'default',
-                    "executables": [
-                        {
-                            "path": "mpc-qt.exe",
-                            "symlink": [],
-                            "add_to_devenv_path": False,
-                            "checksum": "d7ee46b0d4a61a26f8acd5d5fd4da2d252d6bc80c5cab6a55db06e853f2acefb",
-                        }
-                    ],
-                    "add_to_devenv_script": [],
-                }
-            ],
-        })
-
-    # --------------------------------------------------------------------------
-
     version           = "0.9.1"
     download_url      = ""
     download_checksum = ""
