@@ -121,7 +121,7 @@ def download_file_at_url(url, download_path, download_checksum, label):
             if os.path.isfile(download_path):
                 os.unlink(download_path)
 
-            os.rename(temp_file_path, download_path)
+            shutil.move(temp_file_path, download_path)
 
     if file_already_downloaded == False:
         if verify_file_sha256(download_path, download_checksum, 'Downloaded archive') == False:
