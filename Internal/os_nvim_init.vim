@@ -309,31 +309,31 @@ augroup persistent_settings
 augroup end
 
 function! RemedyBGOpenFile()
-    execute("!start remedybg open-file " . expand("%:p") . " " . line("."))
+    execute("Spawn! remedybg open-file " . expand("%:p") . " " . line("."))
     execute("!powershell -Command Add-Type -AssemblyName Microsoft.VisualBasic; [Microsoft.VisualBasic.Interaction]::AppActivate(' - RemedyBG')")
 endfunction
 command RemedyBGOpenFile call RemedyBGOpenFile()
 
 function! RemedyBGStartDebugging()
-    execute("!start remedybg start-debugging " . expand("%:p") . " " . line("."))
+    execute("Spawn! start remedybg start-debugging " . expand("%:p") . " " . line("."))
 endfunction
 command RemedyBGStartDebugging call RemedyBGStartDebugging()
 
 function! RemedyBGStopDebugging()
-    execute("!start remedybg stop-debugging " . expand("%:p") . " " . line("."))
+    execute("Spawn! remedybg stop-debugging " . expand("%:p") . " " . line("."))
 endfunction
 command RemedyBGStopDebugging call RemedyBGStopDebugging()
 
 function! RemedyBGRunToCursor()
-    execute("!start remedybg open-file " . expand("%:p") . " " . line("."))
-    execute("!start remedybg run-to-cursor " . expand("%:p") . " " . line("."))
+    execute("Spawn! remedybg open-file " . expand("%:p") . " " . line("."))
+    execute("Spawn! remedybg run-to-cursor " . expand("%:p") . " " . line("."))
     execute("!powershell -Command Add-Type -AssemblyName Microsoft.VisualBasic; [Microsoft.VisualBasic.Interaction]::AppActivate(' - RemedyBG')")
 endfunction
 command RemedyBGRunToCursor call RemedyBGRunToCursor()
 
 function! RemedyBGAddBreakpointAtFile()
-    execute("!start remedybg open-file " . expand("%:p") . " " . line("."))
-    execute("!start remedybg add-breakpoint-at-file " . expand("%:p") . " " . line("."))
+    execute("Spawn! remedybg open-file " . expand("%:p") . " " . line("."))
+    execute("Spawn! remedybg add-breakpoint-at-file " . expand("%:p") . " " . line("."))
     execute("!powershell -Command Add-Type -AssemblyName Microsoft.VisualBasic; [Microsoft.VisualBasic.Interaction]::AppActivate(' - RemedyBG')")
 endfunction
 command RemedyBGAddBreakpointAtFile call RemedyBGAddBreakpointAtFile()
@@ -435,11 +435,11 @@ set errorformat+=%\\%%(CTIME%\\)%\\@=%m                        " ctime.exe -stat
 " ==============================================================================
 let s:running_windows = has("win16") || has("win32") || has("win64")
 if s:running_windows
-    set makeprg=./build.bat
+    set makeprg=build
+    nnoremap <C-b> :Make ./build.bat<cr>
 else
     " Set vim terminal to enter normal mode using escape like normal vim behaviour
     tnoremap <Esc> <C-\><C-n>
+    nnoremap <C-b> :Make ./build.sh<cr>
     set makeprg=./build.sh
 endif
-
-nnoremap <C-b> :Make<cr>
