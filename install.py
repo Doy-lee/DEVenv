@@ -312,24 +312,6 @@ if "%~1" neq "" (
 start "" /MAX "%~dp0{installed_dev_apps["WezTerm"][0]["exe_path"].relative_to(install_dir)}" !working_dir!
 """)
 
-        # Run background scripts helper
-        # --------------------------------------------------------------------------
-        background_apps_script_path = install_dir / "dev_run_background_apps.bat"
-        devenver.lprint(f"Installing run background script (helper) to {background_apps_script_path}")
-
-        background_apps_script_path.write_text(f"""@echo off
-start "" "%~dp0{installed_dev_apps["Everything"][0]["exe_path"].relative_to(install_dir)}"
-
-REM Ensure that eyes-thanks creates their portable INI file in the correct directory
-pushd "%~dp0{installed_dev_apps["Eyes-Thanks"][0]["install_dir"].parent.relative_to(install_dir)}"
-start "" "%~dp0{installed_dev_apps["Eyes-Thanks"][0]["exe_path"].relative_to(install_dir)}"
-popd
-
-start "" "%~dp0{installed_dev_apps["ShareX"][0]["exe_path"].relative_to(install_dir)}"
-start "" "%~dp0{installed_dev_apps["SpeedCrunch"][0]["exe_path"].relative_to(install_dir)}"
-start "" "%~dp0{installed_dev_apps["Zeal"][0]["exe_path"].relative_to(install_dir)}"
-""")
-
         # Create Odin work-around scripts
         # --------------------------------------------------------------------------
         # Odin uses J. Blow's Microsoft craziness SDK locator which relies on the
