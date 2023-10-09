@@ -414,6 +414,7 @@ pause
     # Install left-overs
     # --------------------------------------------------------------------------
     devenver.print_header("Install configuration files")
+    shutil.copy(internal_dir / "os_clang_format_style_file", install_dir / "_clang-format")
 
     # Copy init.vim to NVIM directory
     nvim_init_dir = ""

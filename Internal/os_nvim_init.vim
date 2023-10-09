@@ -57,9 +57,10 @@ lua <<EOF
 
   -- LSP Setup
   -- ===========================================================================
-  local lsp = require('lsp-zero')
+  local lsp           = require('lsp-zero')
+  local devenver_root = vim.fn.getenv('devenver_root')
+  local clang_format_fallback_file = devenver_root .. '/_clang-format'
   lsp.preset('recommended')
-
   lsp.configure('clangd', {
     cmd = {
       "clangd",
@@ -71,6 +72,7 @@ lua <<EOF
       "--clang-tidy",
       "--header-insertion=iwyu",
       "--header-insertion-decorators",
+      "--fallback-style=" .. clang_format_fallback_file,
     }
   })
 
@@ -268,12 +270,8 @@ let g:cpp_simple_highlight = 1
 " Show EOL type and last modified timestamp, right after the filename
 set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(expand(\"%:p\")))})%=%l,%c%V\ %P
 
-" Resize splits when the window is resized
-au VimResized * :wincmd =
-
 " File patterns to ignore in command line auto complete
-set wildignore+=*.class,*.o
-set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe,*.obj,*.vcxproj,*.pdb,*.idb
+set wildignore+=*.class,*.o,*\\tmp\\*,*.swp,*.zip,*.exe,*.obj,*.vcxproj,*.pdb,*.idb
 
 " Setup undo file
 set undofile
@@ -309,34 +307,40 @@ augroup persistent_settings
 augroup end
 
 function! RemedyBGOpenFile()
-    execute("Spawn! remedybg open-file " . expand("%:p") . " " . line("."))
+    execute("!remedybg open-file " . expand("%:p") . " " . line("."))
     execute("!powershell -Command Add-Type -AssemblyName Microsoft.VisualBasic; [Microsoft.VisualBasic.Interaction]::AppActivate(' - RemedyBG')")
 endfunction
 command RemedyBGOpenFile call RemedyBGOpenFile()
 
 function! RemedyBGStartDebugging()
-    execute("Spawn! start remedybg start-debugging " . expand("%:p") . " " . line("."))
+    execute("!remedybg start-debugging " . expand("%:p") . " " . line("."))
 endfunction
 command RemedyBGStartDebugging call RemedyBGStartDebugging()
 
 function! RemedyBGStopDebugging()
-    execute("Spawn! remedybg stop-debugging " . expand("%:p") . " " . line("."))
+    execute("!remedybg stop-debugging " . expand("%:p") . " " . line("."))
 endfunction
 command RemedyBGStopDebugging call RemedyBGStopDebugging()
 
 function! RemedyBGRunToCursor()
-    execute("Spawn! remedybg open-file " . expand("%:p") . " " . line("."))
-    execute("Spawn! remedybg run-to-cursor " . expand("%:p") . " " . line("."))
+    execute("!remedybg open-file " . expand("%:p") . " " . line("."))
+    execute("!remedybg run-to-cursor " . expand("%:p") . " " . line("."))
     execute("!powershell -Command Add-Type -AssemblyName Microsoft.VisualBasic; [Microsoft.VisualBasic.Interaction]::AppActivate(' - RemedyBG')")
 endfunction
 command RemedyBGRunToCursor call RemedyBGRunToCursor()
 
 function! RemedyBGAddBreakpointAtFile()
-    execute("Spawn! remedybg open-file " . expand("%:p") . " " . line("."))
-    execute("Spawn! remedybg add-breakpoint-at-file " . expand("%:p") . " " . line("."))
+    execute("!remedybg open-file " . expand("%:p") . " " . line("."))
+    execute("!remedybg add-breakpoint-at-file " . expand("%:p") . " " . line("."))
     execute("!powershell -Command Add-Type -AssemblyName Microsoft.VisualBasic; [Microsoft.VisualBasic.Interaction]::AppActivate(' - RemedyBG')")
 endfunction
 command RemedyBGAddBreakpointAtFile call RemedyBGAddBreakpointAtFile()
+
+nnoremap <silent> <F6>    <cmd>RemedyBGOpenFile<cr><cr>
+nnoremap <silent> <F5>    <cmd>RemedyBGStartDebugging<cr><cr>
+nnoremap <silent> <S-F5>  <cmd>RemedyBGStopDebugging<cr><cr>
+nnoremap <silent> <F9>    <cmd>RemedyBGAddBreakpointAtFile<cr><cr>
+nnoremap <silent> <C-F10> <cmd>RemedyBGRunToCursor<cr><cr>
 
 " FZF
 " ==============================================================================
@@ -366,27 +370,21 @@ nnoremap <leader>cc <cmd>FzfCommits<cr>
 nnoremap <leader>cb <cmd>FzfBCommits<cr>
 nnoremap <leader>b  <cmd>FzfBuffers<cr>
 
-function! PadAndTruncateLineTo80Function()
+function! PadAndTruncateLineFunction()
     let line = getline('.')
     let line_length = strlen(line)
-    let padding = 80 - line_length
+    let padding = 100 - line_length
     let padding = max([padding, 0])
 
-    let existing_space = line_length == 80 || match(line, ' $') != -1
+    let existing_space = line_length == 100 || match(line, ' $') != -1
 
     " Construct the new line with padding and a space before the padding
     let new_line = line . (existing_space ? '' : ' ') . repeat('=', padding - 1)
 
     call setline(line('.'), new_line)
 endfunction
-command! PadAndTruncateLineTo80 :call PadAndTruncateLineTo80Function()<CR>
-nnoremap <silent> <F3> :PadAndTruncateLineTo80<cr>
-
-nnoremap <silent> <F6> <cmd>RemedyBGOpenFile<cr><cr>
-nnoremap <silent> <F5> <cmd>RemedyBGStartDebugging<cr><cr>
-nnoremap <silent> <S-F5> <cmd>RemedyBGStopDebugging<cr><cr>
-nnoremap <silent> <F9> <cmd>RemedyBGAddBreakpointAtFile<cr><cr>
-nnoremap <silent> <C-F10> <cmd>RemedyBGRunToCursor<cr><cr>
+command! PadAndTruncateLine :call PadAndTruncateLineFunction()<CR>
+nnoremap <silent> <F3> :PadAndTruncateLine<cr>
 
 " Map Ctrl+HJKL to navigate buffer window
 nmap <silent> <C-h> :wincmd h<CR>
@@ -413,23 +411,6 @@ nnoremap <leader>s :vs<CR>
 " Go to previous error
 nnoremap <A-j> :cn<CR>
 nnoremap <A-k> :cp<CR>
-
-" Clang Format
-" ==============================================================================
-map <C-I> :py3file ~/clang-format.py<CR>
-
-" Compiler Error Formats
-" ==============================================================================
-" Error message formats thanks to
-" https://forums.handmadehero.org/index.php/forum?view=topic&catid=4&id=704#3982
-set errorformat+=\\\ %#%f(%l\\\,%c):\ %m                       " MSVC: MSBuild
-set errorformat+=\\\ %#%f(%l)\ :\ %#%t%[A-z]%#\ %m             " MSVC: cl.exe
-set errorformat+=\\\ %#%t%nxx:\ %m                             " MSVC: cl.exe, fatal errors is crudely implemented
-set errorformat+=\\\ %#LINK\ :\ %m                             " MSVC: link.exe, can't find link library badly implemented
-set errorformat+=\\\ %#%s\ :\ error\ %m                        " MSVC: link.exe, errors is badly implemented
-set errorformat+=\\\ %#%s\ :\ fatal\ error\ %m                 " MSVC: link.exe, fatal errors is badly implemented
-set errorformat+=\\\ %#%f(%l\\\,%c-%*[0-9]):\ %#%t%[A-z]%#\ %m " MSVC: HLSL fxc.exe
-set errorformat+=%\\%%(CTIME%\\)%\\@=%m                        " ctime.exe -stats
 
 " Vim Dispatch
 " ==============================================================================

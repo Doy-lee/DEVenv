@@ -801,7 +801,7 @@ def run(user_app_list,
         devenv_script_buffer += "set path=%~dp0Symlinks;%PATH%\n"
         devenv_script_buffer += "set path=%~dp0Scripts;%PATH%\n"
     else:
-        devenv_script_buffer += f"devenver_root=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )\":$PATH\n"
+        devenv_script_buffer += f"export devenver_root=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )\"\n"
         devenv_script_buffer += f"PATH=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )/Scripts\":$PATH\n"
         devenv_script_buffer += f"PATH=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )/Symlinks\":$PATH\n"
 

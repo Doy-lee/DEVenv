@@ -8,5 +8,5 @@ setlocal
   for /f "delims=" %%a in ('where "$desired_path:%desired_exe%"') do ( set "exe_to_use=%%a")
   echo [DEVENVER] Executing script "%~dpnx0" with "%exe_to_use%"
 
-  call %desired_exe% %*
+  start /B %desired_exe% %*
 endlocal
