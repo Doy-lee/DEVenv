@@ -1,8 +1,7 @@
----
+Language: Cpp
+
 IndentWidth: 4
 TabWidth: 4
----
-Language: Cpp
 
 # Align parameters on the open bracket, e.g.:
 # someLongFunction(argument1,
@@ -27,10 +26,10 @@ AlignArrayOfStructures: Left
 # int d = 3;
 # /* A comment. */
 # double e = 4;
-AlignConsecutiveAssignments: Consecutive
-AlignConsecutiveBitFields: Consecutive
+AlignConsecutiveAssignments:  Consecutive
+AlignConsecutiveBitFields:    Consecutive
 AlignConsecutiveDeclarations: Consecutive
-AlignConsecutiveMacros: Consecutive
+AlignConsecutiveMacros:       Consecutive
 
 # Align escaped newlines as far left as possible.
 # #define A   \
@@ -135,7 +134,7 @@ AlwaysBreakTemplateDeclarations: MultiLine
 #     aaaaaaaaaaaaaaaaaaaa,
 #     aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa);
 # }
-BinPackArguments: false
+BinPackArguments:  false
 BinPackParameters: false # As BinPackArguments but for function definition parameters
 
 # Add space after the : only (space may be added before if needed for
@@ -197,7 +196,7 @@ BreakInheritanceList: AfterComma
 #                 "ryVeryVeryVeryVeryVery"
 #                 "VeryLongString";
 BreakStringLiterals: true
-ColumnLimit: 100
+ColumnLimit: 0
 
 # false:
 # namespace Foo {
@@ -327,6 +326,10 @@ NamespaceIndentation: None
 #       ddddddddddddd()
 PackConstructorInitializers: CurrentLine
 PointerAlignment: Right
+
+# Different ways to arrange specifiers and qualifiers (e.g. const/volatile).
+QualifierAlignment: Custom
+QualifierOrder: ['inline', 'static', 'type', 'const', 'volatile']
 
 # false:
 # // veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongComment with plenty of information

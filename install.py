@@ -381,22 +381,26 @@ pause
     internal_dir  = pathlib.Path(os.path.dirname(os.path.abspath(__file__))) / "Internal"
     if is_windows:
         devenver.print_header("Use LLVM utils script to slim installation size")
-        install_dir_set = set()
+        llvm_install_dir_set = set()
         for entry in installed_dev_apps["LLVM"]:
-            install_dir = entry['install_dir']
-            install_dir_set.add(install_dir)
+            llvm_install_dir_set.add(entry['install_dir'])
 
         llvm_script_src_path = internal_dir / "win_llvm-link-ad01970-2022-08-29.bat"
-        for install_dir in install_dir_set:
-            llvm_script_dest_path = install_dir / "llvm-link.bat"
+        for llvm_install_dir in llvm_install_dir_set:
+            llvm_script_dest_path = llvm_install_dir / "llvm-link.bat"
             shutil.copy(llvm_script_src_path, llvm_script_dest_path)
-            subprocess.run(llvm_script_dest_path, cwd=install_dir)
+            subprocess.run(llvm_script_dest_path, cwd=llvm_install_dir)
             os.remove(llvm_script_dest_path)
 
     # Install left-overs
     # --------------------------------------------------------------------------
     devenver.print_header("Install configuration files")
-    shutil.copy(internal_dir / "os_clang_format_style_file", install_dir / "_clang-format")
+
+    # ClangFormat
+    clang_format_src_path = internal_dir / "os_clang_format_style_file"
+    clang_format_dest_path = install_dir / "_clang-format"
+    devenver.lprint(f"Copying clang-format file from {clang_format_src_path} to {clang_format_dest_path}")
+    shutil.copy(clang_format_src_path, clang_format_dest_path)
 
     # Copy init.vim to NVIM directory
     nvim_init_dir = ""
