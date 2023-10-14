@@ -26,6 +26,7 @@ call plug#begin(stdpath('config') . '/plugged')
 
     " Lua cache to speed up load times
     Plug 'https://github.com/lewis6991/impatient.nvim'
+    Plug 'https://github.com/ggandor/leap.nvim'
 
     " lsp-zero begin
         " LSP Support
@@ -54,12 +55,14 @@ call plug#end()
 " ==============================================================================
 lua <<EOF
   require('impatient')
+  local leap = require('leap')
+  vim.keymap.set({'n', 'x', 'o'}, 'f', '<Plug>(leap-forward-to)')
+  vim.keymap.set({'n', 'x', 'o'}, 'F', '<Plug>(leap-backward-to)')
 
   -- LSP Setup
   -- ===========================================================================
   local lsp           = require('lsp-zero')
   local devenver_root = vim.fn.getenv('devenver_root')
-  local clang_format_fallback_file = devenver_root .. '/_clang-format'
   lsp.preset('recommended')
   lsp.configure('clangd', {
     cmd = {
@@ -72,7 +75,6 @@ lua <<EOF
       "--clang-tidy",
       "--header-insertion=iwyu",
       "--header-insertion-decorators",
-      "--fallback-style=" .. clang_format_fallback_file,
     }
   })
 
