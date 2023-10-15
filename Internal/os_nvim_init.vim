@@ -407,7 +407,7 @@ nnoremap <A-k> :cp<CR>
 " Vim Dispatch =====================================================================================
 let s:running_windows = has("win16") || has("win32") || has("win64")
 if s:running_windows
-    set makeprg=./build.bat
+    set makeprg=build.bat
 else
     " Set vim terminal to enter normal mode using escape like normal vim behaviour
     tnoremap <Esc> <C-\><C-n>
