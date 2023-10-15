@@ -1,5 +1,4 @@
-" Plugins
-" ==============================================================================
+" Plugins ==========================================================================================
 call plug#begin(stdpath('config') . '/plugged')
     " nerdtree provides a file tree explorer
     " vim-dispatch allows running async jobs in vim (i.e. builds in the background)
@@ -51,16 +50,14 @@ call plug#begin(stdpath('config') . '/plugged')
     " lsp-zero end
 call plug#end()
 
-" Lua Setup
-" ==============================================================================
+" Lua Setup ========================================================================================
 lua <<EOF
   require('impatient')
   local leap = require('leap')
-  vim.keymap.set({'n', 'x', 'o'}, 'f', '<Plug>(leap-forward-to)')
-  vim.keymap.set({'n', 'x', 'o'}, 'F', '<Plug>(leap-backward-to)')
+  vim.keymap.set({'n', 'x', 'o'}, '<leader>r', '<Plug>(leap-forward-to)')
+  vim.keymap.set({'n', 'x', 'o'}, '<leader>R', '<Plug>(leap-backward-to)')
 
-  -- LSP Setup
-  -- ===========================================================================
+  -- LSP Setup =====================================================================================
   local lsp           = require('lsp-zero')
   local devenver_root = vim.fn.getenv('devenver_root')
   lsp.preset('recommended')
@@ -80,8 +77,7 @@ lua <<EOF
 
   lsp.setup()
 
-  -- Treesitter
-  -- ===========================================================================
+  -- Treesitter ====================================================================================
   -- TODO: 2022-06-19 Treesitter is too slow on large C++ files
   -- require('nvim-treesitter.configs').setup {
   --   ensure_installed = { "c", "cpp" }, -- A list of parser names, or "all"
@@ -105,8 +101,7 @@ lua <<EOF
   --   },
   -- }
 
-  -- Vim Options
-  -- ===========================================================================
+  -- Vim Options ===================================================================================
   vim.opt.autowrite=true        -- Automatically save before cmds like :next and :prev
   vim.opt.colorcolumn={80, 100} -- Set a 80 and 100 char column ruler
   vim.opt.completeopt={'menu', 'menuone', 'noselect'}
@@ -242,8 +237,7 @@ lua <<EOF
   ]]
 EOF
 
-" Theme
-" ==============================================================================
+" Theme ============================================================================================
 let g:gruvbox_material_background='hard'
 let g:gruvbox_material_foreground='mix'
 let g:gruvbox_material_disable_italic_comment=1
@@ -267,8 +261,7 @@ let g:cpp_member_highlight = 0
 " (affects both C and C++ files)
 let g:cpp_simple_highlight = 1
 
-" Options
-" ==============================================================================
+" Options ==========================================================================================
 " Show EOL type and last modified timestamp, right after the filename
 set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(expand(\"%:p\")))})%=%l,%c%V\ %P
 
@@ -287,8 +280,7 @@ if has('mouse')
     set mouse=a
 endif
 
-" Functions
-" ==============================================================================
+" Functions ========================================================================================
 " Increase font size using (Ctrl+Up Arrow) or (Ctrl+Down Arrow) if we are using
 " gvim Otherwise font size is determined in terminal
 nnoremap <C-Up> :silent! let &guifont = substitute(
@@ -344,8 +336,7 @@ nnoremap <silent> <S-F5>  <cmd>RemedyBGStopDebugging<cr><cr>
 nnoremap <silent> <F9>    <cmd>RemedyBGAddBreakpointAtFile<cr><cr>
 nnoremap <silent> <C-F10> <cmd>RemedyBGRunToCursor<cr><cr>
 
-" FZF
-" ==============================================================================
+" FZF ==============================================================================================
 " Empty value to disable preview window altogether
 let g:fzf_preview_window = []
 
@@ -361,8 +352,7 @@ command! -nargs=* -bang FzfCustomRG call RipgrepFzf(<q-args>, <bang>0)
 command! -bang -nargs=? -complete=dir FzfCustomFiles
     \ call fzf#vim#files(<q-args>, {'options': ['--layout=reverse', '--info=inline', '--preview', 'cat {}']}, <bang>0)
 
-" General Key Bindings
-" ==============================================================================
+" General Key Bindings =============================================================================
 " FZF Bindings
 nnoremap <leader>h  <cmd>FzfHistory<cr>
 nnoremap <leader>f  <cmd>FzfCustomFiles<cr>
@@ -414,15 +404,13 @@ nnoremap <leader>s :vs<CR>
 nnoremap <A-j> :cn<CR>
 nnoremap <A-k> :cp<CR>
 
-" Vim Dispatch
-" ==============================================================================
+" Vim Dispatch =====================================================================================
 let s:running_windows = has("win16") || has("win32") || has("win64")
 if s:running_windows
-    set makeprg=build
-    nnoremap <C-b> :Make ./build.bat<cr>
+    set makeprg=./build.bat
 else
     " Set vim terminal to enter normal mode using escape like normal vim behaviour
     tnoremap <Esc> <C-\><C-n>
-    nnoremap <C-b> :Make ./build.sh<cr>
     set makeprg=./build.sh
 endif
+nnoremap <C-b> :Make<cr>
