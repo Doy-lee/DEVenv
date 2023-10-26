@@ -1287,6 +1287,25 @@ def get_manifest(is_windows):
     checksum             = ""
     add_to_devenv_script = []
 
+    fd_args='''fd \
+--type file \
+--no-ignore-vcs \
+--strip-cwd-prefix \
+--hidden \
+--follow \
+--exclude .git \
+--exclude .cache \
+--exclude .vs \
+--exclude "*.dll" \
+--exclude "*.exe" \
+--exclude "*.lib" \
+--exclude "*.obj" \
+--exclude "*.pdb" \
+--exclude "*.so" \
+--exclude "*.tar" \
+--exclude "*.zip" \
+'''
+
     if is_windows:
         download_url         = f"https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-x86_64-pc-windows-msvc.zip"
         download_checksum    = "657cf430a1b349ce2b9cceeaed0b14220a417bbf24a85995aa6fbf8f746f4e03"
@@ -1294,7 +1313,7 @@ def get_manifest(is_windows):
         exe_path             = "fd.exe"
         add_to_devenv_script = [
             "set FZF_DEFAULT_OPTS=--multi --layout=reverse",
-            "set FZF_DEFAULT_COMMAND=fd --type f --strip-cwd-prefix --hidden --follow --exclude .git --exclude .cache --exclude .vs",
+            f"set FZF_DEFAULT_COMMAND={fd_args}"
         ]
     else:
         download_url      = f"https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-x86_64-unknown-linux-musl.tar.gz"
@@ -1303,9 +1322,8 @@ def get_manifest(is_windows):
         exe_path          = "fd"
         add_to_devenv_script = [
             "FZF_DEFAULT_OPTS=\"--multi --layout=reverse\"",
-            "FZF_DEFAULT_COMMAND=\"fd --type f --strip-cwd-prefix --hidden --follow --exclude .git --exclude .cache --exclude .vs\"",
+            f"FZF_DEFAULT_COMMAND=\"{fd_args}\""
         ]
-
 
     result.append({
         "label": "Fd",
