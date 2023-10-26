@@ -54,8 +54,8 @@ call plug#end()
 lua <<EOF
   require('impatient')
   local leap = require('leap')
-  vim.keymap.set({'n', 'x', 'o'}, '<leader>r', '<Plug>(leap-forward-to)')
-  vim.keymap.set({'n', 'x', 'o'}, '<leader>R', '<Plug>(leap-backward-to)')
+  vim.keymap.set({'n', 'x', 'o'}, '<tab>', '<Plug>(leap-forward-to)')
+  vim.keymap.set({'n', 'x', 'o'}, '<S-tab>', '<Plug>(leap-backward-to)')
 
   -- LSP Setup =====================================================================================
   local lsp           = require('lsp-zero')
