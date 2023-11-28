@@ -1377,4 +1377,35 @@ def get_manifest(is_windows):
             ],
         })
 
+    # --------------------------------------------------------------------------
+
+    if is_windows:
+        version           = "1.7"
+        exe_path          = "jq-windows-amd64.exe"
+        download_url      = f"https://github.com/jqlang/jq/releases/download/jq-{version}/jq-windows-amd64.exe"
+        download_checksum = "2e9cc54d0a5d098e2007decec1dbb3c555ca2f5aabded7aec907fe0ffe401aab"
+        checksum          = download_checksum
+        symlink           = [f"jq.exe", f"jq-{version}.exe"]
+
+        result.append({
+            "label": "jq",
+            "manifests": [
+                {
+                    "download_url": download_url,
+                    "download_checksum": download_checksum,
+                    "version": version,
+                    "unzip_method": 'default',
+                    "executables": [
+                        {
+                            "path": exe_path,
+                            "symlink": symlink,
+                            "add_to_devenv_path": True,
+                            "checksum": checksum,
+                        }
+                    ],
+                    "add_to_devenv_script": [],
+                }
+            ],
+        })
+
     return result
