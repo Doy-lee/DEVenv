@@ -1,6 +1,6 @@
 @echo off
 setlocal
-  set desired_path=%devenver_root%\..\..\Cryptomator\Dev\Win\RemedyBG\0_3_9_4
+  set desired_path=%devenver_root%\..\..\Cryptomator\Dev\Win\RemedyBG\0_3_9_5
   set desired_exe=remedybg.exe
 
   set path=%desired_path%;%path%
