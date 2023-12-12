@@ -962,7 +962,7 @@ def get_manifest(is_windows):
             "label": "Zeal",
             "manifests": [
                 {
-                    "download_url": f"https://github.com/zealdocs/zeal/releases/download/v{version}/zeal-{version}-portable--windows-x64.7z",
+                    "download_url": f"https://github.com/zealdocs/zeal/releases/download/v{version}/zeal-{version}-portable-windows-x64.7z",
                     "download_checksum": "e99a11a5692f8ca93da55589b23d20bf40edc9a3f9d78f7d58e0c55f8bd0acac",
                     "version": version,
                     "unzip_method": 'default',
