@@ -271,7 +271,6 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 
   clink_exe     = string.format("%s\\\\..\\\\..\\\\{clink_exe_path_for_wezterm}", wezterm.executable_dir)
   devenv_bat    = string.format("%s\\\\..\\\\..\\\\{dev_env_script_name}.bat", wezterm.executable_dir)
-  msvc_bat      = "C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\VC\\\\Auxiliary\\\\Build\\\\vcvarsall.bat"
   clink_profile = string.format("%s\\\\..\\\\..\\\\{clink_profile_path_for_wezterm}", wezterm.executable_dir)
 
   -- Taken from: https://wezfurlong.org/wezterm/shell-integration.html
@@ -281,8 +280,7 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 
   default_prog = {{"cmd.exe", "/s", "/k",
                   clink_exe, "inject", "--profile", clink_profile, "-q",
-                  "&&", "call", devenv_bat,
-                  "&&", "call", msvc_bat, "x64"}}
+                  "&&", "call", devenv_bat}}
 end
 
 return {{
