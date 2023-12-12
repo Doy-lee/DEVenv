@@ -957,13 +957,13 @@ def get_manifest(is_windows):
     # --------------------------------------------------------------------------
 
     if is_windows:
-        version = "0.6.1"
+        version = "0.7.0"
         result.append({
             "label": "Zeal",
             "manifests": [
                 {
-                    "download_url": f"https://github.com/zealdocs/zeal/releases/download/v{version}/zeal-portable-{version}-windows-x64.7z",
-                    "download_checksum": "08e9992f620ba0a5ea348471d8ac9c85059e95eedd950118928be639746e3f94",
+                    "download_url": f"https://github.com/zealdocs/zeal/releases/download/v{version}/zeal-{version}-portable--windows-x64.7z",
+                    "download_checksum": "e99a11a5692f8ca93da55589b23d20bf40edc9a3f9d78f7d58e0c55f8bd0acac",
                     "version": version,
                     "unzip_method": 'default',
                     "executables": [
@@ -971,7 +971,7 @@ def get_manifest(is_windows):
                             "path": "zeal.exe",
                             "symlink": [],
                             "add_to_devenv_path": False,
-                            "checksum": "d1e687a33e117b6319210f40e2401b4a68ffeb0f33ef82f5fb6a31ce4514a423",
+                            "checksum": "579188849d64d2f7703f46102573cda13bd50d80ab6c8c88177c1b6d324f14b8",
                         }
                     ],
                     "add_to_devenv_script": [],
