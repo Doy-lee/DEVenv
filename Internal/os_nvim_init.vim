@@ -108,9 +108,7 @@ lua <<EOF
   vim.opt.cpoptions:append('$') -- $ as end marker for the change operator
   vim.opt.cursorline=true       -- Highlight current line
   vim.opt.expandtab=true        -- Replace tabs with spaces
-  vim.opt.guifont={'JetBrains_Mono:h9',
-                   'Consolas:h9',
-                   'InputMonoCondensed:h9'}
+  vim.opt.guifont='JetBrains_Mono:h9','Consolas:h9','InputMonoCondensed:h9'
   vim.opt.hlsearch=false        -- Highlight just the first match on search
   vim.opt.ignorecase=true       -- Search is not case sensitive
   vim.opt.linebreak=true        -- On wrapped lines, break on the wrapping word intelligently
@@ -132,97 +130,6 @@ lua <<EOF
     -- modes which is very visually distracting.
     signs = false,
   })
-
-  -- Check if there were args (i.e. opened file), non-empty buffer, or started in insert mode
-  if vim.fn.argc() == 0 or vim.fn.line2byte("$") ~= -1 and not opt.insertmode then
-    local ascii = {
-        "",
-        "  Useful Bindings (Normal Mode)",
-        "  --------------------------------------------------",
-        "  <Ctrl+n>    to open the file tree explorer",
-        "  <Ctrl+i>    clang format selected lines",
-        "  <Ctrl+j>    jump to next compilation error",
-        "  <Ctrl+k>    jump to prev compilation error",
-        "  <cd>        change working directory to current file",
-        "  <\\s>        split buffer vertically",
-        "",
-        "  Abolish (Text Substitution in Normal Mode)",
-        "  --------------------------------------------------",
-        "  %S/facilit{y,ies}/building{,s}/g Convert facility->building, facilities->buildings",
-        "  %S/action/sleep/g                Convert action to sleep, (preserve case sensitivity ACTION->SLEEP, action->sleep) ",
-        "",
-        "  FZF (Normal Mode)",
-        "  --------------------------------------------------",
-        "  <\\h>        vim command history",
-        "  <\\f>        find files",
-        "  <\\g>        search for text (via ripgrep)",
-        "  <\\tt>       search for tag (global)",
-        "  <\\tb>       search for tag (buffer)",
-        "  <\\cc>       search for commit (global)",
-        "  <\\cb>       search for commit (buffer)",
-        "  <\\b>        search for buffer",
-        "",
-        "  Autocompletion (nvim-cmp in Normal Mode)",
-        "  --------------------------------------------------",
-        "  <Enter>     Confirms selection.",
-        "  <Ctrl-y>    Confirms selection.",
-        "  <Up>        Navigate to previous item on the list.",
-        "  <Down>      Navigate to the next item on the list.",
-        "  <Ctrl-p>    Navigate to previous item on the list.",
-        "  <Ctrl-n>    Navigate to the next item on the list.",
-        "  <Ctrl-u>    Scroll up in the item's documentation.",
-        "  <Ctrl-f>    Scroll down in the item's documentation.",
-        "  <Ctrl-e>    Toggles the completion.",
-        "  <Ctrl-d>    Go to the next placeholder in the snippet.",
-        "  <Ctrl-b>    Go to the previous placeholder in the snippet.",
-        "  <Tab>       Enables completion when the cursor is inside a word. If the completion menu is visible it will navigate to the next item in the list.",
-        "  <Shift-Tab> When the completion menu is visible navigate to the previous item in the list.",
-        "",
-        "  LSP Bindings (Normal Mode)",
-        "  --------------------------------------------------",
-        "  <Shift-K>   Displays hover information about the symbol under the cursor in a floating window. See help vim.lsp.buf.hover().",
-        "  gd          Jumps to the definition of the symbol under the cursor. See help vim.lsp.buf.definition().",
-        "  gD          Jumps to the declaration of the symbol under the cursor. Some servers don't implement this feature. See help vim.lsp.buf.declaration().",
-        "  gi          Lists all the implementations for the symbol under the cursor in the quickfix window. See help vim.lsp.buf.implementation().",
-        "  go          Jumps to the definition of the type of the symbol under the cursor. See help vim.lsp.buf.type_definition().",
-        "  gr          Lists all the references to the symbol under the cursor in the quickfix window. See help vim.lsp.buf.references().",
-        "  <Ctrl-k>    Displays signature information about the symbol under the cursor in a floating window. See help vim.lsp.buf.signature_help(). If a mapping already exists for this key this function is not bound.",
-        "  <F2>        Renames all references to the symbol under the cursor. See help vim.lsp.buf.rename().",
-        "  <F4>        Selects a code action available at the current cursor position. See help vim.lsp.buf.code_action().",
-        "  gl          Show diagnostics in a floating window. See :help vim.diagnostic.open_float().",
-        "  [d          Move to the previous diagnostic in the current buffer. See :help vim.diagnostic.goto_prev().",
-        "  ]d          Move to the next diagnostic. See :help vim.diagnostic.goto_next()."
-    }
-
-    local height = vim.api.nvim_get_option("lines")
-    local width = vim.api.nvim_get_option("columns")
-    local ascii_rows = #ascii
-    local ascii_cols = #ascii[1]
-    local win = vim.api.nvim_get_current_win()
-    local buf = vim.api.nvim_create_buf(true, true)
-
-    local function reset_start_screen()
-        vim.cmd("enew")
-        local buf = vim.api.nvim_get_current_buf()
-        local win = vim.api.nvim_get_current_win()
-        vim.api.nvim_buf_set_option(buf, "modifiable", true)
-        vim.api.nvim_buf_set_option(buf, "buflisted", true)
-        vim.api.nvim_buf_set_option(buf, "buflisted", true)
-    end
-
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, ascii)
-    vim.api.nvim_buf_set_option(buf, "modified", false)
-    vim.api.nvim_buf_set_option(buf, "buflisted", false)
-    vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
-    vim.api.nvim_buf_set_option(buf, "buftype", "nofile")
-    vim.api.nvim_buf_set_option(buf, "swapfile", false)
-    vim.api.nvim_set_current_buf(buf)
-
-    vim.api.nvim_create_autocmd("InsertEnter,WinEnter", {
-        pattern = "<buffer>",
-        callback = reset_start_screen,
-    })
-  end
 
   -- Adjust the quick fix window that pops-up on build to size the buffer with
   -- the size of the output and at most 10 lines.

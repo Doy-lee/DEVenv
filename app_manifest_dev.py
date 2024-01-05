@@ -1118,7 +1118,7 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    version           = "0.9.1"
+    version           = "0.9.5"
     download_url      = ""
     download_checksum = ""
     exe_path          = ""
@@ -1127,13 +1127,13 @@ def get_manifest(is_windows):
 
     if is_windows:
         download_url      = f"https://github.com/neovim/neovim/releases/download/v{version}/nvim-win64.zip"
-        download_checksum = "af41890b8c14d4ed214a2ef6c1ab8e0be004eac7094d5df1cc4bc17ccf0a13ef"
-        checksum          = "53d68005bbbf974fe89bf74f14d926d27a7ac29d008c9a5182da82a8b9817719"
+        download_checksum = "de6dc1f0edb45f5f225ee24ce80a4fcbc3a337932037e98ae143975fca2556bf"
+        checksum          = "d60036b942091c668dc2d7f2e3ecc7f76d534457c37adce102bd3c01c273c2ff"
         exe_path          = "bin/nvim.exe"
     else:
         exe_path          = "nvim.appimage"
         download_url      = f"https://github.com/neovim/neovim/releases/download/v{version}/nvim.appimage"
-        download_checksum = "262892176e21da0902c4f0b1e027d54d21b4bcae6b0397afccd8a81b476c3055"
+        download_checksum = "0c82e5702af7a11fbb916a11b4a82e98928abf8266c74b2030ea740340437bf9"
         checksum          = download_checksum
         symlink           = ["nvim", "vim"] # Usually use VM with no desktop-environment
 
@@ -1160,7 +1160,7 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    version           = "0.11.0"
+    version           = "0.12.1"
     download_url      = ""
     download_checksum = ""
     exe_path          = ""
@@ -1168,13 +1168,13 @@ def get_manifest(is_windows):
 
     if is_windows:
         download_url      = f"https://github.com/neovide/neovide/releases/download/{version}/neovide.exe.zip"
-        download_checksum = "68c431b4f97e56bc27d937e29a46fb7a677f18645635944c5cef2a7c9b013b45"
-        checksum          = "dc48fc61c65e74ca16e389ac35c524650c3a949e695f91ae4cb9e8b813b07384"
+        download_checksum = "9d434a3094a25c27f38b8d846c4645cab8211b427db99a1268307d0a0c2a5154"
+        checksum          = "a403efd394f60ce8c1250b0d741f75f47c04bc5d87bd1b6206af3a0ef709893d"
         exe_path          = "neovide.exe"
     else:
         download_url      = f"https://github.com/neovide/neovide/releases/download/{version}/neovide.AppImage"
-        download_checksum = "9eb3afd5c6abc84cf200219ff494f2a49c5ed0d0366fd510b4aa91d7412a8a50"
-        checksum          = "9eb3afd5c6abc84cf200219ff494f2a49c5ed0d0366fd510b4aa91d7412a8a50"
+        download_checksum = "49df6aafafb0ec5bd5fdfcaee2d1fc9036fe8237bf2bb68102aaf1a0b43d6096"
+        checksum          = download_checksum
         exe_path          = "neovide.AppImage"
 
     result.append({
@@ -1240,7 +1240,7 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    version           = "13.0.0"
+    version           = "14.0.3"
     download_url      = ""
     download_checksum = ""
     exe_path          = ""
@@ -1248,13 +1248,13 @@ def get_manifest(is_windows):
 
     if is_windows:
         download_url      = f"https://github.com/BurntSushi/ripgrep/releases/download/{version}/ripgrep-{version}-x86_64-pc-windows-msvc.zip"
-        download_checksum = "a47ace6f654c5ffa236792fc3ee3fefd9c7e88e026928b44da801acb72124aa8"
-        checksum          = "ab5595a4f7a6b918cece0e7e22ebc883ead6163948571419a1dd5cd3c7f37972"
+        download_checksum = "b6df202a06cab342cf28302f319ddd5788da10672781c38dd49ebe566b423e3f"
+        checksum          = "640535f9ff2d2db4293b9b938f70896a6923f4b5e13b7b4cb975d22a857da246"
         exe_path          = "rg.exe"
     else:
         download_url      = f"https://github.com/BurntSushi/ripgrep/releases/download/{version}/ripgrep-{version}-x86_64-unknown-linux-musl.tar.gz"
-        download_checksum = "ee4e0751ab108b6da4f47c52da187d5177dc371f0f512a7caaec5434e711c091"
-        checksum          = "4ef156371199b3ddac1bf584e0e52b1828279af82e4ea864b4d9c816adb5db40"
+        download_checksum = "62cd0efc4d6f1817b9c852859987b4720cd52e0de008418266e8503028dc0c7a"
+        checksum          = "5877446773eb2a787ad8dc0c25d283fcb63f4ecc205d5a60992ae080c0120df2"
         exe_path          = "rg"
 
     result.append({
@@ -1278,9 +1278,9 @@ def get_manifest(is_windows):
         ],
     })
 
-    # --------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
-    version              = "8.7.0"
+    version              = "9.0.0"
     download_url         = ""
     download_checksum    = ""
     exe_path             = ""
@@ -1308,8 +1308,8 @@ def get_manifest(is_windows):
 
     if is_windows:
         download_url         = f"https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-x86_64-pc-windows-msvc.zip"
-        download_checksum    = "657cf430a1b349ce2b9cceeaed0b14220a417bbf24a85995aa6fbf8f746f4e03"
-        checksum             = "0fd887ffa5b2f36cb77934072ca60d86c42e5afda90ac7005d7f1ef076ca70c6"
+        download_checksum    = "8c5ff3fb24ef02f78d3e8e7ddf116456aceeeb3832f20bba56f21d8b373e5e1b"
+        checksum             = "e3ee4b7be6991fee4641b04074643519f98a0a6c8c1814898d0f6d2acf4fa59b"
         exe_path             = "fd.exe"
         add_to_devenv_script = [
             "set FZF_DEFAULT_OPTS=--multi --layout=reverse",
@@ -1317,8 +1317,8 @@ def get_manifest(is_windows):
         ]
     else:
         download_url      = f"https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-x86_64-unknown-linux-musl.tar.gz"
-        download_checksum = "ced2541984b765994446958206b3411f3dea761a5e618cb18b4724c523727d68"
-        checksum          = "3533a356ff5dac034b6b37ef72f61a0132ffcd54c1d321bf2676d78c3cb499d8"
+        download_checksum = "069e2d58127ddd944c03a2684ad79f72e3f9bd3e0d2642c36adc5b367c134592"
+        checksum          = "2b78bcac90f6a98bd00855446e1e420954470007607e0640dbb423529649a3a7"
         exe_path          = "fd"
         add_to_devenv_script = [
             "FZF_DEFAULT_OPTS=\"--multi --layout=reverse\"",
