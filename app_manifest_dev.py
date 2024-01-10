@@ -888,31 +888,30 @@ def get_manifest(is_windows):
     else:
         download_url      = f"https://github.com/indygreg/python-build-standalone/releases/download/{date}/cpython-{version}-x86_64_v2-unknown-linux-gnu-pgo+lto-full.tar.zst"
         download_checksum = "49f4a8c02efff2debbb258973b1f6efbd568e4be2e5dca07c7dcd754a7bff9cf"
-        checksum          = "none"
-        exe_path          = "bin/python"
+        checksum          = "ee96234460ff4c5163dc0681dbfaf8cf5f4e65972fde796da7b0ee0d5ce077d5"
+        exe_path          = "install/bin/python3"
 
     # TODO: Get ZST somehow on linux
-    if is_windows:
-        result.append({
-            "label": label,
-            "manifests": [
-                {
-                    "download_checksum": download_checksum,
-                    "download_url": download_url,
-                    "version": version,
-                    "unzip_method": 'default',
-                    "executables": [
-                        {
-                            "path": exe_path,
-                            "symlink": [],
-                            "add_to_devenv_path": True,
-                            "checksum": checksum,
-                        }
-                    ],
-                    "add_to_devenv_script": add_to_devenv_script,
-                }
-            ],
-        })
+    result.append({
+        "label": label,
+        "manifests": [
+            {
+                "download_checksum": download_checksum,
+                "download_url": download_url,
+                "version": version,
+                "unzip_method": 'default',
+                "executables": [
+                    {
+                        "path": exe_path,
+                        "symlink": [],
+                        "add_to_devenv_path": True,
+                        "checksum": checksum,
+                    }
+                ],
+                "add_to_devenv_script": add_to_devenv_script,
+            }
+        ],
+    })
 
     # --------------------------------------------------------------------------
 

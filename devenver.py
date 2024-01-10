@@ -520,6 +520,10 @@ def install_app_list(app_list, download_dir, install_dir, is_windows):
     validate_app_list_result = validate_app_list(app_list)
     app_index = 0
 
+    global zstd_exe
+    if not is_windows:
+        zstd_exe = "/usr/bin/zstd"
+
     for app in app_list:
         manifest_list = app['manifests']
         for manifest in manifest_list:
@@ -552,7 +556,6 @@ def install_app_list(app_list, download_dir, install_dir, is_windows):
             if app_list is internal_app_list:
                 global zip7_exe
                 global zip7_bootstrap_exe
-                global zstd_exe
                 exe_path = get_exe_install_path(install_dir, label, version, manifest['executables'][0]['path'])
                 if label == '7zip':
                     if is_windows or os.name == 'nt':
@@ -804,6 +807,7 @@ def run(user_app_list,
         devenv_script_buffer += f"export devenver_root=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )\"\n"
         devenv_script_buffer += f"PATH=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )/Scripts\":$PATH\n"
         devenv_script_buffer += f"PATH=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )/Symlinks\":$PATH\n"
+        devenv_script_buffer += f"PATH=$(echo $PATH | awk -v RS=: -v ORS=: '/^\/mnt\/c/ {{next}} {{print}}')"
 
     devenv_script_name = f"{devenv_script_name}.bat" if is_windows else f"{devenv_script_name}.sh"
     devenv_script_path = pathlib.Path(install_dir, devenv_script_name)
