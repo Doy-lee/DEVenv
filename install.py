@@ -388,6 +388,12 @@ pause
             subprocess.run(llvm_script_dest_path, cwd=llvm_install_dir)
             os.remove(llvm_script_dest_path)
 
+    # Install fzf scripts
+    # --------------------------------------------------------------------------
+    if not is_windows:
+        shutil.copy(internal_dir / "unix_fzf-completion.bash", install_dir)
+        shutil.copy(internal_dir / "unix_fzf-key-bindings.bash", install_dir)
+
     # Install left-overs
     # --------------------------------------------------------------------------
     devenver.print_header("Install configuration files")

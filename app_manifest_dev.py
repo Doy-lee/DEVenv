@@ -1074,7 +1074,7 @@ def get_manifest(is_windows):
 
     # --------------------------------------------------------------------------
 
-    version           = "0.37.0"
+    version           = "0.45.0"
     download_url      = ""
     download_checksum = ""
     exe_path          = ""
@@ -1083,14 +1083,14 @@ def get_manifest(is_windows):
 
     if is_windows:
         download_url      = f"https://github.com/junegunn/fzf/releases/download/{version}/fzf-{version}-windows_amd64.zip"
-        download_checksum = "247bffe84ff3294a8c0a7bb96329d5e4152d3d034e13dec59dcc97d8a828000d"
-        checksum          = "c0f4b20d0602977ff3e592cac8eadf86473abed0d24e2def81239bd2e76047e8"
+        download_checksum = "eaac5e0c8ee52c984b92fd5a5ef6e96d4ad33c194ea84aeac17df1d72ea207f8"
+        checksum          = "5e1a05b84eef7189aa085b8d9e00545246d7d2eeff9f841806984c7a2a7e74aa"
         exe_path          = "fzf.exe"
         symlink           = [f"fzf.exe"]
     else:
         download_url      = f"https://github.com/junegunn/fzf/releases/download/{version}/fzf-{version}-linux_amd64.tar.gz"
-        download_checksum = "ffa3220089f2ed6ddbef2d54795e49f46467acfadd4ad0d22c5f07c52dc0d4ab"
-        checksum          = "6475c41e56d949da753782fef56017657b77846f23e71fca88378e3f55c1d6d0"
+        download_checksum = "0f1f0b7f71680f6c88e8ddf18ece8e14c54ea6793ec17d4d51e58d15c0bab03c"
+        checksum          = "8a3a3fa6a5dd441604d0eff28364d607c0bc666ab92036f63dbd7344f8bcdc54"
         exe_path          = "fzf"
         symlink           = [f"fzf"]
 

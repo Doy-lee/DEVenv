@@ -52,7 +52,7 @@ def verify_file_sha256(file_path, checksum, label):
 
     result = False
     try:
-        file = open(file_path, 'r+b')
+        file = open(file_path, 'rb')
         hasher = hashlib.sha256()
         hasher.update(file.read())
         derived_checksum = hasher.hexdigest()
@@ -807,7 +807,9 @@ def run(user_app_list,
         devenv_script_buffer += f"export devenver_root=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )\"\n"
         devenv_script_buffer += f"PATH=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )/Scripts\":$PATH\n"
         devenv_script_buffer += f"PATH=\"$( cd -- $( dirname -- \"${{BASH_SOURCE[0]}}\" ) &> /dev/null && pwd )/Symlinks\":$PATH\n"
-        devenv_script_buffer += f"PATH=$(echo $PATH | awk -v RS=: -v ORS=: '/^\/mnt\/c/ {{next}} {{print}}')"
+        devenv_script_buffer += f"PATH=$(echo $PATH | awk -v RS=: -v ORS=: '/^\/mnt\/c/ {{next}} {{print}}')\n"
+        devenv_script_buffer += f"source $devenver_root/unix_fzf-completion.bash\n"
+        devenv_script_buffer += f"source $devenver_root/unix_fzf-key-bindings.bash\n"
 
     devenv_script_name = f"{devenv_script_name}.bat" if is_windows else f"{devenv_script_name}.sh"
     devenv_script_path = pathlib.Path(install_dir, devenv_script_name)
