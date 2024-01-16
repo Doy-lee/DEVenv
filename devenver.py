@@ -269,8 +269,11 @@ def download_and_install_archive(download_url,
                 if os.path.exists(next_archive_path) == False:
                     command = ""
                     if archive_path.suffix == '.zst':
-                        command = [str(zstd_exe), "--output-dir-flat", str(exe_install_dir), "-d", str(archive_path)]
-                        lprint(f'- zstd unzip {label} to: {exe_install_dir}', level=1)
+                        command = [str(zstd_exe), "-d", "-f", str(archive_path)]
+                        lprint(f'- zstd unzip {label}', level=1)
+
+                        # zstd extracts to the same directory as the archive
+                        next_archive_path = pathlib.Path(download_dir, archive_without_suffix)
                     else:
                         if not is_windows:
                             linux_used_tar = True
