@@ -685,19 +685,23 @@ def run(user_app_list,
             "add_to_devenv_script": [],
         })
 
-    version           = "2301"
+    version           = ""
     download_url      = ""
     download_checksum = ""
     checksum          = ""
     exe_path          = ""
 
     if is_windows or os.name == "nt":
-        download_url      = f"https://www.7-zip.org/a/7z{version}-x64.exe"
-        download_checksum = "26cb6e9f56333682122fafe79dbcdfd51e9f47cc7217dccd29ac6fc33b5598cd"
-        checksum          = "8cebb25e240db3b6986fcaed6bc0b900fa09dad763a56fb71273529266c5c525"
+        sevenz_version    = "22.01"
+        zs_version        = "1.5.5-R3"
+        version           = f"{sevenz_version}-{zs_version}"
+        download_url      = f"https://github.com/mcmilk/7-Zip-zstd/releases/download/v{sevenz_version}-v{zs_version}/7z{sevenz_version}-zstd-x64.exe"
+        download_checksum = "d542d78397bbed8e77c221f36cad461a0d83f1263b993a7048e81df40f403fb8"
+        checksum          = "9d818c7a524ee2e8f81874c6067289c3eaa250887e25ee898937dfc1486bc066"
         exe_path          = "7z.exe"
 
     else:
+        version           = "2301"
         download_url      = f"https://www.7-zip.org/a/7z{version}-linux-x64.tar.xz"
         download_checksum = "23babcab045b78016e443f862363e4ab63c77d75bc715c0b3463f6134cbcf318"
         checksum          = "c7f8769e2bc8df6bcbfba34571ee0340670a52dec824dbac844dd3b5bd1a69e1"
