@@ -865,6 +865,34 @@ def get_manifest(is_windows):
         ],
     })
 
+    if not is_windows:
+        version           = "12.22.12"
+        download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-linux-x64.tar.xz"
+        download_checksum = "e6d052364bfa2c17da92cf31794100cfd709ba147415ddaeed2222eec9ca1469"
+        checksum          = "5a3c51dbee8fdd7201fe7b531f03262754b9b9fb1008f4c824e8d649c4e9c96b"
+        symlink           = [f"node-{version}"]
+
+        result.append({
+            "label": "NodeJS",
+            "manifests": [
+                {
+                    "download_checksum": download_checksum,
+                    "download_url": download_url,
+                    "version": version,
+                    "unzip_method": 'default',
+                    "executables": [
+                        {
+                            "path": exe_path,
+                            "symlink": symlink,
+                            "add_to_devenv_path": True,
+                            "checksum": checksum,
+                        }
+                    ],
+                    "add_to_devenv_script": add_to_devenv_script,
+                }
+            ],
+        })
+
     # --------------------------------------------------------------------------
 
     label                = "Python"
