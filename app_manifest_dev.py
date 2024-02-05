@@ -799,13 +799,11 @@ def get_manifest(is_windows):
         download_checksum = "e07399a4a441091ca0a5506faf7a9236ea1675220146daeea3bee828c2cbda3f"
         checksum          = "e4e7f389fbec9300275defc749246c62bdbe4f66406eb01e7c9a4101e07352da"
         exe_path          = "node.exe"
-        symlink           = [f"node-{version}.exe"]
     else:
         download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-linux-x64.tar.xz"
         download_checksum = "c88b52497ab38a3ddf526e5b46a41270320409109c3f74171b241132984fd08f"
         checksum          = "45afcfc9a45df626e8aa2b883753d1cf7f222ad9243f3003d1aa372696120df6"
         exe_path          = "bin/node"
-        symlink           = [f"node-{version}"]
 
     result.append({
         "label": "NodeJS",
@@ -833,7 +831,6 @@ def get_manifest(is_windows):
         download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-win-x64.7z"
         download_checksum = "cad3cc0910dc216e8b6dcfc3c5b3be0a619c2d4a4b29f2e674820b70e4f374dd"
         checksum          = "17fd75d8a41bf9b4c475143e19ff2808afa7a92f7502ede731537d9da674d5e8"
-        symlink           = [f"node-{version}.exe"]
         add_to_devenv_script = [
             f"set PATH=%~dp0{label}\\{version}\\node_modules\\corepack\\shims;%PATH%",
         ]
@@ -841,7 +838,6 @@ def get_manifest(is_windows):
         download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-linux-x64.tar.xz"
         download_checksum = "c8c5fa53ce0c0f248e45983e86368e0b1daf84b77e88b310f769c3cfc12682ef"
         checksum          = "a2a40807f57c1c215ddb996e71e4f30b93e375cab2bfb725287b8a1f51fd1e7a"
-        symlink           = [f"node-{version}"]
 
 
     result.append({
@@ -870,7 +866,6 @@ def get_manifest(is_windows):
         download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-linux-x64.tar.xz"
         download_checksum = "e6d052364bfa2c17da92cf31794100cfd709ba147415ddaeed2222eec9ca1469"
         checksum          = "5a3c51dbee8fdd7201fe7b531f03262754b9b9fb1008f4c824e8d649c4e9c96b"
-        symlink           = [f"node-{version}"]
 
         result.append({
             "label": "NodeJS",
