@@ -861,32 +861,36 @@ def get_manifest(is_windows):
         ],
     })
 
-    if not is_windows:
-        version           = "12.22.12"
+    version = "12.22.12"
+    if is_windows:
+        download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-win-x64.7z"
+        download_checksum = "95f969cafbe02eb91e9d375899518b8e517f9f16300d040ac89fdaf4b881ba8d"
+        checksum          = "b014e4ec5ca810b2fb54cdbf6ab8d6acc488285c98469606efb8b412472bec2a"
+    else:
         download_url      = f"https://nodejs.org/dist/v{version}/node-v{version}-linux-x64.tar.xz"
         download_checksum = "e6d052364bfa2c17da92cf31794100cfd709ba147415ddaeed2222eec9ca1469"
         checksum          = "5a3c51dbee8fdd7201fe7b531f03262754b9b9fb1008f4c824e8d649c4e9c96b"
 
-        result.append({
-            "label": "NodeJS",
-            "manifests": [
-                {
-                    "download_checksum": download_checksum,
-                    "download_url": download_url,
-                    "version": version,
-                    "unzip_method": 'default',
-                    "executables": [
-                        {
-                            "path": exe_path,
-                            "symlink": symlink,
-                            "add_to_devenv_path": True,
-                            "checksum": checksum,
-                        }
-                    ],
-                    "add_to_devenv_script": add_to_devenv_script,
-                }
-            ],
-        })
+    result.append({
+        "label": "NodeJS",
+        "manifests": [
+            {
+                "download_checksum": download_checksum,
+                "download_url": download_url,
+                "version": version,
+                "unzip_method": 'default',
+                "executables": [
+                    {
+                        "path": exe_path,
+                        "symlink": symlink,
+                        "add_to_devenv_path": True,
+                        "checksum": checksum,
+                    }
+                ],
+                "add_to_devenv_script": add_to_devenv_script,
+            }
+        ],
+    })
 
     # --------------------------------------------------------------------------
 
