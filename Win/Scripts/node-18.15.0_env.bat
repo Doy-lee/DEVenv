@@ -1,6 +1,7 @@
 @echo off
 setlocal
-  set path=%devenver_root%\NodeJS\18.15.0;%path%
-  echo [DEVENVER] Executing script "%~dpnx0" with "%exe_to_use%"
+  set path_to_add=%devenver_root%\NodeJS\18.15.0
+  set path=%path_to_add%;%path%
+  echo [DEVENVER] "%~dpnx0" is adding to path "%path_to_add%"
   call %*
 endlocal

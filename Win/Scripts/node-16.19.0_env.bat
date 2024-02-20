@@ -1,4 +1,7 @@
 @echo off
 setlocal
-  call %devenver_root%\raddbg\trunk\raddbg.exe --user %devenver_root%\raddbg\doylet.raddbg_user
+  set path_to_add=%devenver_root%\NodeJS\16.19.0
+  set path=%path_to_add%;%path%
+  echo [DEVENVER] "%~dpnx0" is adding to path "%path_to_add%"
+  call %*
 endlocal
