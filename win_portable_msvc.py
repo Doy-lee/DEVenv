@@ -9,6 +9,14 @@
 # folders, skip the downloading of MSVC or the SDK if we only need one of them).
 #
 # Changelog
+# 2024-02-21
+# - Add more environment variables that Windows may use, `WindowsSDKVersion`
+#   `WindowsSDKDir`, `VSCMD_ARG_TGT_ARCH`
+# - Cache the downloads into the `msvc/Installers` directory to allow reusing
+#   or resuming an installation that has failed or been terminated prematurely.
+# - Fix output scripts using MSVC/SDK version arguments which could be empty
+#   if defaulted.
+#
 # 2023-04-15
 # - Fix "msvc-{version}.bat" script generating trailing "\;" on
 #   VCToolsInstallDir environment variable. clang-cl relies on this variable to
@@ -77,7 +85,7 @@ def download_progress(url, check, name, f):
   data = data.getvalue()
   digest = hashlib.sha256(data).hexdigest()
   if check.lower() != digest:
-    exit(f"Hash mismatch for f{pkg}")
+    exit(f"Hash mismatch for {pkg}")
   return data
 
 # super crappy msi format parser just to find required .cab files
@@ -147,8 +155,10 @@ install_msvc = not args.no_msvc
 if args.no_sdk and args.no_msvc:
     exit()
 
-msvc_ver = args.msvc_version or max(sorted(msvc.keys()))
-sdk_ver = args.sdk_version or max(sorted(sdk.keys()))
+msvc_ver_key = args.msvc_version or max(sorted(msvc.keys()))
+sdk_ver_key  = args.sdk_version or max(sorted(sdk.keys()))
+msvc_ver     = msvc_ver_key
+sdk_ver      = sdk_ver_key
 
 info_line = "Downloading"
 if install_msvc:
@@ -156,14 +166,14 @@ if install_msvc:
       msvc_pid = msvc[msvc_ver]
       msvc_ver = ".".join(msvc_pid.split(".")[4:-2])
     else:
-      exit(f"Unknown MSVC version: f{args.msvc_version}")
+      exit(f"Unknown MSVC version: {args.msvc_version}")
     info_line += f" MSVC v{msvc_ver}"
 
 if install_sdk:
     if sdk_ver in sdk:
       sdk_pid = sdk[sdk_ver]
     else:
-      exit(f"Unknown Windows SDK version: f{args.sdk_version}")
+      exit(f"Unknown Windows SDK version: {args.sdk_version}")
     info_line += f" Windows SDK v{sdk_ver}"
 
 print(info_line)
@@ -182,6 +192,12 @@ if not args.accept_license:
 
 OUTPUT.mkdir(exist_ok=True)
 total_download = 0
+
+OUTPUT_CACHE_DIR = OUTPUT / "Installers"
+OUTPUT_CACHE_DIR.mkdir(exist_ok=True)
+
+OUTPUT_CACHE_MSVC_DIR    = OUTPUT_CACHE_DIR / f"msvc-{msvc_ver}-{HOST}-{TARGET}"
+OUTPUT_CACHE_WIN_SDK_DIR = OUTPUT_CACHE_DIR / f"win-sdk-{sdk_ver}-{HOST}-{TARGET}"
 
 ### download MSVC
 
@@ -204,18 +220,24 @@ if install_msvc:
       #f"microsoft.vc.{msvc_ver}.crt.redist.x64.base",
     ]
 
+    OUTPUT_CACHE_MSVC_DIR.mkdir(exist_ok=True)
+
     for pkg in msvc_packages:
       p = first(packages[pkg], lambda p: p.get("language") in (None, "en-US"))
       for payload in p["payloads"]:
-        with tempfile.TemporaryFile() as f:
-          data = download_progress(payload["url"], payload["sha256"], pkg, f)
-          total_download += len(data)
-          with zipfile.ZipFile(f) as z:
-            for name in z.namelist():
-              if name.startswith("Contents/"):
-                out = OUTPUT / Path(name).relative_to("Contents")
-                out.parent.mkdir(parents=True, exist_ok=True)
-                out.write_bytes(z.read(name))
+        pkg_path = OUTPUT_CACHE_MSVC_DIR / pkg
+        if not os.path.exists(pkg_path):
+          with tempfile.NamedTemporaryFile(delete=False) as f:
+            data = download_progress(payload["url"], payload["sha256"], pkg, f)
+            total_download += len(data)
+          shutil.move(f.name, pkg_path)
+
+        with zipfile.ZipFile(pkg_path) as z:
+          for name in z.namelist():
+            if name.startswith("Contents/"):
+              out = OUTPUT / Path(name).relative_to("Contents")
+              out.parent.mkdir(parents=True, exist_ok=True)
+              out.write_bytes(z.read(name))
 
 
 ### download Windows SDK
@@ -236,35 +258,41 @@ if install_sdk:
       #"Universal CRT Redistributable-x86_en-us.msi",
     ]
 
-    with tempfile.TemporaryDirectory() as d:
-      dst = Path(d)
+    sdk_pkg       = packages[sdk_pid][0]
+    sdk_pkg       = packages[first(sdk_pkg["dependencies"], lambda x: True).lower()][0]
+    OUTPUT_CACHE_WIN_SDK_DIR.mkdir(exist_ok=True)
 
-      sdk_pkg = packages[sdk_pid][0]
-      sdk_pkg = packages[first(sdk_pkg["dependencies"], lambda x: True).lower()][0]
+    msi = []
+    cabs = []
 
-      msi = []
-      cabs = []
-
-      # download msi files
-      for pkg in sdk_packages:
-        payload = first(sdk_pkg["payloads"], lambda p: p["fileName"] == f"Installers\\{pkg}")
-        msi.append(dst / pkg)
-        with open(dst / pkg, "wb") as f:
+    # download msi files
+    for pkg in sdk_packages:
+      payload = first(sdk_pkg["payloads"], lambda p: p["fileName"] == f"Installers\\{pkg}")
+      msi_path = OUTPUT_CACHE_WIN_SDK_DIR / pkg
+      msi.append(msi_path)
+      if not os.path.exists(msi_path):
+        with tempfile.NamedTemporaryFile(delete=False) as f:
           data = download_progress(payload["url"], payload["sha256"], pkg, f)
           total_download += len(data)
-          cabs += list(get_msi_cabs(data))
+        shutil.move(f.name, msi_path)
 
-      # download .cab files
-      for pkg in cabs:
-        payload = first(sdk_pkg["payloads"], lambda p: p["fileName"] == f"Installers\\{pkg}")
-        with open(dst / pkg, "wb") as f:
+      with open(msi_path, "rb") as f:
+        cabs += list(get_msi_cabs(f.read()))
+
+    # download .cab files
+    for pkg in cabs:
+      payload = first(sdk_pkg["payloads"], lambda p: p["fileName"] == f"Installers\\{pkg}")
+      cab_path = OUTPUT_CACHE_WIN_SDK_DIR / pkg
+      if not os.path.exists(cab_path):
+        with tempfile.NamedTemporaryFile(delete=False) as f:
           download_progress(payload["url"], payload["sha256"], pkg, f)
+        shutil.move(f.name, cab_path)
 
-      print("Unpacking msi files...")
+    print("Unpacking msi files...")
 
-      # run msi installers
-      for m in msi:
-        subprocess.check_call(["msiexec.exe", "/a", m, "/quiet", "/qn", f"TARGETDIR={OUTPUT.resolve()}"])
+    # run msi installers
+    for m in msi:
+      subprocess.check_call(["msiexec.exe", "/a", m, "/quiet", "/qn", f"TARGETDIR={OUTPUT.resolve()}"])
 
 
 ### versions
@@ -273,10 +301,10 @@ msvcv = ""
 sdkv  = ""
 
 if install_msvc:
-    msvcv = list((OUTPUT / "VC/Tools/MSVC").glob("*"))[0].name
+    msvcv = list((OUTPUT / "VC/Tools/MSVC").glob(f"{msvc_ver_key}*"))[0].name
 
 if install_sdk:
-    sdkv = list((OUTPUT / "Windows Kits/10/bin").glob("*"))[0].name
+    sdkv = list((OUTPUT / "Windows Kits/10/bin").glob(f"*{sdk_ver_key}*"))[0].name
 
 # place debug CRT runtime into MSVC folder (not what real Visual Studio installer does... but is reasonable)
 
@@ -286,13 +314,14 @@ if install_msvc:
     pkg = "microsoft.visualcpp.runtimedebug.14"
     dbg = packages[pkg][0]
     payload = first(dbg["payloads"], lambda p: p["fileName"] == "cab1.cab")
-    try:
-      with tempfile.TemporaryFile(suffix=".cab", delete=False) as f:
+
+    pkg_path = OUTPUT_CACHE_MSVC_DIR / f"{pkg}.cab"
+    if not os.path.exists(pkg_path):
+      with tempfile.NamedTemporaryFile(delete=False) as f:
         data = download_progress(payload["url"], payload["sha256"], pkg, f)
         total_download += len(data)
-      subprocess.check_call(["expand.exe", f.name, "-F:*", dst], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    finally:
-      os.unlink(f.name)
+      shutil.move(f.name, pkg_path)
+    subprocess.check_call(["expand.exe", pkg_path, "-F:*", dst], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 # place the folders under the Redist folder in the SDK under a versioned folder to allow other versions to be installed
 
@@ -305,7 +334,8 @@ if install_sdk:
 
     for file_name in os.listdir(redist_dir):
         if not file_name.startswith('10.0.'): # Simple heuristic
-            shutil.move((redist_dir / file_name), redist_versioned_dir)
+          shutil.rmtree(redist_versioned_dir, ignore_errors=True)
+          shutil.move((redist_dir / file_name), redist_versioned_dir)
 
 ### cleanup
 
@@ -336,14 +366,19 @@ if install_msvc and install_sdk:
 set MSVC_VERSION={msvcv}
 set MSVC_HOST=Host{HOST}
 set MSVC_ARCH={TARGET}
+set MSVC_ROOT=%~dp0VC\\Tools\\MSVC\\%MSVC_VERSION%
+
 set SDK_VERSION={sdkv}
 set SDK_ARCH={TARGET}
-
-set MSVC_ROOT=%~dp0VC\\Tools\\MSVC\\%MSVC_VERSION%
 set SDK_INCLUDE=%~dp0Windows Kits\\10\\Include\\%SDK_VERSION%
 set SDK_LIBS=%~dp0Windows Kits\\10\\Lib\\%SDK_VERSION%
 
-set VCToolsInstallDir=%MSVC_ROOT%\\
+set WindowsSDKVersion=%SDK_VERSION%
+set WindowsSDKDir=%~dp0Windows Kits\\10
+
+set VCToolsInstallDir=%MSVC_ROOT%
+set VSCMD_ARG_TGT_ARCH=%MSVC_ARCH%
+
 set PATH=%MSVC_ROOT%\\bin\\%MSVC_HOST%\\%MSVC_ARCH%;%~dp0Windows Kits\\10\\bin\\%SDK_VERSION%\\%SDK_ARCH%;%~dp0Windows Kits\\10\\bin\\%SDK_VERSION%\\%SDK_ARCH%\\ucrt;%PATH%
 set INCLUDE=%MSVC_ROOT%\\include;%SDK_INCLUDE%\\ucrt;%SDK_INCLUDE%\\shared;%SDK_INCLUDE%\\um;%SDK_INCLUDE%\\winrt;%SDK_INCLUDE%\\cppwinrt
 set LIB=%MSVC_ROOT%\\lib\\%MSVC_ARCH%;%SDK_LIBS%\\ucrt\\%SDK_ARCH%;%SDK_LIBS%\\um\\%SDK_ARCH%
@@ -359,12 +394,14 @@ set MSVC_ARCH={TARGET}
 set MSVC_ROOT=%~dp0VC\\Tools\\MSVC\\%MSVC_VERSION%
 
 set VCToolsInstallDir=%MSVC_ROOT%
+set VSCMD_ARG_TGT_ARCH=%MSVC_ARCH%
+
 set PATH=%MSVC_ROOT%\\bin\\%MSVC_HOST%\\%MSVC_ARCH%;%PATH%
 set INCLUDE=%MSVC_ROOT%\\include;%INCLUDE%
 set LIB=%MSVC_ROOT%\\lib\\%MSVC_ARCH%;%LIB%
 """
     (OUTPUT / f"msvc-{msvcv}.bat").write_text(MSVC_SCRIPT)
-    (OUTPUT / f"msvc-{args.msvc_version}.bat").write_text(MSVC_SCRIPT)
+    (OUTPUT / f"msvc-{msvc_ver_key}.bat").write_text(MSVC_SCRIPT)
 
 if install_sdk:
     WIN10_SDK_SCRIPT = f"""@echo off
@@ -374,12 +411,15 @@ set SDK_ARCH={TARGET}
 set SDK_INCLUDE=%~dp0Windows Kits\\10\\Include\\%SDK_VERSION%
 set SDK_LIBS=%~dp0Windows Kits\\10\\Lib\\%SDK_VERSION%
 
+set WindowsSDKVersion=%SDK_VERSION%
+set WindowsSDKDir=%~dp0Windows Kits\\10
+
 set PATH=%~dp0Windows Kits\\10\\bin\\%SDK_VERSION%\\%SDK_ARCH%;%~dp0Windows Kits\\10\\bin\\%SDK_VERSION%\\%SDK_ARCH%\\ucrt;%PATH%
 set INCLUDE=%SDK_INCLUDE%\\ucrt;%SDK_INCLUDE%\\shared;%SDK_INCLUDE%\\um;%SDK_INCLUDE%\\winrt;%SDK_INCLUDE%\\cppwinrt;%INCLUDE%
 set LIB=%SDK_LIBS%\\ucrt\\%SDK_ARCH%;%SDK_LIBS%\\um\\%SDK_ARCH%;%LIB%
 """
     (OUTPUT / f"win-sdk-{sdkv}.bat").write_text(WIN10_SDK_SCRIPT)
-    (OUTPUT / f"win-sdk-{args.sdk_version}.bat").write_text(WIN10_SDK_SCRIPT)
+    (OUTPUT / f"win-sdk-{sdk_ver_key}.bat").write_text(WIN10_SDK_SCRIPT)
 
 print(f"Total downloaded: {total_download>>20} MB")
 print("Done!")
