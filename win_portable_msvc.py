@@ -328,13 +328,11 @@ if install_msvc:
 if install_sdk:
     redist_dir           = OUTPUT / "Windows Kits/10/Redist"
     redist_versioned_dir = redist_dir / f'{sdkv}'
-
-    if not os.path.exists(redist_versioned_dir):
-        os.makedirs(redist_versioned_dir)
+    shutil.rmtree(redist_versioned_dir, ignore_errors=True)
+    redist_versioned_dir.mkdir(exist_ok=True)
 
     for file_name in os.listdir(redist_dir):
         if not file_name.startswith('10.0.'): # Simple heuristic
-          shutil.rmtree(redist_versioned_dir, ignore_errors=True)
           shutil.move((redist_dir / file_name), redist_versioned_dir)
 
 ### cleanup
