@@ -4,11 +4,29 @@
 # https://gist.github.com/mmozeiko/7f3162ec2988e81e56d5c4e22cde9977
 #
 # Further modifications by https://github.com/doy-lee with the primary purpose
-# of facilitating multiple versions to be stored in the same root directory
+# of facilitating multiple versions to be stored in the same root directory.
 # ('Redist' in the SDK was unversioned, store it versioned like all other
 # folders, skip the downloading of MSVC or the SDK if we only need one of them).
+# We have some other useful features ..
+#
+# - Cache the downloads to ./msvc/Installers instead of a temporary directory
+#   meaning downloads that are interrupted can be resumed/reused.
+# - Allow downloading of _just_ the SDK or _just_ the VC toolchain.
+# - Create scripts for each individual component,
+#
+#     msvc-{version}.bat
+#     win-sdk-{version}.bat
+#
+# - Allow multiple versions to co-exist in the same installation root
 #
 # Changelog
+# 2024-03-14
+# - Fold in mmozeiko's latest changes from revision 2024-03-14
+#   a6303b82561a4061c71e8838976143f06f295cc9a8a60cf53fc170cb5b9f3f1d
+#   - SSL checks
+#   - Removal of vctip.exe (telemetry)
+#   - DIA SDK DLL
+#
 # 2024-02-21
 # - Add more environment variables that Windows may use, `WindowsSDKVersion`
 #   `WindowsSDKDir`, `VSCMD_ARG_TGT_ARCH`
@@ -52,6 +70,7 @@ import tempfile
 import argparse
 import subprocess
 import urllib.request
+import urllib.error
 from pathlib import Path
 
 OUTPUT = Path("msvc") # output folder
@@ -62,14 +81,15 @@ TARGET = "x64" # or x86, arm, arm64
 
 MANIFEST_URL = "https://aka.ms/vs/17/release/channel"
 
+ssl_context = None
 
 def download(url):
-  with urllib.request.urlopen(url) as res:
+  with urllib.request.urlopen(url, context=ssl_context) as res:
     return res.read()
 
 def download_progress(url, check, name, f):
   data = io.BytesIO()
-  with urllib.request.urlopen(url) as res:
+  with urllib.request.urlopen(url, context=ssl_context) as res:
     total = int(res.headers["Content-Length"])
     size = 0
     while True:
@@ -85,7 +105,7 @@ def download_progress(url, check, name, f):
   data = data.getvalue()
   digest = hashlib.sha256(data).hexdigest()
   if check.lower() != digest:
-    exit(f"Hash mismatch for {pkg}")
+    exit(f"Hash mismatch for f{pkg}")
   return data
 
 # super crappy msi format parser just to find required .cab files
@@ -114,7 +134,24 @@ args = ap.parse_args()
 
 ### get main manifest
 
-manifest = json.loads(download(MANIFEST_URL))
+try:
+  manifest = json.loads(download(MANIFEST_URL))
+except urllib.error.URLError as err:
+  import ssl
+  if isinstance(err.args[0], ssl.SSLCertVerificationError):
+    # for more info about Python & issues with Windows certificates see https://stackoverflow.com/a/52074591
+    print("ERROR: ssl certificate verification error")
+    try:
+      import certifi
+    except ModuleNotFoundError:
+      print("ERROR: please install 'certifi' package to use Mozilla certificates")
+      print("ERROR: or update your Windows certs, see instructions here: https://woshub.com/updating-trusted-root-certificates-in-windows-10/#h2_3")
+      exit()
+    print("NOTE: retrying with certifi certificates")
+    ssl_context = ssl.create_default_context(cafile=certifi.where())
+    manifest = json.loads(download(MANIFEST_URL))
+  else:
+    raise
 
 
 ### download VS manifest
@@ -306,22 +343,54 @@ if install_msvc:
 if install_sdk:
     sdkv = list((OUTPUT / "Windows Kits/10/bin").glob(f"*{sdk_ver_key}*"))[0].name
 
-# place debug CRT runtime into MSVC folder (not what real Visual Studio installer does... but is reasonable)
 
 if install_msvc:
-    dst = str(OUTPUT / "VC/Tools/MSVC" / msvcv / f"bin/Host{HOST}/{TARGET}")
+    # place debug CRT runtime into MSVC folder (not what real Visual Studio installer does... but is reasonable)
+    dst = OUTPUT / "VC/Tools/MSVC" / msvcv / f"bin/Host{HOST}/{TARGET}"
 
     pkg = "microsoft.visualcpp.runtimedebug.14"
-    dbg = packages[pkg][0]
-    payload = first(dbg["payloads"], lambda p: p["fileName"] == "cab1.cab")
+    dbg = first(packages[pkg], lambda p: p["chip"] == HOST)
+    for payload in dbg["payloads"]:
+      name = payload["fileName"]
+      pkg_dir  = OUTPUT_CACHE_MSVC_DIR /pkg
+      pkg_dir.mkdir(exist_ok=True)
+      pkg_path = pkg_dir / name
+      if not os.path.exists(pkg_path):
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+          data = download_progress(payload["url"], payload["sha256"], f"{pkg}/{name}", f)
+          total_download += len(data)
+        shutil.move(f.name, pkg_path)
+    msi = OUTPUT_CACHE_MSVC_DIR / pkg / first(dbg["payloads"], lambda p: p["fileName"].endswith(".msi"))["fileName"]
 
-    pkg_path = OUTPUT_CACHE_MSVC_DIR / f"{pkg}.cab"
-    if not os.path.exists(pkg_path):
-      with tempfile.NamedTemporaryFile(delete=False) as f:
-        data = download_progress(payload["url"], payload["sha256"], pkg, f)
-        total_download += len(data)
-      shutil.move(f.name, pkg_path)
-    subprocess.check_call(["expand.exe", pkg_path, "-F:*", dst], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    with tempfile.TemporaryDirectory() as d2:
+      subprocess.check_call(["msiexec.exe", "/a", str(msi), "/quiet", "/qn", f"TARGETDIR={d2}"])
+      for f in first(Path(d2).glob("System*"), lambda x: True).iterdir():
+        f.replace(dst / f.name)
+
+    # download DIA SDK and put msdia140.dll file into MSVC folder
+    pkg = "microsoft.visualc.140.dia.sdk.msi"
+    dia = packages[pkg][0]
+    for payload in dia["payloads"]:
+      name    = payload["fileName"]
+      pkg_dir = OUTPUT_CACHE_MSVC_DIR /pkg
+      pkg_dir.mkdir(exist_ok=True)
+      pkg_path = OUTPUT_CACHE_MSVC_DIR / pkg / name
+      if not os.path.exists(pkg_path):
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+          data = download_progress(payload["url"], payload["sha256"], f"{pkg}/{name}", f)
+          total_download += len(data)
+        shutil.move(f.name, pkg_path)
+    msi = OUTPUT_CACHE_MSVC_DIR / pkg / first(dia["payloads"], lambda p: p["fileName"].endswith(".msi"))["fileName"]
+
+    with tempfile.TemporaryDirectory() as d2:
+      subprocess.check_call(["msiexec.exe", "/a", str(msi), "/quiet", "/qn", f"TARGETDIR={d2}"])
+
+      if HOST == "x86": msdia = "msdia140.dll"
+      elif HOST == "x64": msdia = "amd64/msdia140.dll"
+      else: exit("unknown")
+
+      src = Path(d2) / "Program Files" / "Microsoft Visual Studio 14.0" / "DIA SDK" / "bin" / msdia
+      src.replace(dst / "msdia140.dll")
 
 # place the folders under the Redist folder in the SDK under a versioned folder to allow other versions to be installed
 
@@ -338,22 +407,20 @@ if install_sdk:
 ### cleanup
 
 shutil.rmtree(OUTPUT / "Common7", ignore_errors=True)
-if install_msvc:
-    for f in ["Auxiliary", f"lib/{TARGET}/store", f"lib/{TARGET}/uwp"]:
-      shutil.rmtree(OUTPUT / "VC/Tools/MSVC" / msvcv / f)
+for f in ["Auxiliary", f"lib/{TARGET}/store", f"lib/{TARGET}/uwp"]:
+  shutil.rmtree(OUTPUT / "VC/Tools/MSVC" / msvcv / f, ignore_errors=True)
 for f in OUTPUT.glob("*.msi"):
   f.unlink()
-if install_sdk:
-    for f in ["Catalogs", "DesignTime", f"bin/{sdkv}/chpe", f"Lib/{sdkv}/ucrt_enclave"]:
-      shutil.rmtree(OUTPUT / "Windows Kits/10" / f, ignore_errors=True)
+for f in ["Catalogs", "DesignTime", f"bin/{sdkv}/chpe", f"Lib/{sdkv}/ucrt_enclave"]:
+  shutil.rmtree(OUTPUT / "Windows Kits/10" / f, ignore_errors=True)
 for arch in ["x86", "x64", "arm", "arm64"]:
   if arch != TARGET:
-    if install_msvc:
-        shutil.rmtree(OUTPUT / "VC/Tools/MSVC" / msvcv / f"bin/Host{arch}", ignore_errors=True)
-    if install_sdk:
-        shutil.rmtree(OUTPUT / "Windows Kits/10/bin" / sdkv / arch)
-        shutil.rmtree(OUTPUT / "Windows Kits/10/Lib" / sdkv / "ucrt" / arch)
-        shutil.rmtree(OUTPUT / "Windows Kits/10/Lib" / sdkv / "um" / arch)
+    shutil.rmtree(OUTPUT / "Windows Kits/10/Lib" / sdkv / "ucrt" / arch, ignore_errors=True)
+    shutil.rmtree(OUTPUT / "Windows Kits/10/Lib" / sdkv / "um" / arch, ignore_errors=True)
+  if arch != HOST:
+    shutil.rmtree(OUTPUT / "Windows Kits/10/bin" / sdkv / arch, ignore_errors=True)
+# executable that is collecting & sending telemetry every time cl/link runs
+(OUTPUT / "VC/Tools/MSVC" / msvcv / f"bin/Host{HOST}/{TARGET}/vctip.exe").unlink(missing_ok=True)
 
 
 ### setup.bat
