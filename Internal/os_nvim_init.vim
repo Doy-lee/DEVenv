@@ -22,60 +22,71 @@ call plug#begin(stdpath('config') . '/plugged')
     " odin for syntax highlighting
     Plug 'https://github.com/Tetralux/odin.vim'
     Plug 'https://github.com/sainnhe/gruvbox-material'
-
-    " Lua cache to speed up load times
-    Plug 'https://github.com/lewis6991/impatient.nvim'
     Plug 'https://github.com/ggandor/leap.nvim'
 
     " lsp-zero begin
         " LSP Support
-        Plug 'neovim/nvim-lspconfig'
         Plug 'williamboman/mason.nvim'
         Plug 'williamboman/mason-lspconfig.nvim'
-
-        " Autocompletion
+        Plug 'neovim/nvim-lspconfig'
         Plug 'hrsh7th/nvim-cmp'
+        Plug 'hrsh7th/cmp-nvim-lsp'
+        Plug 'L3MON4D3/LuaSnip'
         Plug 'hrsh7th/cmp-buffer'
         Plug 'hrsh7th/cmp-path'
-        Plug 'saadparwaiz1/cmp_luasnip'
-        Plug 'hrsh7th/cmp-nvim-lsp'
-        Plug 'hrsh7th/cmp-nvim-lua'
-
-        "  Snippets
-        Plug 'L3MON4D3/LuaSnip'
-
-        " Snippet collection (Optional)
-        Plug 'rafamadriz/friendly-snippets'
-        Plug 'VonHeikemen/lsp-zero.nvim'
+        Plug 'VonHeikemen/lsp-zero.nvim', {'branch': 'v3.x'}
     " lsp-zero end
 call plug#end()
 
 " Lua Setup ========================================================================================
 lua <<EOF
-  require('impatient')
   local leap = require('leap')
   vim.keymap.set({'n', 'x', 'o'}, '<tab>', '<Plug>(leap-forward-to)')
   vim.keymap.set({'n', 'x', 'o'}, '<S-tab>', '<Plug>(leap-backward-to)')
 
   -- LSP Setup =====================================================================================
-  local lsp           = require('lsp-zero')
   local devenver_root = vim.fn.getenv('devenver_root')
-  lsp.preset('recommended')
-  lsp.configure('clangd', {
-    cmd = {
-      "clangd",
-      "-j",
-      "1",
-      "--background-index",
-      "--background-index-priority=background",
-      "--pch-storage=memory",
-      "--clang-tidy",
-      "--header-insertion=iwyu",
-      "--header-insertion-decorators",
-    }
+  local lsp_zero = require('lsp-zero')
+  lsp_zero.on_attach(function(client, bufnr)
+    -- see :help lsp-zero-keybindings
+    -- to learn the available actions
+    lsp_zero.default_keymaps({buffer = bufnr})
+    local opts = {buffer = bufnr}
+
+    vim.keymap.set({'n', 'x'}, 'gq', function()
+      vim.lsp.buf.format({async = false, timeout_ms = 10000})
+    end, opts)
+  end)
+
+  -- to learn how to use mason.nvim with lsp-zero
+  -- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guide/integrate-with-mason-nvim.md
+  require('mason').setup({})
+  require('mason-lspconfig').setup({
+    ensure_installed = { "clangd" },
+    handlers = {
+      lsp_zero.default_setup,
+    },
   })
 
-  lsp.setup()
+  local cmp = require('cmp')
+  local cmp_action = require('lsp-zero').cmp_action()
+  local cmp_format = require('lsp-zero').cmp_format({details = true})
+
+  cmp.setup({
+    sources = {
+      {name = 'nvim_lsp'},
+      {name = 'buffer'},
+      {name = 'path'},
+
+    },
+    mapping = cmp.mapping.preset.insert({
+      ['<Tab>'] = cmp_action.luasnip_supertab(),
+      ['<S-Tab>'] = cmp_action.luasnip_shift_supertab(),
+      ['<CR>'] = cmp.mapping.confirm({select = false}),
+    }),
+    --- (Optional) Show source name in completion menu
+    formatting = cmp_format,
+  })
 
   -- Treesitter ====================================================================================
   -- TODO: 2022-06-19 Treesitter is too slow on large C++ files
@@ -112,7 +123,7 @@ lua <<EOF
   vim.opt.hlsearch=false        -- Highlight just the first match on search
   vim.opt.ignorecase=true       -- Search is not case sensitive
   vim.opt.linebreak=true        -- On wrapped lines, break on the wrapping word intelligently
-  vim.opt.list=true             -- Show the 'listchar' characters on trailing spaces, tabs e.t.c
+  vim.opt.list=true             -- Show the 'listchar' characters on trailing spaces, tabs e.t.c ===
   vim.opt.listchars:append('tab:>-,trail:■,extends:»,precedes:«')
   vim.opt.number=true           -- Show line numbers
   vim.opt.relativenumber=true   -- Show relative line numbers
@@ -131,17 +142,10 @@ lua <<EOF
     signs = false,
   })
 
-  -- Adjust the quick fix window that pops-up on build to size the buffer with
-  -- the size of the output and at most 10 lines.
-  function AdjustQuickfixHeight()
-    local num_lines = vim.fn.line('$')
-    local max_height = 10
-    local height = math.min(num_lines, max_height)
-    vim.cmd(height .. 'wincmd _')
-  end
-  vim.cmd[[
-    autocmd BufWinEnter quickfix lua AdjustQuickfixHeight()
-  ]]
+  -- Automatically scroll to bottom of quickfix window when opened
+  vim.cmd([[
+    autocmd FileType qf lua vim.cmd('normal! G')
+  ]])
 EOF
 
 " Theme ============================================================================================
@@ -268,22 +272,6 @@ nnoremap <leader>t  :FzfWorkspaceSymbols<space>
 nnoremap <leader>cc <cmd>FzfCommits<cr>
 nnoremap <leader>cb <cmd>FzfBCommits<cr>
 nnoremap <leader>b  <cmd>FzfBuffers<cr>
-
-function! PadAndTruncateLineFunction()
-    let line = getline('.')
-    let line_length = strlen(line)
-    let padding = 100 - line_length
-    let padding = max([padding, 0])
-
-    let existing_space = line_length == 100 || match(line, ' $') != -1
-
-    " Construct the new line with padding and a space before the padding
-    let new_line = line . (existing_space ? '' : ' ') . repeat('=', padding - 1)
-
-    call setline(line('.'), new_line)
-endfunction
-command! PadAndTruncateLine :call PadAndTruncateLineFunction()<CR>
-nnoremap <silent> <F3> :PadAndTruncateLine<cr>
 
 " Map Ctrl+HJKL to navigate buffer window
 nmap <silent> <C-h> :wincmd h<CR>
