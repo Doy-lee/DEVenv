@@ -13,11 +13,12 @@ call plug#begin(stdpath('config') . '/plugged')
 
     " FZF
     Plug 'junegunn/fzf'
-    Plug 'junegunn/fzf.vim'
+    Plug 'ibhagwan/fzf-lua', {'branch': 'main'}
+    Plug 'nvim-tree/nvim-web-devicons'
 
-    " FZF for LSP
-    Plug 'gfanto/fzf-lsp.nvim'
+    " Harpoon
     Plug 'nvim-lua/plenary.nvim'
+    Plug 'ThePrimeagen/harpoon', {'branch': 'harpoon2'}
 
     " odin for syntax highlighting
     Plug 'https://github.com/Tetralux/odin.vim'
@@ -43,6 +44,25 @@ lua <<EOF
   local leap = require('leap')
   vim.keymap.set({'n', 'x', 'o'}, '<tab>', '<Plug>(leap-forward-to)')
   vim.keymap.set({'n', 'x', 'o'}, '<S-tab>', '<Plug>(leap-backward-to)')
+
+  require('fzf-lua').setup{
+    winopts = {
+       height=0.95,
+       width=0.95
+    }
+  }
+
+  -- Harpoon =======================================================================================
+  local harpoon = require('harpoon')
+  harpoon:setup()
+  vim.keymap.set("n", "<M-0>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+  vim.keymap.set("n", "<M-=>", function() harpoon:list():append() end)
+  vim.keymap.set("n", "<M-1>", function() harpoon:list():select(1) end)
+  vim.keymap.set("n", "<M-2>", function() harpoon:list():select(2) end)
+  vim.keymap.set("n", "<M-3>", function() harpoon:list():select(3) end)
+  vim.keymap.set("n", "<M-4>", function() harpoon:list():select(4) end)
+  vim.keymap.set("n", "<M-h>", function() harpoon:list():prev() end)
+  vim.keymap.set("n", "<M-l>", function() harpoon:list():next() end)
 
   -- LSP Setup =====================================================================================
   local devenver_root = vim.fn.getenv('devenver_root')
@@ -247,31 +267,15 @@ nnoremap <silent> <S-F5>  <cmd>RemedyBGStopDebugging<cr><cr>
 nnoremap <silent> <F9>    <cmd>RemedyBGAddBreakpointAtFile<cr><cr>
 nnoremap <silent> <C-F10> <cmd>RemedyBGRunToCursor<cr><cr>
 
-" FZF ==============================================================================================
-" Empty value to disable preview window altogether
-let g:fzf_preview_window = []
-
-" Prefix all commands with Fzf for discoverability
-let g:fzf_command_prefix = 'Fzf'
-
-" - down / up / left / right
-let g:fzf_layout = { 'down': '40%' }
-
-command! -nargs=* -bang FzfCustomRG call RipgrepFzf(<q-args>, <bang>0)
-
-" Augment the "FzfCustomFiles" command
-command! -bang -nargs=? -complete=dir FzfCustomFiles
-    \ call fzf#vim#files(<q-args>, {'options': ['--layout=reverse', '--info=inline', '--preview', 'cat {}']}, <bang>0)
-
 " General Key Bindings =============================================================================
 " FZF Bindings
-nnoremap <leader>h  <cmd>FzfHistory<cr>
-nnoremap <leader>f  <cmd>FzfCustomFiles<cr>
-nnoremap <leader>g  <cmd>FzfRg<cr>
-nnoremap <leader>t  :FzfWorkspaceSymbols<space>
-nnoremap <leader>cc <cmd>FzfCommits<cr>
-nnoremap <leader>cb <cmd>FzfBCommits<cr>
-nnoremap <leader>b  <cmd>FzfBuffers<cr>
+nnoremap <leader>h  <cmd>FzfLua oldfiles<cr>
+nnoremap <leader>f  <cmd>FzfLua files<cr>
+nnoremap <leader>r  <cmd>FzfLua live_grep<cr>
+nnoremap <leader>R  <cmd>FzfLua grep_cword<cr>
+nnoremap <leader>t  <cmd>FzfLua lsp_live_workspace_symbols<cr>
+nnoremap <leader>T  <cmd>FzfLua lsp_finder<cr>
+nnoremap <leader>b  <cmd>FzfLua buffers<cr>
 
 " Map Ctrl+HJKL to navigate buffer window
 nmap <silent> <C-h> :wincmd h<CR>
