@@ -6,6 +6,7 @@ call plug#begin(stdpath('config') . '/plugged')
     Plug 'https://github.com/tpope/vim-dispatch'
     Plug 'https://github.com/tpope/vim-fugitive'
     Plug 'https://github.com/tpope/vim-abolish'
+    Plug 'https://github.com/LunarVim/bigfile.nvim'
 
     " TODO: 2022-06-19 Treesitter is too slow on large C++ files
     " Plug 'https://github.com/nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -44,7 +45,7 @@ lua <<EOF
   local leap = require('leap')
   vim.keymap.set({'n', 'x', 'o'}, '<tab>', '<Plug>(leap-forward-to)')
   vim.keymap.set({'n', 'x', 'o'}, '<S-tab>', '<Plug>(leap-backward-to)')
-
+  require('bigfile').setup()
   require('fzf-lua').setup{
     winopts = {
        height=0.95,
