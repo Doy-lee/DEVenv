@@ -53,18 +53,6 @@ lua <<EOF
     }
   }
 
-  -- Harpoon =======================================================================================
-  local harpoon = require('harpoon')
-  harpoon:setup()
-  vim.keymap.set("n", "<M-0>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
-  vim.keymap.set("n", "<M-=>", function() harpoon:list():append() end)
-  vim.keymap.set("n", "<M-1>", function() harpoon:list():select(1) end)
-  vim.keymap.set("n", "<M-2>", function() harpoon:list():select(2) end)
-  vim.keymap.set("n", "<M-3>", function() harpoon:list():select(3) end)
-  vim.keymap.set("n", "<M-4>", function() harpoon:list():select(4) end)
-  vim.keymap.set("n", "<M-h>", function() harpoon:list():prev() end)
-  vim.keymap.set("n", "<M-l>", function() harpoon:list():next() end)
-
   -- LSP Setup =====================================================================================
   local devenver_root = vim.fn.getenv('devenver_root')
   local lsp_zero = require('lsp-zero')
@@ -74,7 +62,7 @@ lua <<EOF
     lsp_zero.default_keymaps({buffer = bufnr})
     local opts = {buffer = bufnr}
 
-    vim.keymap.set({'n', 'x'}, 'gq', function()
+    vim.keymap.set({'v', 'x'}, 'gq', function()
       vim.lsp.buf.format({async = false, timeout_ms = 10000})
     end, opts)
   end)
@@ -108,6 +96,18 @@ lua <<EOF
     --- (Optional) Show source name in completion menu
     formatting = cmp_format,
   })
+
+  -- Harpoon =======================================================================================
+  local harpoon = require('harpoon')
+  harpoon:setup()
+  vim.keymap.set("n", "<M-0>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+  vim.keymap.set("n", "<M-->", function() harpoon:list():append() end)
+  vim.keymap.set("n", "<M-1>", function() harpoon:list():select(1) end)
+  vim.keymap.set("n", "<M-2>", function() harpoon:list():select(2) end)
+  vim.keymap.set("n", "<M-3>", function() harpoon:list():select(3) end)
+  vim.keymap.set("n", "<M-4>", function() harpoon:list():select(4) end)
+  vim.keymap.set("n", "<M-h>", function() harpoon:list():prev() end)
+  vim.keymap.set("n", "<M-l>", function() harpoon:list():next() end)
 
   -- Treesitter ====================================================================================
   -- TODO: 2022-06-19 Treesitter is too slow on large C++ files
