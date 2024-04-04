@@ -45,6 +45,7 @@ lua <<EOF
   local leap = require('leap')
   vim.keymap.set({'n', 'x', 'o'}, '<tab>', '<Plug>(leap-forward-to)')
   vim.keymap.set({'n', 'x', 'o'}, '<S-tab>', '<Plug>(leap-backward-to)')
+
   require('bigfile').setup()
   require('fzf-lua').setup{
     winopts = {
@@ -54,12 +55,14 @@ lua <<EOF
   }
 
   -- LSP Setup =====================================================================================
-  local devenver_root = vim.fn.getenv('devenver_root')
   local lsp_zero = require('lsp-zero')
   lsp_zero.on_attach(function(client, bufnr)
     -- see :help lsp-zero-keybindings
     -- to learn the available actions
-    lsp_zero.default_keymaps({buffer = bufnr})
+    lsp_zero.default_keymaps({
+        buffer = bufnr,
+        exclude = {'<F3>'}, -- Disable code-format of current buffer
+    })
     local opts = {buffer = bufnr}
 
     vim.keymap.set({'v', 'x'}, 'gq', function()
@@ -93,6 +96,11 @@ lua <<EOF
       ['<S-Tab>'] = cmp_action.luasnip_shift_supertab(),
       ['<CR>'] = cmp.mapping.confirm({select = false}),
     }),
+    snippet = {
+      expand = function(args)
+        require('luasnip').lsp_expand(args.body)
+      end,
+    },
     --- (Optional) Show source name in completion menu
     formatting = cmp_format,
   })
@@ -100,14 +108,14 @@ lua <<EOF
   -- Harpoon =======================================================================================
   local harpoon = require('harpoon')
   harpoon:setup()
-  vim.keymap.set("n", "<M-0>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
-  vim.keymap.set("n", "<M-->", function() harpoon:list():append() end)
-  vim.keymap.set("n", "<M-1>", function() harpoon:list():select(1) end)
-  vim.keymap.set("n", "<M-2>", function() harpoon:list():select(2) end)
-  vim.keymap.set("n", "<M-3>", function() harpoon:list():select(3) end)
-  vim.keymap.set("n", "<M-4>", function() harpoon:list():select(4) end)
-  vim.keymap.set("n", "<M-h>", function() harpoon:list():prev() end)
-  vim.keymap.set("n", "<M-l>", function() harpoon:list():next() end)
+  vim.keymap.set("n", "<M-0>",     function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+  vim.keymap.set("n", "<M-a>",     function() harpoon:list():prepend() end)
+  vim.keymap.set("n", "<M-1>",     function() harpoon:list():select(1) end)
+  vim.keymap.set("n", "<M-2>",     function() harpoon:list():select(2) end)
+  vim.keymap.set("n", "<M-3>",     function() harpoon:list():select(3) end)
+  vim.keymap.set("n", "<M-4>",     function() harpoon:list():select(4) end)
+  vim.keymap.set("n", "<M-h>",     function() harpoon:list():prev() end)
+  vim.keymap.set("n", "<M-l>",     function() harpoon:list():next() end)
 
   -- Treesitter ====================================================================================
   -- TODO: 2022-06-19 Treesitter is too slow on large C++ files
@@ -277,6 +285,7 @@ nnoremap <leader>R  <cmd>FzfLua grep_cword<cr>
 nnoremap <leader>t  <cmd>FzfLua lsp_live_workspace_symbols<cr>
 nnoremap <leader>T  <cmd>FzfLua lsp_finder<cr>
 nnoremap <leader>b  <cmd>FzfLua buffers<cr>
+nnoremap <leader><leader> <cmd>FzfLua<cr>
 
 " Map Ctrl+HJKL to navigate buffer window
 nmap <silent> <C-h> :wincmd h<CR>
