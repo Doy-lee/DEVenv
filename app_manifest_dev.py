@@ -79,6 +79,36 @@ def get_manifest(is_windows):
     checksum          = ""
     symlink           = []
 
+    version = "3.29.1"
+    if is_windows:
+        exe_path          = f"bin/cmake.exe"
+        download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-windows-x86_64.zip"
+        download_checksum = "c8cf6ed50551d00ad8cd1f3b232810cd0a8b43b4a1d4f1393f0a575d423884dc"
+        checksum          = "cc6050622336a786b336e22171f72ea178fc215b33d17d89b62a3cf6e98ea165"
+        symlink           = [f"cmake-{version}.exe"]
+    else:
+        exe_path          = f"bin/cmake"
+        download_url      = f"https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-linux-x86_64.tar.gz"
+        download_checksum = "751bbe7ccabb78179335a75b88999b1c52afcd4d8a4cd03217d367d8bb2c5100"
+        checksum          = "aaa"
+        symlink           = [f"cmake-{version}"]
+
+    result[-1]['manifests'].append({
+        "download_checksum": download_checksum,
+        "download_url": download_url,
+        "version": version,
+        "executables": [
+            {
+                "path": exe_path,
+                "symlink": symlink,
+                "add_to_devenv_path": True,
+                "checksum": checksum,
+            }
+        ],
+        "add_to_devenv_script": [],
+    })
+
+
     version = "3.26.4"
     if is_windows:
         exe_path          = f"bin/cmake.exe"

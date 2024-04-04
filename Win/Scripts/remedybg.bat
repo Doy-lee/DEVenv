@@ -2,7 +2,6 @@
 setlocal
   set desired_path=%devenver_root%\RemedyBG\0_3_9_6
   set desired_exe=remedybg.exe
-
   set path=%desired_path%;%path%
   set exe_to_use=""
   for /f "delims=" %%a in ('where "$desired_path:%desired_exe%"') do ( set "exe_to_use=%%a")
